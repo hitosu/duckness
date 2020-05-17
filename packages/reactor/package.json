@@ -20,7 +20,8 @@
   },
   "scripts": {
     "test": "echo \"Error: run tests from root\" && exit 1",
-    "build": "babel src -d lib"
+    "build": "babel src -d lib",
+    "lint": "eslint '{src,__tests__}/**/*.{js,jsx}'"
   },
   "bugs": {
     "url": "https://github.com/hitosu/duckness/issues"

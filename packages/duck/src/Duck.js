@@ -1,16 +1,20 @@
 export default function Duck(duckName, poolName, duckContext) {
+  // DUCK FACE is interface to duck received by selectors and reducers
   const duckFace = {
     /*
     actionTypes
     select
-    act
+    action
     reduce
+    duckName
+    poolName
+    duckContext
     */
   }
 
+  // Duck is root reducer
   const reducers = {}
   const customReducers = []
-
   const duck = function duckRootReducer(state, action) {
     var actionReducers = reducers[action.type]
     var reducedState =
@@ -35,31 +39,28 @@ export default function Duck(duckName, poolName, duckContext) {
       : reducedState
   }
 
-  function addReducer(actionType, reducer) {
-    if ('function' === typeof reducer) {
-      if ('string' === typeof actionType) {
-        const fullActionType = duck.mapActionType(actionType)
-        if (!reducers[fullActionType]) {
-          reducers[fullActionType] = []
-        }
-        reducers[fullActionType].push(reducer)
-      } else if ('function' === typeof actionType) {
-        customReducers.push([actionType, reducer])
-      } else if (null == actionType) {
-        customReducers.push([() => true, reducer])
-      }
-    }
-  }
-  Object.defineProperty(duck, 'reducer', { value: addReducer, writable: false, enumerable: true })
+  // Duck attributes
+  Object.defineProperty(duck, 'duckFace', { value: duckFace, writable: false, enumerable: true })
+  Object.defineProperty(duck, 'duckName', { value: duckName, writable: false, enumerable: true })
+  Object.defineProperty(duck, 'poolName', { value: poolName, writable: false, enumerable: true })
+  Object.defineProperty(duck, 'duckContext', { value: duckContext, writable: false, enumerable: true })
 
+  // duckFace attributes
+  Object.defineProperty(duckFace, 'reduce', { value: duck, writable: false, enumerable: true })
+  Object.defineProperty(duckFace, 'duckName', { value: duckName, writable: false, enumerable: true })
+  Object.defineProperty(duckFace, 'poolName', { value: poolName, writable: false, enumerable: true })
+  Object.defineProperty(duckFace, 'duckContext', { value: duckContext, writable: false, enumerable: true })
+
+  // add functionality
   addActionTypes(duck, duckFace, duckName, poolName, duckContext)
   addActionConstructors(duck, duckFace, duckName, poolName, duckContext)
   addSelectors(duck, duckFace, duckName, poolName, duckContext)
+  addReducers(duck, duckFace, duckName, poolName, duckContext, reducers, customReducers)
 
   return duck
 }
 
-// -----------------------------------------------------------------------------
+// ---- ACTION TYPES -------------------------------------------------------------------------
 
 function addActionTypes(duck, duckFace, duckName, poolName /*, duckContext*/) {
   const actionTypes = {}
@@ -84,10 +85,9 @@ function addActionTypes(duck, duckFace, duckName, poolName /*, duckContext*/) {
   Object.defineProperty(duckFace, 'actionTypes', { value: actionTypes, writable: false, enumerable: true })
 }
 
-// -----------------------------------------------------------------------------
+// ---- ACTION CONSTRUCTORS -------------------------------------------------------------------------
 
 function addActionConstructors(duck, duckFace, _duckName, _poolName, duckContext) {
-  // const act = {}
   function actionConstructor(actionName, actionType, payloadBuilder, actionTransformer) {
     const fullActionType = duck.mapActionType(actionType)
     function constructAction(payload) {
@@ -123,10 +123,11 @@ function addActionConstructors(duck, duckFace, _duckName, _poolName, duckContext
   }
 
   Object.defineProperty(duck, 'action', { value: actionConstructor, writable: false, enumerable: true })
-  // Object.defineProperty(duck, 'act', { value: act, writable: false, enumerable: true })
+
+  Object.defineProperty(duckFace, 'action', { value: actionConstructor, writable: false, enumerable: true })
 }
 
-// -----------------------------------------------------------------------------
+// ---- SELECTORS -------------------------------------------------------------------------
 
 function addSelectors(duck, duckFace, _duckName, _poolName, duckContext) {
   const selectors = {}
@@ -151,4 +152,25 @@ function addSelectors(duck, duckFace, _duckName, _poolName, duckContext) {
   Object.defineProperty(duck, 'select', { value: selectors, writable: false, enumerable: true })
 
   Object.defineProperty(duckFace, 'select', { value: selectors, writable: false, enumerable: true })
+}
+
+// ---- REDUCERS -------------------------------------------------------------------------
+
+function addReducers(duck, _duckFace, _duckName, _poolName, _duckContext, reducers, customReducers) {
+  function addReducer(actionType, reducer) {
+    if ('function' === typeof reducer) {
+      if ('string' === typeof actionType) {
+        const fullActionType = duck.mapActionType(actionType)
+        if (!reducers[fullActionType]) {
+          reducers[fullActionType] = []
+        }
+        reducers[fullActionType].push(reducer)
+      } else if ('function' === typeof actionType) {
+        customReducers.push([actionType, reducer])
+      } else if (null == actionType) {
+        customReducers.push([() => true, reducer])
+      }
+    }
+  }
+  Object.defineProperty(duck, 'reducer', { value: addReducer, writable: false, enumerable: true })
 }
