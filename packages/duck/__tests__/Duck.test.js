@@ -180,17 +180,17 @@ describe('@duckness/duck', () => {
 
   // -----------------------------------------------------
 
-  describe('should inject duckFace and duckContext', () => {
+  describe('should inject duckFace', () => {
     const duckContext = { longFishLength: 4 }
     const duck = spawnDuck(duckContext)
     duck.selector('fish', state => state.fish)
-    duck.selector('longFish', (state, duckFace, duckContext) =>
-      duckFace.select.fish(state).filter(fish => fish.length > duckContext.longFishLength)
+    duck.selector('longFish', (state, duckFace) =>
+      duckFace.select.fish(state).filter(fish => fish.length > duckFace.duckContext.longFishLength)
     )
-    duck.reducer('EAT_SMALL_FISH', (state, _action, duckFace, duckContext) => {
+    duck.reducer('EAT_SMALL_FISH', (state, _action, duckFace) => {
       return {
         ...state,
-        fish: state.fish.filter(fish => fish.length <= duckContext.longFishLength),
+        fish: state.fish.filter(fish => fish.length <= duckFace.duckContext.longFishLength),
         fishEaten: duckFace.select.longFish(state)
       }
     })
@@ -230,10 +230,10 @@ describe('@duckness/duck', () => {
     it('to another duck', () => {
       duck.selector('fish', state => state.fish)
       duck.action('eatFish', 'EAT')
-      duck.reducer('EAT', (state, _action, duckFace, duckContext) => {
+      duck.reducer('EAT', (state, _action, duckFace) => {
         return {
           ...state,
-          ...duckContext,
+          ...(duckFace.duckContext || {}),
           fish: [],
           fishEaten: duckFace.select.fish(state).length
         }
@@ -254,6 +254,40 @@ describe('@duckness/duck', () => {
         fishEaten: 1,
         duck: 'cloned',
         actions: 1
+      })
+    })
+  })
+
+  // -----------------------------------------------------
+
+  describe('context', () => {
+    const duck = spawnDuck({ mealSize: 1 })
+    duck.selector('fichEaten', state => state.fichEaten)
+    duck.action('eatFish', 'EAT')
+    duck.reducer('EAT', (state, _action, duckFace) => {
+      return {
+        ...state,
+        fishEaten: state.fishEaten + duckFace.duckContext.mealSize
+      }
+    })
+    test('should be able to update', () => {
+      expect(duck.duckContext).toEqual({ mealSize: 1 })
+      expect(duck.duckFace.duckContext).toEqual({ mealSize: 1 })
+      let state = { fishEaten: 0 }
+      expect((state = duck(state, duck.action.eatFish()))).toEqual({
+        fishEaten: 1
+      })
+      expect((state = duck(state, duck.action.eatFish()))).toEqual({
+        fishEaten: 2
+      })
+      duck.updateContext({ mealSize: 3 })
+      expect(duck.duckContext).toEqual({ mealSize: 3 })
+      expect(duck.duckFace.duckContext).toEqual({ mealSize: 3 })
+      expect((state = duck(state, duck.action.eatFish()))).toEqual({
+        fishEaten: 5
+      })
+      expect((state = duck(state, duck.action.eatFish()))).toEqual({
+        fishEaten: 8
       })
     })
   })
