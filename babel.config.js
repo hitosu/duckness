@@ -15,8 +15,8 @@ module.exports = api => {
       [
         'minify',
         {
-          removeConsole: true,
-          removeDebugger: true
+          // removeConsole: true,
+          // removeDebugger: true
         }
       ]
     ].filter(Boolean),

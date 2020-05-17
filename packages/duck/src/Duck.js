@@ -13,23 +13,23 @@ export default function Duck(duckName, poolName, duckContext) {
   }
 
   // Duck is root reducer
-  const reducers = {}
+  const typedReducers = {}
   const customReducers = []
   const duck = function duckRootReducer(state, action) {
-    var actionReducers = reducers[action.type]
+    var actionReducers = typedReducers[action.type]
     var reducedState =
       null == actionReducers || 0 === actionReducers.length
         ? state
         : 1 === actionReducers.length
-        ? actionReducers[0](state, action, duckFace, duckContext)
-        : actionReducers.reduce((state, reducer) => {
+        ? actionReducers.reducers[0](state, action, duckFace, duckContext)
+        : actionReducers.reducers.reduce((state, reducer) => {
             const reducedState = reducer(state, action, duckFace, duckContext)
             return null == reducedState ? state : reducedState
           }, state)
 
     return customReducers.length
       ? customReducers.reduce((state, customReducer) => {
-          if (customReducer[0](action, duckContext)) {
+          if (null == customReducer[0] || customReducer[0](action, duckContext)) {
             const reducedState = customReducer[1](state, action, duckFace, duckContext)
             return null == reducedState ? state : reducedState
           } else {
@@ -52,17 +52,18 @@ export default function Duck(duckName, poolName, duckContext) {
   Object.defineProperty(duckFace, 'duckContext', { value: duckContext, writable: false, enumerable: true })
 
   // add functionality
-  addActionTypes(duck, duckFace, duckName, poolName, duckContext)
-  addActionConstructors(duck, duckFace, duckName, poolName, duckContext)
-  addSelectors(duck, duckFace, duckName, poolName, duckContext)
-  addReducers(duck, duckFace, duckName, poolName, duckContext, reducers, customReducers)
+  addActionTypes(duck, duckFace, duckName, poolName)
+  addActionConstructors(duck, duckFace, duckContext)
+  addSelectors(duck, duckFace, duckContext)
+  addReducers(duck, typedReducers, customReducers)
+  addCloning(duck, typedReducers, customReducers)
 
   return duck
 }
 
 // ---- ACTION TYPES -------------------------------------------------------------------------
 
-function addActionTypes(duck, duckFace, duckName, poolName /*, duckContext*/) {
+function addActionTypes(duck, duckFace, duckName, poolName) {
   const actionTypes = {}
   function mapActionType(actionType) {
     return (
@@ -87,7 +88,7 @@ function addActionTypes(duck, duckFace, duckName, poolName /*, duckContext*/) {
 
 // ---- ACTION CONSTRUCTORS -------------------------------------------------------------------------
 
-function addActionConstructors(duck, duckFace, _duckName, _poolName, duckContext) {
+function addActionConstructors(duck, duckFace, duckContext) {
   function actionConstructor(actionName, actionType, payloadBuilder, actionTransformer) {
     const fullActionType = duck.mapActionType(actionType)
     function constructAction(payload) {
@@ -129,7 +130,7 @@ function addActionConstructors(duck, duckFace, _duckName, _poolName, duckContext
 
 // ---- SELECTORS -------------------------------------------------------------------------
 
-function addSelectors(duck, duckFace, _duckName, _poolName, duckContext) {
+function addSelectors(duck, duckFace, duckContext) {
   const selectors = {}
   function addSelector(selectorName, selector) {
     if (selectorName && 'function' === typeof selector) {
@@ -138,6 +139,11 @@ function addSelectors(duck, duckFace, _duckName, _poolName, duckContext) {
       }
       Object.defineProperty(selectorWithContext, 'selectorName', {
         value: selectorName,
+        writable: false,
+        enumerable: true
+      })
+      Object.defineProperty(selectorWithContext, 'originalSelector', {
+        value: selector,
         writable: false,
         enumerable: true
       })
@@ -156,21 +162,68 @@ function addSelectors(duck, duckFace, _duckName, _poolName, duckContext) {
 
 // ---- REDUCERS -------------------------------------------------------------------------
 
-function addReducers(duck, _duckFace, _duckName, _poolName, _duckContext, reducers, customReducers) {
+function addReducers(duck, typedReducers, customReducers) {
   function addReducer(actionType, reducer) {
     if ('function' === typeof reducer) {
       if ('string' === typeof actionType) {
         const fullActionType = duck.mapActionType(actionType)
-        if (!reducers[fullActionType]) {
-          reducers[fullActionType] = []
+        if (!typedReducers[fullActionType]) {
+          typedReducers[fullActionType] = {
+            actionType,
+            reducers: []
+          }
         }
-        reducers[fullActionType].push(reducer)
+        typedReducers[fullActionType].reducers.push(reducer)
       } else if ('function' === typeof actionType) {
         customReducers.push([actionType, reducer])
       } else if (null == actionType) {
-        customReducers.push([() => true, reducer])
+        customReducers.push([null, reducer])
       }
     }
   }
   Object.defineProperty(duck, 'reducer', { value: addReducer, writable: false, enumerable: true })
+}
+
+// ---- CLONING --------------------------------------------------------------------------
+
+function addCloning(duck, typedReducers, customReducers) {
+  function cloneDuck(duckName, poolName, duckContext) {
+    const clonedDuck = Duck(duckName, poolName, duckContext)
+    // clone action types
+    duck.listActionTypes().forEach(function (actionType) {
+      clonedDuck.mapActionType(actionType)
+    })
+
+    // clone action constructors
+    Object.keys(duck.action).forEach(actionName => {
+      const actionConstructor = duck.action[actionName]
+      if ('function' === typeof actionConstructor && actionConstructor.actionType) {
+        clonedDuck.action(actionName, actionConstructor.actionType)
+      }
+    })
+
+    // clone selectors
+    Object.keys(duck.select).forEach(selectorName => {
+      if (duck.select[selectorName].originalSelector) {
+        clonedDuck.selector(selectorName, duck.select[selectorName].originalSelector)
+      }
+    })
+
+    // clone reducers
+    Object.keys(typedReducers).forEach(reducerActionType => {
+      const actionReducers = typedReducers[reducerActionType]
+      if (actionReducers) {
+        const { actionType, reducers } = actionReducers
+        reducers.forEach(reducer => {
+          clonedDuck.reducer(actionType, reducer)
+        })
+      }
+    })
+    customReducers.forEach(customReducer => {
+      clonedDuck.reducer(customReducer[0], customReducer[1])
+    })
+
+    return clonedDuck
+  }
+  Object.defineProperty(duck, 'clone', { value: cloneDuck, writable: false, enumerable: true })
 }

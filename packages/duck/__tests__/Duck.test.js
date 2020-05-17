@@ -1,7 +1,7 @@
 import Duck from '../src/Duck'
 
-function spawnDuck() {
-  const duck = Duck('Donald', 'Lake')
+function spawnDuck(duckContext) {
+  const duck = Duck('Donald', 'Lake', duckContext)
   duck.mapActionType('QUACK')
   duck.mapActionType('SWIM')
   duck.mapActionType('EAT')
@@ -174,6 +174,86 @@ describe('@duckness/duck', () => {
       expect((state = duck(state, duck.action.fastFly()))).toEqual({
         swimTimes: 2,
         flyTimes: 2
+      })
+    })
+  })
+
+  // -----------------------------------------------------
+
+  describe('should inject duckFace and duckContext', () => {
+    const duckContext = { longFishLength: 4 }
+    const duck = spawnDuck(duckContext)
+    duck.selector('fish', state => state.fish)
+    duck.selector('longFish', (state, duckFace, duckContext) =>
+      duckFace.select.fish(state).filter(fish => fish.length > duckContext.longFishLength)
+    )
+    duck.reducer('EAT_SMALL_FISH', (state, _action, duckFace, duckContext) => {
+      return {
+        ...state,
+        fish: state.fish.filter(fish => fish.length <= duckContext.longFishLength),
+        fishEaten: duckFace.select.longFish(state)
+      }
+    })
+    duck.action('eatSmallFish', 'EAT_SMALL_FISH')
+
+    it('to selectors', () => {
+      const state = { fish: ['(==<', '{=={=<'] }
+      expect(duck.select.longFish(state)).toEqual(['{=={=<'])
+    })
+
+    it('to reducers', () => {
+      const state = { fish: ['(==<', '{=={=<'] }
+      expect(duck(state, duck.action.eatSmallFish())).toEqual({
+        fish: ['(==<'],
+        fishEaten: ['{=={=<']
+      })
+    })
+
+    it('and show duckFace through duck.duckFace', () => {
+      expect(duck.duckFace).toBeTruthy()
+      expect(duck.duckFace.actionTypes).toBeTruthy()
+      expect(duck.duckFace.select).toBeTruthy()
+      expect(duck.duckFace.action).toBeTruthy()
+      expect(duck.duckFace.reduce).toBeInstanceOf(Function)
+      expect(duck.duckFace.duckName).toBe('Donald')
+      expect(duck.duckFace.poolName).toBe('Lake')
+      expect(duck.duckFace.duckContext).toEqual(duckContext)
+      expect(duck.duckFace.reduce).toBe(duck)
+    })
+  })
+
+  // -----------------------------------------------------
+
+  describe('should clone', () => {
+    const duck = spawnDuck({ duck: 'original' })
+
+    it('to another duck', () => {
+      duck.selector('fish', state => state.fish)
+      duck.action('eatFish', 'EAT')
+      duck.reducer('EAT', (state, _action, duckFace, duckContext) => {
+        return {
+          ...state,
+          ...duckContext,
+          fish: [],
+          fishEaten: duckFace.select.fish(state).length
+        }
+      })
+      duck.reducer(null, state => {
+        return {
+          ...state,
+          actions: (state.actions || 0) + 1
+        }
+      })
+
+      const duckClone = duck.clone('Huey', 'Hill', { duck: 'cloned' })
+      expect(new Set(duckClone.listActionTypes())).toEqual(new Set(duck.listActionTypes()))
+      expect(duckClone.mapActionType('QUACK')).toBe('Hill/Huey/QUACK')
+      expect(duckClone.select.fish({ fish: ['{=<'] })).toEqual(['{=<'])
+      expect(duckClone({ fish: ['{=<'] }, duckClone.action.eatFish())).toEqual({
+        fish: [],
+        fishEaten: 1,
+        duck: 'cloned',
+        actions: 1
       })
     })
   })
