@@ -21,7 +21,7 @@
   },
   "scripts": {
     "test": "echo \"Error: run tests from root\" && exit 1",
-    "build": "babel src -d lib",
+    "build": "babel src --out-dir lib --source-maps",
     "lint": "eslint '{src,__tests__}/**/*.{js,jsx}'"
   },
   "bugs": {

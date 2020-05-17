@@ -1,11 +1,4 @@
 # `@duckness/reactor`
 
-> TODO: description
+> WORK IN PROGRESS
 
-## Usage
-
-```
-const reactor = require('@duckness/reactor');
-
-// TODO: DEMONSTRATE API
-```

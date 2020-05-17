@@ -11,15 +11,17 @@
     "packages/*"
   ],
   "scripts": {
-    "test": "jest",
+    "test": "yarn lint && jest",
     "lint": "lerna exec yarn lint",
-    "build": "lerna exec yarn build",
-    "bootstrap": "lerna bootstrap"
+    "build": "lerna bootstrap && lerna exec yarn build"
   },
   "devDependencies": {
     "@babel/cli": "^7.8.4",
     "@babel/core": "^7.9.6",
     "@babel/preset-env": "^7.9.6",
+    "@babel/preset-react": "^7.9.4",
+    "@storybook/cli": "^5.3.18",
+    "@storybook/react": "^5.3.18",
     "babel-jest": "^26.0.1",
     "babel-preset-minify": "^0.5.1",
     "eslint": "^7.0.0",
