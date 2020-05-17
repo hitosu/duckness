@@ -1,8 +1,13 @@
 {
   "name": "@duckness/saga",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Saga extension for Duckness - Modular Redux Ducks hatchery",
-  "keywords": ["redux", "ducks", "modular", "saga"],
+  "keywords": [
+    "redux",
+    "ducks",
+    "modular",
+    "saga"
+  ],
   "author": "Vasily Kazantsev <vasily@kazantsev.xyz>",
   "homepage": "https://github.com/hitosu/duckness/packages/saga",
   "license": "MIT",
@@ -11,7 +16,9 @@
     "lib": "lib",
     "test": "__tests__"
   },
-  "files": ["lib"],
+  "files": [
+    "lib"
+  ],
   "publishConfig": {
     "registry": "https://registry.yarnpkg.com"
   },
