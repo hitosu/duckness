@@ -1,0 +1,13 @@
+parser: babel
+printWidth: 120
+useTabs: false
+tabWidth: 2
+semi: false
+singleQuote: true
+trailingComma: none
+arrowParens: avoid
+bracketSpacing: true
+overrides:
+- files: "*.json"
+  options:
+    parser: json
