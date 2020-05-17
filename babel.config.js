@@ -8,7 +8,7 @@ module.exports = api => {
         {
           targets: {
             browsers: '> 1%, since 2015, IE 11, not OperaMini all',
-            node: '12'
+            node: 'current'
           }
         }
       ],
