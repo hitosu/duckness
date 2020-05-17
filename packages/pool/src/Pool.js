@@ -29,7 +29,7 @@ export default function Pool({
       redux.rootReducer = buildRootReducer ? buildRootReducer(pool.ducks) : redux.defaultRootReducer
       const composeEnhancers =
         typeof window === 'object' && window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__
-          ? window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__()
+          ? window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__({})
           : compose
       const enhancer = composeEnhancers(applyMiddleware(reduxSaga.sagaMiddleware))
       redux.store = createStore(redux.rootReducer, buildStore ? buildStore(pool.props) || {} : {}, enhancer)

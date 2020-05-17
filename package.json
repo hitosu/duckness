@@ -7,29 +7,43 @@
   "author": "Vasily Kazantsev <vasily@kazantsev.xyz>",
   "license": "MIT",
   "private": true,
-  "workspaces": [
-    "packages/*"
-  ],
+  "workspaces": ["packages/*"],
   "scripts": {
     "test": "yarn lint && jest",
     "lint": "lerna exec yarn lint",
-    "build": "lerna bootstrap && lerna exec yarn build"
+    "build": "lerna bootstrap && lerna exec yarn build",
+    "storybook": "start-storybook -p 6006",
+    "build-storybook": "build-storybook"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "yarn test",
+      "pre-push": "yarn test"
+    }
   },
   "devDependencies": {
     "@babel/cli": "^7.8.4",
     "@babel/core": "^7.9.6",
+    "@babel/plugin-transform-modules-commonjs": "^7.9.6",
     "@babel/preset-env": "^7.9.6",
     "@babel/preset-react": "^7.9.4",
+    "@storybook/addon-actions": "^5.3.18",
+    "@storybook/addon-links": "^5.3.18",
+    "@storybook/addons": "^5.3.18",
     "@storybook/cli": "^5.3.18",
     "@storybook/react": "^5.3.18",
     "babel-jest": "^26.0.1",
+    "babel-loader": "^8.1.0",
     "babel-preset-minify": "^0.5.1",
     "eslint": "^7.0.0",
     "eslint-config-prettier": "^6.11.0",
     "eslint-plugin-jest": "^23.13.1",
     "eslint-plugin-react": "^7.20.0",
+    "husky": "^4.2.5",
     "jest": "^26.0.1",
     "lerna": "^3.21.0",
-    "prettier": "^2.0.5"
-  }
+    "prettier": "^2.0.5",
+    "prop-types": "^15.7.2"
+  },
+  "dependencies": {}
 }

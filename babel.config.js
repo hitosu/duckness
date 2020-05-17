@@ -9,7 +9,8 @@ module.exports = api => {
           targets: {
             browsers: '> 1%, since 2015, IE 11, not OperaMini all',
             node: 'current'
-          }
+          },
+          modules: false
         }
       ],
       ['@babel/preset-react'],
@@ -21,6 +22,7 @@ module.exports = api => {
         }
       ]
     ].filter(Boolean),
+    plugins: ['@babel/plugin-transform-modules-commonjs'].filter(Boolean),
     comments: false,
     ignore: ['node_modules']
   }
