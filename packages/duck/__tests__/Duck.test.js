@@ -262,7 +262,6 @@ describe('@duckness/duck', () => {
 
   describe('context', () => {
     const duck = spawnDuck({ mealSize: 1 })
-    duck.selector('fichEaten', state => state.fichEaten)
     duck.action('eatFish', 'EAT')
     duck.reducer('EAT', (state, _action, duckFace) => {
       return {
@@ -270,7 +269,7 @@ describe('@duckness/duck', () => {
         fishEaten: state.fishEaten + duckFace.duckContext.mealSize
       }
     })
-    test('should be able to update', () => {
+    it('should be able to update', () => {
       expect(duck.duckContext).toEqual({ mealSize: 1 })
       expect(duck.duckFace.duckContext).toEqual({ mealSize: 1 })
       let state = { fishEaten: 0 }
