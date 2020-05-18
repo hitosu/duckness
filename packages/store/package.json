@@ -1,0 +1,39 @@
+{
+  "name": "@duckness/store",
+  "version": "0.2.4",
+  "description": "Simple store for React components",
+  "keywords": [
+    "store",
+    "react",
+    "react-hooks"
+  ],
+  "author": "Vasily Kazantsev <vasily@kazantsev.xyz>",
+  "homepage": "https://github.com/hitosu/duckness/tree/master/packages/store",
+  "license": "MIT",
+  "main": "lib/store.js",
+  "directories": {
+    "lib": "lib",
+    "test": "__tests__"
+  },
+  "files": [
+    "lib"
+  ],
+  "publishConfig": {
+    "registry": "https://registry.yarnpkg.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hitosu/duckness.git"
+  },
+  "scripts": {
+    "test": "echo \"Error: run tests from root\" && exit 1",
+    "build": "babel src --out-dir lib --source-maps",
+    "lint": "eslint '{src,__tests__}/**/*.{js,jsx}'"
+  },
+  "bugs": {
+    "url": "https://github.com/hitosu/duckness/issues"
+  },
+  "dependencies": {
+    "react": "^16.13.1"
+  }
+}
