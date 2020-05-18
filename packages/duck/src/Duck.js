@@ -34,7 +34,10 @@ export default function Duck(duckName, poolName, duckContext) {
 
     return customReducers.length
       ? customReducers.reduce((state, customReducer) => {
-          if (null == customReducer[0] || customReducer[0](action, duckFace)) {
+          if (
+            (null == customReducer[0] && 0 === action.type.indexOf(`${poolName || ''}/${duckName || ''}/`)) ||
+            ('function' === typeof customReducer[0] && customReducer[0](action, duckFace))
+          ) {
             const reducedState = customReducer[1](state, action, duckFace)
             return null == reducedState ? state : reducedState
           } else {
@@ -85,7 +88,7 @@ function addActionTypes(duck, duckFace, duckName, poolName) {
     return (
       actionTypes[actionType] ||
       Object.defineProperty(actionTypes, actionType, {
-        value: (poolName || '') + '/' + (duckName || '') + '/' + actionType,
+        value: `${poolName || ''}/${duckName || ''}/${actionType}`,
         writable: false,
         enumerable: true
       })[actionType]
