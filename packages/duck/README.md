@@ -7,6 +7,7 @@ Duckness helps you to build [ducks - redux modules](https://github.com/erikras/d
 ![dependencies](https://img.shields.io/david/hitosu/duckness?path=packages%2Fduck)
 ![dev dependencies](https://img.shields.io/david/dev/hitosu/duckness?path=packages%2Fduck)
 [![GitHub issues](https://img.shields.io/github/issues/hitosu/duckness)](https://github.com/hitosu/duckness/issues)
+![vulnerabilities](https://img.shields.io/snyk/vulnerabilities/npm/@duckness/duck)
 ![npm bundle size](https://img.shields.io/bundlephobia/minzip/@duckness/duck)
 
 # Example

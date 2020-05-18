@@ -7,6 +7,7 @@ Saga extension for [Duckness - Modular Redux Ducks hatchery](https://github.com/
 ![dependencies](https://img.shields.io/david/hitosu/duckness?path=packages%2Fsaga)
 ![dev dependencies](https://img.shields.io/david/dev/hitosu/duckness?path=packages%2Fsaga)
 [![GitHub issues](https://img.shields.io/github/issues/hitosu/duckness)](https://github.com/hitosu/duckness/issues)
+![vulnerabilities](https://img.shields.io/snyk/vulnerabilities/npm/@duckness/saga)
 ![npm bundle size](https://img.shields.io/bundlephobia/minzip/@duckness/saga)
 
 # Example

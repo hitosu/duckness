@@ -7,6 +7,7 @@ Duckness Pool - boilerplate for React-Redux apps based on [Duckness - Modular Re
 ![dependencies](https://img.shields.io/david/hitosu/duckness?path=packages%2Fpool)
 ![dev dependencies](https://img.shields.io/david/dev/hitosu/duckness?path=packages%2Fpool)
 [![GitHub issues](https://img.shields.io/github/issues/hitosu/duckness)](https://github.com/hitosu/duckness/issues)
+![vulnerabilities](https://img.shields.io/snyk/vulnerabilities/npm/@duckness/pool)
 ![npm bundle size](https://img.shields.io/bundlephobia/minzip/@duckness/pool)
 
 # Example
