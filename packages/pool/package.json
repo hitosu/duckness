@@ -2,25 +2,16 @@
   "name": "@duckness/pool",
   "version": "0.2.2",
   "description": "Duckness Pool - boilerplate for React-Redux apps based on @duckness ducks",
-  "keywords": [
-    "react",
-    "redux",
-    "ducks",
-    "modular",
-    "redux-saga"
-  ],
+  "keywords": ["react", "redux", "ducks", "modular", "redux-saga"],
   "author": "Vasily Kazantsev <vasily@kazantsev.xyz>",
-  "homepage": "https://github.com/hitosu/duckness/packages/pool",
+  "homepage": "https://github.com/hitosu/duckness/tree/master/packages/pool",
   "license": "MIT",
   "main": "lib/Pool.js",
   "directories": {
     "lib": "lib",
     "test": "__tests__"
   },
-  "files": [
-    "lib",
-    "src"
-  ],
+  "files": ["lib", "src"],
   "publishConfig": {
     "registry": "https://registry.npmjs.org",
     "access": "public"
