@@ -8,11 +8,10 @@
   "main": "lib/Reactor.js",
   "directories": {
     "lib": "lib",
+    "src": "src",
     "test": "__tests__"
   },
-  "files": [
-    "lib"
-  ],
+  "files": ["lib"],
   "publishConfig": {
     "registry": "https://registry.npmjs.org",
     "access": "public"
