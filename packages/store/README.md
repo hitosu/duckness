@@ -11,3 +11,7 @@ Simple store for React components. Intended to store data that should not be sto
 ![npm bundle size](https://img.shields.io/bundlephobia/minzip/@duckness/store)
 
 > TODO: write doc
+
+* [@duckness/duck](https://github.com/hitosu/duckness/tree/master/packages/duck) - @duckness/duck - Modular Redux Ducks hatchery
+* [@duckness/saga](https://github.com/hitosu/duckness/tree/master/packages/saga) - Saga extension for @duckness/duck
+* [@duckness/pool](https://github.com/hitosu/duckness/tree/master/packages/pool) - boilerplate for React-Redux apps based on @duckness/duck and @duckness/saga
