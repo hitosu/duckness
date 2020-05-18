@@ -17,7 +17,7 @@ export default function createStore({ initState = {}, actions = {} } = {}) {
     current: initState
   }
 
-  const listeners = new Set() // eslint-disable-line immutablejs/no-native-map-set
+  const listeners = new Set()
 
   function updateStore(updater) {
     const nextStore = updater(refStore.current)

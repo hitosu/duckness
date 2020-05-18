@@ -1,5 +1,7 @@
 // const store = require('..')
 
 describe('@duckness/store', () => {
-  // TODO
+  it('TODO', () => {
+    expect(true).toBeTruthy()
+  })
 })
