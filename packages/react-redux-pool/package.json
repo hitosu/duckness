@@ -1,6 +1,6 @@
 {
   "name": "@duckness/react-redux-pool",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "@duckness/pool + React-Redux",
   "keywords": [
     "duckness",
