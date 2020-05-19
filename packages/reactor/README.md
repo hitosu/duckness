@@ -1,8 +1,30 @@
-# `@duckness/reactor`
+# `@duckness/reactor` <!-- omit in toc -->
+
+Reactive data flow builder
+
+[![NPM](https://img.shields.io/npm/v/@duckness/reactor)](https://www.npmjs.com/package/@duckness/reactor)
+[![License](https://img.shields.io/github/license/hitosu/duckness)](https://github.com/hitosu/duckness/blob/master/LICENSE)
+![dependencies](https://img.shields.io/david/hitosu/duckness?path=packages/reactor)
+![dev dependencies](https://img.shields.io/david/dev/hitosu/duckness?path=packages/reactor)
+[![GitHub issues](https://img.shields.io/github/issues/hitosu/duckness)](https://github.com/hitosu/duckness/issues)
+![vulnerabilities](https://img.shields.io/snyk/vulnerabilities/npm/@duckness/reactor)
+![npm bundle size](https://img.shields.io/bundlephobia/minzip/@duckness/reactor)
 
 > WORK IN PROGRESS
 
-* [@duckness/duck](https://github.com/hitosu/duckness/tree/master/packages/duck) - @duckness/duck - Modular Redux Ducks hatchery
-* [@duckness/saga](https://github.com/hitosu/duckness/tree/master/packages/saga) - Saga extension for @duckness/duck
-* [@duckness/pool](https://github.com/hitosu/duckness/tree/master/packages/pool) - boilerplate for React-Redux apps based on @duckness/duck and @duckness/saga
-* [@duckness/store](https://github.com/hitosu/duckness/tree/master/packages/store) - simple store for React components
+# Example
+
+```js
+```
+
+# Table of Contents <!-- omit in toc -->
+- [Example](#example)
+- [Additional resources](#additional-resources)
+
+# Additional resources
+
+* [@duckness/duck](https://github.com/hitosu/duckness/tree/master/packages/duck) - [Modular Redux Ducks](https://github.com/erikras/ducks-modular-redux) hatchery
+* [@duckness/saga](https://github.com/hitosu/duckness/tree/master/packages/saga) - [Redux Saga](https://redux-saga.js.org/) extension for [@duckness/duck](https://github.com/hitosu/duckness/tree/master/packages/duck)
+* [@duckness/pool](https://github.com/hitosu/duckness/tree/master/packages/pool) - [@duckness/duck](https://github.com/hitosu/duckness/tree/master/packages/duck) + [@duckness/saga](https://github.com/hitosu/duckness/tree/master/packages/saga) + [Redux](https://redux.js.org/)
+* [@duckness/react-redux-pool](https://github.com/hitosu/duckness/tree/master/packages/react-redux-pool) - [@duckness/pool](https://github.com/hitosu/duckness/tree/master/packages/pool) + [React-Redux](https://react-redux.js.org/)
+* [@duckness/store](https://github.com/hitosu/duckness/tree/master/packages/store) - simple store for [React](https://reactjs.org/) components

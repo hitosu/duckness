@@ -1,11 +1,11 @@
-# `@duckness/pool`
+# `@duckness/pool` <!-- omit in toc -->
 
-Duckness Pool - @duckness/ducks + @duckness/saga + Redux
+[@duckness/duck](https://github.com/hitosu/duckness/tree/master/packages/duck) + [@duckness/saga](https://github.com/hitosu/duckness/tree/master/packages/saga) + [Redux](https://redux.js.org/)
 
 [![NPM](https://img.shields.io/npm/v/@duckness/pool)](https://www.npmjs.com/package/@duckness/pool)
 [![License](https://img.shields.io/github/license/hitosu/duckness)](https://github.com/hitosu/duckness/blob/master/LICENSE)
-![dependencies](https://img.shields.io/david/hitosu/duckness?path=packages%2Fpool)
-![dev dependencies](https://img.shields.io/david/dev/hitosu/duckness?path=packages%2Fpool)
+![dependencies](https://img.shields.io/david/hitosu/duckness?path=packages/pool)
+![dev dependencies](https://img.shields.io/david/dev/hitosu/duckness?path=packages/pool)
 [![GitHub issues](https://img.shields.io/github/issues/hitosu/duckness)](https://github.com/hitosu/duckness/issues)
 ![vulnerabilities](https://img.shields.io/snyk/vulnerabilities/npm/@duckness/pool)
 ![npm bundle size](https://img.shields.io/bundlephobia/minzip/@duckness/pool)
@@ -19,24 +19,18 @@ import CounterDuck from './ducks/CounterDuck'
 const CounterPool = Pool({
   buildStore: ({ initialCounter = 0 } = {}) => {
     return { counter: initialCounter }
-  },
-  renderRoot: () => (
-    <Suspense fallback="Loading...">
-      <App />
-    </Suspense>
-  )
+  }
 })
 CounterPool.addDuck(CounterDuck)
 
 CounterPool.build({initialCounter: 0})
-CounterPool.mount(document.getElementById('counterApp'))
+CounterPool.store
+// => [redux store]
 ```
 
-# Table of Contents
+# Table of Contents <!-- omit in toc -->
 
-- [`@duckness/pool`](#ducknesspool)
 - [Example](#example)
-- [Table of Contents](#table-of-contents)
 - [API](#api)
   - [Create Pool](#create-pool)
     - [default `buildStore`](#default-buildstore)
@@ -44,11 +38,7 @@ CounterPool.mount(document.getElementById('counterApp'))
     - [default `buildRootSaga`](#default-buildrootsaga)
   - [`.addDuck(duck)`](#addduckduck)
   - [`.build(props)`](#buildprops)
-  - [`.mount(toElement)`](#mounttoelement)
-  - [`.unmount()`](#unmount)
-  - [`.render(?props)`](#renderprops)
-  - [`.start(props, element)`](#startprops-element)
-  - [`.stop()`](#stop)
+  - [`.store`](#store)
   - [`.errorReporter(reporterFn)`](#errorreporterreporterfn)
 - [Examples](#examples)
 - [Additional resources](#additional-resources)
@@ -63,7 +53,7 @@ const myPool = Pool({
   ?buildStore: props => store, // build initial store state
   ?buildRootReducer: ducks => rootReducer, // build custom root reducer from ducks instead of default root reducer
   ?buildRootSaga: ducks => rootSaga*, // build custom root saga from ducks instead of default root saga
-  renderRoot: props => <AppRoot />, // render pool's root component
+  ?middlewares: Array // additional redux middlewares
 })
 ```
 
@@ -99,50 +89,20 @@ Build pool state from some props. `props` will be passed to `buildStore` functio
 myPool.build({ initialCounter: 0 })
 ```
 
-## `.mount(toElement)`
+## `.store`
 
-Mount pool to DOM element.
+Reference to built redux store
 ```js
-myPool.mount(document.getElementById('my-pool-div'))
+myPool.store.subscribe(/* ... */)
 ```
 
-## `.unmount()`
-
-Unmount pool from mounted DOM element.
-```js
-myPool.unmount()
-```
-
-## `.render(?props)`
-
-Return root component wrapped in Redux `<Provider>`. Useful for testing.
-Render will build pool store with supplied props if store was not built.
-```js
-myPool.build({ /*...*/ })
-myPool.render()
-// => <Provider store={store}>{renderRoot(props)}</Provider>
-```
-
-## `.start(props, element)`
-
-`Build` store with `props` and `mount` pool to `element`.
-```js
-myPool.start({ initialCounter: 0 }, document.getElementById('my-pool-div'))
-```
-
-## `.stop()`
-
-`Unmount` pool and remove Redux store.
-```js
-myPool.stop()
-```
 
 ## `.errorReporter(reporterFn)`
 
-Set exception reporter function. Will also overwrite all added SagaDuck errorReporters.
+Set exception reporter function. Will also overwrite all added [SagaDuck](https://github.com/hitosu/duckness/tree/master/packages/saga) errorReporters.
 ```js
 myPool.errorReporter(error => {
-  window.Raven.captureException(error)
+  window.Sentry.captureException(error)
 })
 ```
 
@@ -152,6 +112,8 @@ https://github.com/hitosu/duckness/tree/master/stories
 
 # Additional resources
 
-* [@duckness/duck](https://github.com/hitosu/duckness/tree/master/packages/duck) - @duckness/duck - Modular Redux Ducks hatchery
-* [@duckness/saga](https://github.com/hitosu/duckness/tree/master/packages/saga) - Saga extension for @duckness/duck
-* [@duckness/store](https://github.com/hitosu/duckness/tree/master/packages/store) - simple store for React components
+* [@duckness/duck](https://github.com/hitosu/duckness/tree/master/packages/duck) - [Modular Redux Ducks](https://github.com/erikras/ducks-modular-redux) hatchery
+* [@duckness/saga](https://github.com/hitosu/duckness/tree/master/packages/saga) - [Redux Saga](https://redux-saga.js.org/) extension for [@duckness/duck](https://github.com/hitosu/duckness/tree/master/packages/duck)
+* [@duckness/react-redux-pool](https://github.com/hitosu/duckness/tree/master/packages/react-redux-pool) - [@duckness/pool](https://github.com/hitosu/duckness/tree/master/packages/pool) + [React-Redux](https://react-redux.js.org/)
+* [@duckness/store](https://github.com/hitosu/duckness/tree/master/packages/store) - simple store for [React](https://reactjs.org/) components
+* [@duckness/reactor](https://github.com/hitosu/duckness/tree/master/packages/reactor) - reactive data flow builder

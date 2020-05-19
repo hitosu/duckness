@@ -1,11 +1,11 @@
-# `@duckness/duck`
+# `@duckness/duck` <!-- omit in toc -->
 
-Duckness helps you to build [ducks - redux modules](https://github.com/erikras/ducks-modular-redux).
+[Modular Redux Ducks](https://github.com/erikras/ducks-modular-redux) hatchery.
 
 [![NPM](https://img.shields.io/npm/v/@duckness/duck)](https://www.npmjs.com/package/@duckness/duck)
 [![License](https://img.shields.io/github/license/hitosu/duckness)](https://github.com/hitosu/duckness/blob/master/LICENSE)
-![dependencies](https://img.shields.io/david/hitosu/duckness?path=packages%2Fduck)
-![dev dependencies](https://img.shields.io/david/dev/hitosu/duckness?path=packages%2Fduck)
+![dependencies](https://img.shields.io/david/hitosu/duckness?path=packages/duck)
+![dev dependencies](https://img.shields.io/david/dev/hitosu/duckness?path=packages/duck)
 [![GitHub issues](https://img.shields.io/github/issues/hitosu/duckness)](https://github.com/hitosu/duckness/issues)
 ![vulnerabilities](https://img.shields.io/snyk/vulnerabilities/npm/@duckness/duck)
 ![npm bundle size](https://img.shields.io/bundlephobia/minzip/@duckness/duck)
@@ -48,11 +48,9 @@ counterDuck.reducer('DECREMENT', (state, _action, duckFace) => {
 export default counterDuck
 ```
 
-# Table of Contents
+# Table of Contents <!-- omit in toc -->
 
-- [`@duckness/duck`](#ducknessduck)
 - [Example](#example)
-- [Table of Contents](#table-of-contents)
 - [API](#api)
   - [Create Duck](#create-duck)
     - [`.duckName`](#duckname)
@@ -336,6 +334,8 @@ extendedDuck.reducer('ANOTHER_ACTION', /* ... */)
 
 # Additional resources
 
-* [@duckness/saga](https://github.com/hitosu/duckness/tree/master/packages/saga) - Saga extension for @duckness/duck
-* [@duckness/pool](https://github.com/hitosu/duckness/tree/master/packages/pool) - boilerplate for React-Redux apps based on @duckness/duck and @duckness/saga
-* [@duckness/store](https://github.com/hitosu/duckness/tree/master/packages/store) - simple store for React components
+* [@duckness/saga](https://github.com/hitosu/duckness/tree/master/packages/saga) - [Redux Saga](https://redux-saga.js.org/) extension for [@duckness/duck](https://github.com/hitosu/duckness/tree/master/packages/duck)
+* [@duckness/pool](https://github.com/hitosu/duckness/tree/master/packages/pool) - [@duckness/duck](https://github.com/hitosu/duckness/tree/master/packages/duck) + [@duckness/saga](https://github.com/hitosu/duckness/tree/master/packages/saga) + [Redux](https://redux.js.org/)
+* [@duckness/react-redux-pool](https://github.com/hitosu/duckness/tree/master/packages/react-redux-pool) - [@duckness/pool](https://github.com/hitosu/duckness/tree/master/packages/pool) + [React-Redux](https://react-redux.js.org/)
+* [@duckness/store](https://github.com/hitosu/duckness/tree/master/packages/store) - simple store for [React](https://reactjs.org/) components
+* [@duckness/reactor](https://github.com/hitosu/duckness/tree/master/packages/reactor) - reactive data flow builder
