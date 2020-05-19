@@ -1,65 +1,43 @@
-import React from 'react'
-import ReactDOM from 'react-dom'
-import { createStore, applyMiddleware, compose } from 'redux'
-import { Provider } from 'react-redux'
+import { createStore, applyMiddleware } from 'redux'
 import createSagaMiddleware from 'redux-saga'
 import { spawn, call, all } from 'redux-saga/effects'
 
 export default function Pool({
+  props: initProps = {},
   ducks: initDucks = [],
   buildStore = _props => {
     return {}
   },
   buildRootReducer,
   buildRootSaga,
-  renderRoot = _props => null
+  middlewares = []
 } = {}) {
-  const pool = {
-    props: {},
-    ducks: initDucks || [],
-    addDuck(duck) {
-      pool.ducks.push(duck)
-    },
-    errorReporter: console.error,
-    setErrorReporter(reporter) {
-      pool.errorReporter = reporter
-    },
-    build(props = pool.props) {
-      pool.props = props || {}
-      redux.rootReducer = buildRootReducer ? buildRootReducer(pool.ducks) : redux.defaultRootReducer
-      const composeEnhancers =
-        typeof window === 'object' && window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__
-          ? window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__({})
-          : compose
-      const enhancer = composeEnhancers(applyMiddleware(reduxSaga.sagaMiddleware))
-      redux.store = createStore(redux.rootReducer, buildStore ? buildStore(pool.props) || {} : {}, enhancer)
-      reduxSaga.rootSaga = buildRootSaga ? buildRootSaga(pool.ducks) : reduxSaga.defaultRootSaga
-      reduxSaga.sagaMiddleware.run(reduxSaga.rootSaga)
-    },
-    render(props = pool.props) {
-      pool.props = props || {}
-      if (null == redux.store) pool.build(pool.props)
-      return <Provider store={redux.store}>{renderRoot(pool.props)}</Provider>
-    },
-    start(props = pool.props, toElement) {
-      pool.build(props)
-      dom.mount(toElement)
-    },
-    stop() {
-      dom.unmount()
-      redux.store = null
+  const refProps = { current: initProps || {} }
+  const refDucks = { current: initDucks || [] }
+  const refErrorReporter = { current: ('undefined' !== typeof console && console.error) || (() => {}) }
+
+  function addDuck(duck) {
+    refDucks.current.push(duck)
+  }
+
+  function setErrorReporter(reporter) {
+    refErrorReporter.current = reporter
+  }
+
+  function reportError(...args) {
+    if ('function' === typeof refErrorReporter.current) {
+      refErrorReporter.current(...args)
     }
   }
 
   const redux = {
     store: null,
     defaultRootReducer(state, action) {
-      return pool.ducks.reduce((state, duck) => {
+      return refDucks.current.reduce((state, duck) => {
         try {
           return duck(state, action)
         } catch (error) {
-          if ('function' === typeof pool.errorReporter)
-            pool.errorReporter('@duckness/pool', duck.duckName, 'reducer', error)
+          reportError(error, '@duckness/pool', 'reducer', duck.poolName, duck.duckName)
           return state
         }
       }, state)
@@ -69,9 +47,9 @@ export default function Pool({
   const reduxSaga = {
     sagaMiddleware: createSagaMiddleware(),
     *defaultRootSaga() {
-      const sagas = pool.ducks.reduce((sagas, duck) => {
+      const sagas = refDucks.current.reduce((sagas, duck) => {
         if (duck.rootSaga) {
-          duck.errorReporter(pool.errorReporter)
+          duck.errorReporter(refErrorReporter.current)
           sagas.push(
             spawn(function* () {
               while (true) {
@@ -79,8 +57,7 @@ export default function Pool({
                   yield call(duck.rootSaga)
                   break
                 } catch (error) {
-                  if ('function' === typeof pool.errorReporter)
-                    pool.errorReporter('@duckness/pool', duck.duckName, 'saga', error)
+                  reportError(error, '@duckness/pool', 'saga', duck.poolName, duck.duckName)
                 }
               }
             })
@@ -92,33 +69,44 @@ export default function Pool({
     }
   }
 
-  const dom = {
-    mountedTo: null,
-    mount(toElement) {
-      if (toElement) {
-        if (null != dom.mountedTo && toElement !== dom.mountedTo) {
-          dom.unmount()
-        }
-        dom.mountedTo = toElement
-        ReactDOM.render(pool.render(), dom.mountedTo)
-      }
-    },
-    unmount() {
-      if (dom.mountedTo) {
-        ReactDOM.unmountComponentAtNode(dom.mountedTo)
-        dom.mountedTo = null
-      }
-    }
+  function build(props = refProps.current) {
+    refProps.current = props || {}
+    redux.rootReducer = buildRootReducer ? buildRootReducer(refDucks.current) : redux.defaultRootReducer
+    const composeEnhancers =
+      typeof window === 'object' && window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__
+        ? window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__({})
+        : x => x
+    const enhancer = composeEnhancers(applyMiddleware(reduxSaga.sagaMiddleware, ...(middlewares || [])))
+    redux.store = createStore(redux.rootReducer, buildStore ? buildStore(refProps.current) || {} : {}, enhancer)
+    reduxSaga.rootSaga = buildRootSaga ? buildRootSaga(refDucks.current) : reduxSaga.defaultRootSaga
+    reduxSaga.sagaMiddleware.run(reduxSaga.rootSaga)
+    return redux.store
   }
 
-  return {
-    addDuck: pool.addDuck,
-    start: pool.start,
-    stop: pool.stop,
-    build: pool.build,
-    render: pool.render,
-    mount: dom.mount,
-    unmount: dom.unmount,
-    errorReporter: pool.setErrorReporter
-  }
+  const pool = {}
+
+  Object.defineProperty(pool, 'addDuck', { value: addDuck, writable: false, enumerable: true })
+  Object.defineProperty(pool, 'build', { value: build, writable: false, enumerable: true })
+  Object.defineProperty(pool, 'reportError', { value: reportError, writable: false, enumerable: true })
+  Object.defineProperty(pool, 'store', {
+    get() {
+      return redux.store
+    },
+    enumerable: true
+  })
+  Object.defineProperty(pool, 'setErrorReporter', { value: setErrorReporter, writable: false, enumerable: true })
+  Object.defineProperty(pool, 'ducks', {
+    get() {
+      return [...(refDucks.current || [])]
+    },
+    enumerable: true
+  })
+  Object.defineProperty(pool, 'props', {
+    get() {
+      return { ...(refProps.current || {}) }
+    },
+    enumerable: true
+  })
+
+  return pool
 }

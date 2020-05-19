@@ -1,5 +1,6 @@
 import React, { Suspense } from 'react'
 import Pool from '@duckness/pool'
+import ReactReduxPool from '@duckness/react-redux-pool'
 
 import TodoDuck from './ducks/TodoDuck'
 import VisibilityFilterDuck from './ducks/VisibilityFilterDuck'
@@ -14,12 +15,14 @@ function RootComponent() {
   )
 }
 
-const TodoListPool = Pool({
-  buildStore: () => {
-    return { todos: [] }
-  },
-  renderRoot: RootComponent
-})
+const TodoListPool = ReactReduxPool(
+  Pool({
+    buildStore: () => {
+      return { todos: [] }
+    }
+  }),
+  RootComponent
+)
 TodoListPool.addDuck(TodoDuck)
 TodoListPool.addDuck(VisibilityFilterDuck)
 

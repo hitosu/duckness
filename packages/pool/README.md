@@ -1,6 +1,6 @@
 # `@duckness/pool`
 
-Duckness Pool - boilerplate for React-Redux apps based on [Duckness - Modular Redux Ducks hatchery](https://github.com/hitosu/duckness/tree/master/packages/duck)
+Duckness Pool - @duckness/ducks + @duckness/saga + Redux
 
 [![NPM](https://img.shields.io/npm/v/@duckness/pool)](https://www.npmjs.com/package/@duckness/pool)
 [![License](https://img.shields.io/github/license/hitosu/duckness)](https://github.com/hitosu/duckness/blob/master/LICENSE)

@@ -12,6 +12,12 @@ export default function SagaDuck(duckName, appName, duckContext) {
     refErrorReporter.current = reporter
   }
 
+  function reportError(...args) {
+    if ('function' === typeof refErrorReporter.current) {
+      refErrorReporter.current(...args)
+    }
+  }
+
   const sagas = []
   function addSaga(saga) {
     sagas.push(
@@ -21,7 +27,7 @@ export default function SagaDuck(duckName, appName, duckContext) {
             yield call(saga, duck.duckFace)
             break
           } catch (error) {
-            if ('function' === typeof refErrorReporter.current) refErrorReporter.current(error)
+            reportError(error, '@duckness/saga', duck.poolName, duck.duckName)
           }
         }
       })
@@ -35,6 +41,7 @@ export default function SagaDuck(duckName, appName, duckContext) {
   Object.defineProperty(duck, 'saga', { value: addSaga, writable: false, enumerable: true })
   Object.defineProperty(duck, 'rootSaga', { value: rootSaga, writable: false, enumerable: true })
   Object.defineProperty(duck, 'errorReporter', { value: setErrorReporter, writable: false, enumerable: true })
+  Object.defineProperty(duck, 'reportError', { value: reportError, writable: false, enumerable: true })
 
   return duck
 }

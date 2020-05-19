@@ -1,5 +1,6 @@
 import React, { Suspense } from 'react'
 import Pool from '@duckness/pool'
+import ReactReduxPool from '@duckness/react-redux-pool'
 
 import CounterDuck from './ducks/CounterDuck'
 
@@ -13,12 +14,14 @@ function RootComponent() {
   )
 }
 
-const CounterPool = Pool({
-  buildStore: ({ initialCounter = 0 } = {}) => {
-    return { counter: initialCounter }
-  },
-  renderRoot: RootComponent
-})
+const CounterPool = ReactReduxPool(
+  Pool({
+    buildStore: ({ initialCounter = 0 } = {}) => {
+      return { counter: initialCounter }
+    }
+  }),
+  RootComponent
+)
 CounterPool.addDuck(CounterDuck)
 
 export default CounterPool

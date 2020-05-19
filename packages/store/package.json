@@ -2,11 +2,7 @@
   "name": "@duckness/store",
   "version": "0.2.6",
   "description": "Simple store for React components",
-  "keywords": [
-    "store",
-    "react",
-    "react-hooks"
-  ],
+  "keywords": ["store", "react", "react-hooks"],
   "author": "Vasily Kazantsev <vasily@kazantsev.xyz>",
   "homepage": "https://github.com/hitosu/duckness/tree/master/packages/store",
   "license": "MIT",
@@ -16,10 +12,7 @@
     "src": "src",
     "test": "__tests__"
   },
-  "files": [
-    "lib",
-    "src"
-  ],
+  "files": ["lib", "src"],
   "publishConfig": {
     "registry": "https://registry.npmjs.org",
     "access": "public"
@@ -38,6 +31,5 @@
   },
   "dependencies": {
     "react": "^16.13.1"
-  },
-  "gitHead": "1c0ca11af32d5bf9e98b5da1bdaa46e76ce98bc0"
+  }
 }
