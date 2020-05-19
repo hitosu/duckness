@@ -85,14 +85,15 @@ export default function Duck(duckName, poolName, duckContext) {
 function addActionTypes(duck, duckFace, duckName, poolName) {
   const actionTypes = {}
   function mapActionType(actionType) {
-    return (
-      actionTypes[actionType] ||
-      Object.defineProperty(actionTypes, actionType, {
-        value: `${poolName || ''}/${duckName || ''}/${actionType}`,
-        writable: false,
-        enumerable: true
-      })[actionType]
-    )
+    const fullActionType = `${poolName || ''}/${duckName || ''}/${actionType}`
+    return '@@' === actionType.substring(0, 2)
+      ? fullActionType
+      : actionTypes[actionType] ||
+          Object.defineProperty(actionTypes, actionType, {
+            value: fullActionType,
+            writable: false,
+            enumerable: true
+          })[actionType]
   }
   function listActionTypes() {
     return Object.keys(actionTypes)
@@ -109,6 +110,9 @@ function addActionTypes(duck, duckFace, duckName, poolName) {
 
 function addActionConstructors(duck, duckFace) {
   function actionConstructor(actionName, actionType, payloadBuilder, actionTransformer) {
+    if ('string' !== typeof actionType || !actionType) {
+      throw new Error('@duckness/duck.action: - actionType must be a non empty String')
+    }
     const fullActionType = duck.mapActionType(actionType)
     function constructAction(payload) {
       const isError = payload instanceof Error
@@ -131,7 +135,7 @@ function addActionConstructors(duck, duckFace) {
       enumerable: true
     })
 
-    if (actionName) {
+    if (actionName && 'string' === typeof actionName) {
       Object.defineProperty(constructAction, 'actionName', { value: actionName, writable: false, enumerable: true })
       Object.defineProperty(actionConstructor, actionName, {
         value: constructAction,
@@ -152,25 +156,30 @@ function addActionConstructors(duck, duckFace) {
 function addSelectors(duck, duckFace) {
   const selectors = {}
   function addSelector(selectorName, selector) {
-    if (selectorName && 'function' === typeof selector) {
+    if ('function' === typeof selector) {
       const selectorWithContext = function (...args) {
         return selector.apply(this, [...args, duckFace])
       }
-      Object.defineProperty(selectorWithContext, 'selectorName', {
-        value: selectorName,
-        writable: false,
-        enumerable: true
-      })
       Object.defineProperty(selectorWithContext, 'originalSelector', {
         value: selector,
         writable: false,
         enumerable: true
       })
-      Object.defineProperty(selectors, selectorName, {
-        value: selectorWithContext,
-        writable: false,
-        enumerable: true
-      })
+      if (selectorName) {
+        Object.defineProperty(selectorWithContext, 'selectorName', {
+          value: selectorName,
+          writable: false,
+          enumerable: true
+        })
+        Object.defineProperty(selectors, selectorName, {
+          value: selectorWithContext,
+          writable: false,
+          enumerable: true
+        })
+      }
+      return selectorWithContext
+    } else {
+      throw new Error('@duckness/duck.selector: - selector must be a Function')
     }
   }
   Object.defineProperty(duck, 'selector', { value: addSelector, writable: false, enumerable: true })
@@ -197,7 +206,12 @@ function addReducers(duck, typedReducers, customReducers) {
         customReducers.push([actionType, reducer])
       } else if (null == actionType) {
         customReducers.push([null, reducer])
+      } else {
+        throw new Error('@duckness/duck.reducer: actionType must be a String, null or Function')
       }
+      return reducer
+    } else {
+      throw new Error('@duckness/duck.reducer: reducer must be a Function')
     }
   }
   Object.defineProperty(duck, 'reducer', { value: addReducer, writable: false, enumerable: true })

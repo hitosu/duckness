@@ -11,9 +11,7 @@
     "src": "src",
     "test": "__tests__"
   },
-  "files": [
-    "lib"
-  ],
+  "files": ["lib"],
   "publishConfig": {
     "registry": "https://registry.npmjs.org",
     "access": "public"
@@ -25,6 +23,7 @@
   "scripts": {
     "test": "echo \"Error: run tests from root\" && exit 1",
     "build": "babel src --out-dir lib --source-maps",
+    "build:watch": "babel src --out-dir lib --source-maps --watch",
     "lint": "eslint '{src,__tests__}/**/*.{js,jsx}'"
   },
   "bugs": {

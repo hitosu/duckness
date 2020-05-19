@@ -12,7 +12,8 @@ export default function Link({ active, children, onClick } = {}) {
       onClick={onClick}
       disabled={active}
       style={{
-        marginLeft: '4px'
+        marginLeft: '4px',
+        color: active ? '#1EA7FD' : null
       }}
     >
       {children}

@@ -1,14 +1,12 @@
 import React, { useRef, useCallback } from 'react'
-import PropTypes from 'prop-types'
-import { connect } from 'react-redux'
+import { useDispatch } from '@duckness/use-pool'
 
-import TodoDuck from '../ducks/TodoDuck'
+import TodoListPool, { TodoDuck } from '../TodoListPool'
 
-AddTodo.propTypes = {
-  onAddTodo: PropTypes.func.isRequired
-}
-function AddTodo({ onAddTodo } = {}) {
+export default function AddTodo() {
   const refInput = useRef()
+
+  const onAddTodo = useDispatch(TodoListPool, TodoDuck.action.addTodo)
 
   const onSubmit = useCallback(
     event => {
@@ -32,9 +30,3 @@ function AddTodo({ onAddTodo } = {}) {
     </div>
   )
 }
-
-export default connect(null, dispatch => {
-  return {
-    onAddTodo: text => dispatch(TodoDuck.action.addTodo(text))
-  }
-})(AddTodo)

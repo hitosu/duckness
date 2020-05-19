@@ -4,14 +4,10 @@ import { call, put, race, take, takeLatest, delay } from 'redux-saga/effects'
 const CounterDuck = SagaDuck('counter', 'counter-pool')
 
 CounterDuck.selector('counter', state => state.counter || 0)
-CounterDuck.selector('CounterProps', (state, _ownProps, duckFace) => {
-  return {
-    counter: duckFace.select.counter(state)
-  }
-})
 
 CounterDuck.action('increment', 'INCREMENT')
 CounterDuck.action('decrement', 'DECREMENT')
+CounterDuck.action('reset', 'RESET')
 CounterDuck.action('startTimer', 'START_TIMER')
 CounterDuck.action('startFastTimer', 'START_FAST_TIMER')
 CounterDuck.action('stopTimer', 'STOP_TIMER')
@@ -27,6 +23,13 @@ CounterDuck.reducer('DECREMENT', (state, _action, duckFace) => {
   return {
     ...state,
     counter: duckFace.select.counter(state) - 1
+  }
+})
+
+CounterDuck.reducer('RESET', (state, _action, _duckFace) => {
+  return {
+    ...state,
+    counter: 0
   }
 })
 

@@ -2,13 +2,7 @@
   "name": "@duckness/react-redux-pool",
   "version": "0.2.7",
   "description": "@duckness/pool + React-Redux",
-  "keywords": [
-    "duckness",
-    "react",
-    "redux",
-    "react-redux",
-    "redux-saga"
-  ],
+  "keywords": ["duckness", "react", "redux", "react-redux", "redux-saga"],
   "author": "Vasily Kazantsev <vasily@kazantsev.xyz>",
   "homepage": "https://github.com/hitosu/duckness/tree/master/packages/react-redux-pool",
   "license": "MIT",
@@ -18,10 +12,7 @@
     "src": "src",
     "test": "__tests__"
   },
-  "files": [
-    "lib",
-    "src"
-  ],
+  "files": ["lib", "src"],
   "publishConfig": {
     "registry": "https://registry.npmjs.org",
     "access": "public"
@@ -33,6 +24,7 @@
   "scripts": {
     "test": "echo \"Error: run tests from root\" && exit 1",
     "build": "babel src --out-dir lib --source-maps",
+    "build:watch": "babel src --out-dir lib --source-maps --watch",
     "lint": "eslint '{src,__tests__}/**/*.{js,jsx}'"
   },
   "bugs": {

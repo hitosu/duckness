@@ -1,6 +1,6 @@
 import { connect } from 'react-redux'
-import TodoList from '../components/TodoList'
-import TodoDuck from '../ducks/TodoDuck'
+import TodoList from '../../components/TodoList'
+import { TodoDuck } from '../TodoListPool'
 
 export default connect(
   state => {

@@ -14,7 +14,7 @@ export default function Pool({
 } = {}) {
   const refProps = { current: initProps || {} }
   const refDucks = { current: initDucks || [] }
-  const refErrorReporter = { current: ('undefined' !== typeof console && console.error) || (() => {}) }
+  const refErrorReporter = { current: ('undefined' !== typeof console && console.error) || (() => {}) } // eslint-disable-line no-console
 
   function addDuck(duck) {
     refDucks.current.push(duck)
@@ -80,6 +80,10 @@ export default function Pool({
     redux.store = createStore(redux.rootReducer, buildStore ? buildStore(refProps.current) || {} : {}, enhancer)
     reduxSaga.rootSaga = buildRootSaga ? buildRootSaga(refDucks.current) : reduxSaga.defaultRootSaga
     reduxSaga.sagaMiddleware.run(reduxSaga.rootSaga)
+    // run @@INIT actions for each duck after store is built
+    refDucks.current.forEach(duck => {
+      redux.store.dispatch({ type: duck.mapActionType('@@INIT'), payload: refProps.current })
+    })
     return redux.store
   }
 

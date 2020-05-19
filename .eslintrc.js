@@ -29,7 +29,8 @@ module.exports = {
         caughtErrors: 'all',
         caughtErrorsIgnorePattern: '^_'
       }
-    ]
+    ],
+    'no-console': 'error'
   },
   settings: {
     react: {

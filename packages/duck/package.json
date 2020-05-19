@@ -2,11 +2,7 @@
   "name": "@duckness/duck",
   "version": "0.2.7",
   "description": "@duckness/duck - Modular Redux Ducks hatchery",
-  "keywords": [
-    "redux",
-    "ducks",
-    "modular"
-  ],
+  "keywords": ["redux", "ducks", "modular"],
   "author": "Vasily Kazantsev <vasily@kazantsev.xyz>",
   "homepage": "https://github.com/hitosu/duckness/tree/master/packages/duck",
   "license": "MIT",
@@ -16,10 +12,7 @@
     "src": "src",
     "test": "__tests__"
   },
-  "files": [
-    "lib",
-    "src"
-  ],
+  "files": ["lib", "src"],
   "publishConfig": {
     "registry": "https://registry.npmjs.org",
     "access": "public"
@@ -31,6 +24,7 @@
   "scripts": {
     "test": "echo \"Error: run tests from root\" && exit 1",
     "build": "babel src --out-dir lib --source-maps",
+    "build:watch": "babel src --out-dir lib --source-maps --watch",
     "lint": "eslint '{src,__tests__}/**/*.{js,jsx}'"
   },
   "bugs": {

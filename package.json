@@ -10,8 +10,9 @@
   "workspaces": ["packages/*"],
   "scripts": {
     "test": "yarn lint && jest",
-    "lint": "lerna exec yarn lint",
-    "build": "lerna bootstrap && lerna exec yarn build",
+    "lint": "lerna exec yarn lint && eslint 'stories/**/*.{js,jsx}'",
+    "build": "lerna bootstrap && lerna exec --parallel -- yarn build",
+    "build:watch": "lerna bootstrap && lerna exec --parallel -- yarn build:watch",
     "storybook": "start-storybook -p 6006",
     "build-storybook": "build-storybook"
   },

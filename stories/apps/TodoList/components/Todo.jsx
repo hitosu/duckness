@@ -14,7 +14,8 @@ export default function Todo({ onClick, completed, text } = {}) {
         textDecoration: completed ? 'line-through' : 'none',
         cursor: 'pointer',
         fontSize: '1.2em',
-        margin: '0.25em 0 0 0'
+        margin: '0.25em 0 0 0',
+        userSelect: 'none'
       }}
     >
       {text}

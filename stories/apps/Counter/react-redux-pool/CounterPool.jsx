@@ -2,7 +2,8 @@ import React, { Suspense } from 'react'
 import Pool from '@duckness/pool'
 import ReactReduxPool from '@duckness/react-redux-pool'
 
-import CounterDuck from './ducks/CounterDuck'
+import CounterDuck from '../../../ducks/Counter/CounterDuck'
+export { CounterDuck }
 
 const App = React.lazy(() => import('./components/App'))
 

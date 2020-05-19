@@ -1,7 +1,7 @@
 import Duck from '@duckness/duck'
-import VisibilityFilters from '../VisibilityFilters'
+import visibilityFilters from './const/VisibilityFilters'
 
-const TodoDuck = Duck('todo', 'todo-list-pool')
+const TodoDuck = Duck('todo', 'todo-list-pool', { visibilityFilters })
 
 let nextTodoId = 0
 TodoDuck.action('addTodo', 'ADD_TODO', text => {
@@ -13,19 +13,29 @@ TodoDuck.action('toggleTodo', 'TOGGLE_TODO', id => {
 })
 
 TodoDuck.selector('todos', state => state.todos || [])
-TodoDuck.selector('visibilityFilter', state => state.visibilityFilter || VisibilityFilters.SHOW_ALL)
+TodoDuck.selector(
+  'visibilityFilter',
+  (state, duckFace) => state.visibilityFilter || duckFace.duckContext.visibilityFilters.SHOW_ALL
+)
 TodoDuck.selector('visibleTodos', (state, duckFace) => {
   const todos = duckFace.select.todos(state)
   const visibilityFilter = duckFace.select.visibilityFilter(state)
   switch (visibilityFilter) {
-    case VisibilityFilters.SHOW_ALL:
+    case duckFace.duckContext.visibilityFilters.SHOW_ALL:
       return todos
-    case VisibilityFilters.SHOW_COMPLETED:
+    case duckFace.duckContext.visibilityFilters.SHOW_COMPLETED:
       return todos.filter(t => t.completed)
-    case VisibilityFilters.SHOW_ACTIVE:
+    case duckFace.duckContext.visibilityFilters.SHOW_ACTIVE:
       return todos.filter(t => !t.completed)
     default:
       throw new Error('Unknown filter: ' + visibilityFilter)
+  }
+})
+
+TodoDuck.reducer('@@INIT', (state, _action, duckFace) => {
+  return {
+    ...state,
+    todos: duckFace.select.todos(state)
   }
 })
 

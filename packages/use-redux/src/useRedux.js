@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 
 export default function useRedux(store, selector, shouldUpdate, shouldSelect) {
   const [state, setState] = useState(() => selector(store.getState()))
@@ -29,4 +29,8 @@ export default function useRedux(store, selector, shouldUpdate, shouldSelect) {
   }, [store, selector, shouldUpdate, shouldSelect])
 
   return [state, store.dispatch]
+}
+
+export function useDispatch(store, actionCreator) {
+  return useCallback((...args) => store.dispatch(actionCreator(...args)), [store, actionCreator])
 }

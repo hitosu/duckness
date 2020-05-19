@@ -5,7 +5,7 @@ export default function SagaDuck(duckName, appName, duckContext) {
   const duck = Duck(duckName, appName, duckContext)
 
   const refErrorReporter = {
-    current: console.error
+    current: ('undefined' !== typeof console && console.error) || (() => {}) // eslint-disable-line no-console
   }
 
   function setErrorReporter(reporter) {
