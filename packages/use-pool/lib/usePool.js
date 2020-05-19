@@ -1,0 +1,2 @@
+"use strict";var _useRedux=_interopRequireDefault(require("@duckness/use-redux"));Object.defineProperty(exports,"__esModule",{value:!0}),exports.default=usePool;function _interopRequireDefault(a){return a&&a.__esModule?a:{default:a}}function usePool(a,b,c,d){return(0,_useRedux.default)(a.store,b,c,d)}
+//# sourceMappingURL=usePool.js.map
