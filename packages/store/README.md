@@ -4,11 +4,10 @@ Simple store for [React](https://reactjs.org/) components. Intended to store dat
 
 [![NPM](https://img.shields.io/npm/v/@duckness/store)](https://www.npmjs.com/package/@duckness/store)
 [![License](https://img.shields.io/github/license/hitosu/duckness)](https://github.com/hitosu/duckness/blob/master/LICENSE)
-![dependencies](https://img.shields.io/david/hitosu/duckness?path=packages/store)
-![dev dependencies](https://img.shields.io/david/dev/hitosu/duckness?path=packages/store)
+[![Libraries.io dependency status for latest release, scoped npm package](https://img.shields.io/librariesio/release/npm/@duckness/store)](https://www.npmjs.com/package/@duckness/store?activeTab=dependencies)
 [![GitHub issues](https://img.shields.io/github/issues/hitosu/duckness)](https://github.com/hitosu/duckness/issues)
-![vulnerabilities](https://img.shields.io/snyk/vulnerabilities/npm/@duckness/store)
-![npm bundle size](https://img.shields.io/bundlephobia/minzip/@duckness/store)
+[![vulnerabilities](https://img.shields.io/snyk/vulnerabilities/npm/@duckness/store)](https://github.com/hitosu/duckness/issues)
+[![npm bundle size](https://img.shields.io/bundlephobia/min/@duckness/store)](https://www.npmjs.com/package/@duckness/store)
 
 > TODO: write doc
 

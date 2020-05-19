@@ -4,11 +4,10 @@
 
 [![NPM](https://img.shields.io/npm/v/@duckness/pool)](https://www.npmjs.com/package/@duckness/pool)
 [![License](https://img.shields.io/github/license/hitosu/duckness)](https://github.com/hitosu/duckness/blob/master/LICENSE)
-![dependencies](https://img.shields.io/david/hitosu/duckness?path=packages/pool)
-![dev dependencies](https://img.shields.io/david/dev/hitosu/duckness?path=packages/pool)
+[![Libraries.io dependency status for latest release, scoped npm package](https://img.shields.io/librariesio/release/npm/@duckness/pool)](https://www.npmjs.com/package/@duckness/pool?activeTab=dependencies)
 [![GitHub issues](https://img.shields.io/github/issues/hitosu/duckness)](https://github.com/hitosu/duckness/issues)
-![vulnerabilities](https://img.shields.io/snyk/vulnerabilities/npm/@duckness/pool)
-![npm bundle size](https://img.shields.io/bundlephobia/minzip/@duckness/pool)
+[![vulnerabilities](https://img.shields.io/snyk/vulnerabilities/npm/@duckness/pool)](https://github.com/hitosu/duckness/issues)
+[![npm bundle size](https://img.shields.io/bundlephobia/min/@duckness/pool)](https://www.npmjs.com/package/@duckness/pool)
 
 # Example
 
