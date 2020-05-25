@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useCallback } from 'react'
 import { useDispatch } from '@duckness/use-pool'
 
 import CounterPool, { CounterDuck } from '../CounterPool'
@@ -6,12 +6,30 @@ import CounterPool, { CounterDuck } from '../CounterPool'
 const Counter = React.lazy(() => import('./Counter'))
 
 export default function App() {
-  const onInc = useDispatch(CounterPool, CounterDuck.action.increment)
-  const onDec = useDispatch(CounterPool, CounterDuck.action.decrement)
-  const onReset = useDispatch(CounterPool, CounterDuck.action.reset)
-  const onStartTimer = useDispatch(CounterPool, CounterDuck.action.startTimer)
-  const onStartFastTimer = useDispatch(CounterPool, CounterDuck.action.startFastTimer)
-  const onStopTimer = useDispatch(CounterPool, CounterDuck.action.stopTimer)
+  const increment = useDispatch(CounterPool, CounterDuck.action.increment)
+  const onInc = useCallback(() => {
+    increment()
+  }, [increment])
+  const decrement = useDispatch(CounterPool, CounterDuck.action.decrement)
+  const onDec = useCallback(() => {
+    decrement()
+  }, [decrement])
+  const reset = useDispatch(CounterPool, CounterDuck.action.reset)
+  const onReset = useCallback(() => {
+    reset()
+  }, [reset])
+  const startTimer = useDispatch(CounterPool, CounterDuck.action.startTimer)
+  const onStartTimer = useCallback(() => {
+    startTimer()
+  }, [startTimer])
+  const startFastTimer = useDispatch(CounterPool, CounterDuck.action.startFastTimer)
+  const onStartFastTimer = useCallback(() => {
+    startFastTimer()
+  }, [startFastTimer])
+  const stopTimer = useDispatch(CounterPool, CounterDuck.action.stopTimer)
+  const onStopTimer = useCallback(() => {
+    stopTimer()
+  }, [stopTimer])
 
   return (
     <div>

@@ -1,15 +1,13 @@
 {
   "name": "duckness",
-  "version": "0.0.0",
+  "version": "0.3.4",
   "description": "Duckness - Modular Redux Ducks monorepo",
   "main": "index.js",
   "repository": "git@github.com:hitosu/duckness.git",
   "author": "Vasily Kazantsev <vasily@kazantsev.xyz>",
   "license": "MIT",
   "private": true,
-  "workspaces": [
-    "packages/*"
-  ],
+  "workspaces": ["packages/*"],
   "scripts": {
     "test": "yarn lint && jest",
     "lint": "lerna exec yarn lint && eslint 'stories/**/*.{js,jsx}'",
@@ -47,5 +45,10 @@
     "prettier": "^2.0.5",
     "prop-types": "^15.7.2"
   },
-  "dependencies": {}
+  "dependencies": {
+    "react": "^16.13.1",
+    "redux": "^4.0.5",
+    "redux-saga": "^1.1.3",
+    "react-redux": "^7.2.0"
+  }
 }
