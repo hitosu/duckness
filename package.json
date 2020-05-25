@@ -7,7 +7,9 @@
   "author": "Vasily Kazantsev <vasily@kazantsev.xyz>",
   "license": "MIT",
   "private": true,
-  "workspaces": ["packages/*"],
+  "workspaces": [
+    "packages/*"
+  ],
   "scripts": {
     "test": "yarn lint && jest",
     "lint": "lerna exec yarn lint && eslint 'stories/**/*.{js,jsx}'",

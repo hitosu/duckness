@@ -1,18 +1,18 @@
 import { useState, useEffect, useCallback } from 'react'
 
 export default function useRedux(store, selector, shouldUpdate, shouldSelect) {
-  const [state, setState] = useState(() => selector(store.getState()))
+  const [selectedState, setSelectedState] = useState(() => selector(store.getState()))
 
   useEffect(() => {
-    const refLastState = { current: shouldSelect ? state : null }
-    const refLastSelected = { current: shouldUpdate ? selector(state) : null }
+    const refLastState = { current: shouldSelect ? store.getState() : null }
+    const refLastSelected = { current: shouldUpdate ? selectedState : null }
     const refUnsubscribe = {
       current: store.subscribe(() => {
         const currentState = store.getState()
         if (!shouldSelect || shouldSelect(currentState, refLastState.current)) {
           const selected = selector(currentState)
           if (!shouldUpdate || shouldUpdate(selected, refLastSelected.current)) {
-            setState(selected)
+            setSelectedState(selected)
           }
           if (shouldUpdate) {
             refLastSelected.current = selected
@@ -28,7 +28,7 @@ export default function useRedux(store, selector, shouldUpdate, shouldSelect) {
     }
   }, [store, selector, shouldUpdate, shouldSelect])
 
-  return [state, store.dispatch]
+  return [selectedState, store.dispatch]
 }
 
 export function useDispatch(store, actionCreator) {
