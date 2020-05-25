@@ -1,8 +1,13 @@
 {
   "name": "@duckness/pool",
-  "version": "0.3.4",
+  "version": "0.3.5",
   "description": "Duckness Pool - @duckness/ducks + @duckness/saga + Redux",
-  "keywords": ["redux", "ducks", "modular", "redux-saga"],
+  "keywords": [
+    "redux",
+    "ducks",
+    "modular",
+    "redux-saga"
+  ],
   "author": "Vasily Kazantsev <vasily@kazantsev.xyz>",
   "homepage": "https://github.com/hitosu/duckness/tree/master/packages/pool",
   "license": "MIT",
@@ -12,7 +17,10 @@
     "src": "src",
     "test": "__tests__"
   },
-  "files": ["lib", "src"],
+  "files": [
+    "lib",
+    "src"
+  ],
   "publishConfig": {
     "registry": "https://registry.npmjs.org",
     "access": "public"
@@ -31,8 +39,8 @@
     "url": "https://github.com/hitosu/duckness/issues"
   },
   "dependencies": {
-    "@duckness/duck": "^0.3.4",
-    "@duckness/saga": "^0.3.4"
+    "@duckness/duck": "^0.3.5",
+    "@duckness/saga": "^0.3.5"
   },
   "peerDependencies": {
     "redux": "^4.0.5",
