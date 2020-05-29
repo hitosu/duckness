@@ -1,26 +1,28 @@
-# `@duckness/pool` <!-- omit in toc -->
+# `@duckness/pool-saga-stream` <!-- omit in toc -->
 
-[@duckness/duck](https://github.com/hitosu/duckness/tree/master/packages/duck) + [@duckness/saga](https://github.com/hitosu/duckness/tree/master/packages/saga) + [Redux](https://redux.js.org/)
+[@duckness/saga](https://github.com/hitosu/duckness/tree/master/packages/saga) plugin for [@duckness/pool](https://github.com/hitosu/duckness/tree/master/packages/pool)
 
-[![NPM](https://img.shields.io/npm/v/@duckness/pool)](https://www.npmjs.com/package/@duckness/pool)
+[![NPM](https://img.shields.io/npm/v/@duckness/pool-saga-stream)](https://www.npmjs.com/package/@duckness/pool-saga-stream)
 [![License](https://img.shields.io/github/license/hitosu/duckness)](https://github.com/hitosu/duckness/blob/master/LICENSE)
-[![Libraries.io dependency status for latest release, scoped npm package](https://img.shields.io/librariesio/release/npm/@duckness/pool)](https://www.npmjs.com/package/@duckness/pool?activeTab=dependencies)
+[![Libraries.io dependency status for latest release, scoped npm package](https://img.shields.io/librariesio/release/npm/@duckness/pool-saga-stream)](https://www.npmjs.com/package/@duckness/pool-saga-stream?activeTab=dependencies)
 [![GitHub issues](https://img.shields.io/github/issues/hitosu/duckness)](https://github.com/hitosu/duckness/issues)
-[![vulnerabilities](https://img.shields.io/snyk/vulnerabilities/npm/@duckness/pool)](https://github.com/hitosu/duckness/issues)
-[![npm bundle size](https://img.shields.io/bundlephobia/min/@duckness/pool)](https://www.npmjs.com/package/@duckness/pool)
+[![vulnerabilities](https://img.shields.io/snyk/vulnerabilities/npm/@duckness/pool-saga-stream)](https://github.com/hitosu/duckness/issues)
+[![npm bundle size](https://img.shields.io/bundlephobia/min/@duckness/pool-saga-stream)](https://www.npmjs.com/package/@duckness/pool-saga-stream)
 
 # Example
 
 ```js
 import Pool from '@duckness/pool'
-import CounterDuck from './ducks/CounterDuck'
+import PoolSagaStream from '@duckness/pool-saga-stream'
+import CounterSagaDuck from './ducks/CounterSagaDuck'
 
 const CounterPool = Pool({
   buildStore: ({ initialCounter = 0 } = {}) => {
     return { counter: initialCounter }
   }
 })
-CounterPool.addDuck(CounterDuck)
+CounterPool.addDuck(CounterSagaDuck)
+CounterPool.addStream(PoolSagaStream())
 
 CounterPool.build({initialCounter: 0})
 CounterPool.store
@@ -31,78 +33,40 @@ CounterPool.store
 
 - [Example](#example)
 - [API](#api)
-  - [Create Pool](#create-pool)
-    - [default `buildStore`](#default-buildstore)
-    - [default `buildRootReducer`](#default-buildrootreducer)
-    - [default `buildRootSaga`](#default-buildrootsaga)
-  - [`.addDuck(duck)`](#addduckduck)
-  - [`.build(props)`](#buildprops)
-  - [`.store`](#store)
-  - [`.errorReporter(reporterFn)`](#errorreporterreporterfn)
+  - [Create Pool Saga Stream](#create-pool-saga-stream)
+    - [`buildRootSaga`](#buildrootsaga)
+      - [default `buildRootSaga`](#default-buildrootsaga)
+  - [Use Pool Saga Stream](#use-pool-saga-stream)
 - [Examples](#examples)
 - [@Duckness packages:](#duckness-packages)
 
 # API
 
-## Create Pool
+## Create Pool Saga Stream
 
 ```js
-const myPool = Pool({
-  ?ducks: Array<Duck>, // array of pool ducks
-  ?buildStore: props => store, // build initial store state
-  ?buildRootReducer: ducks => rootReducer, // build custom root reducer from ducks instead of default root reducer
-  ?buildRootSaga: ducks => rootSaga*, // build custom root saga from ducks instead of default root saga
-  ?middlewares: Array // additional redux middlewares
+PoolSagaStream({
+  // build custom root saga from ducks instead of default root saga
+  ?buildRootSaga: (ducks, { refDucks, refErrorReporter }) => rootSaga*
 })
 ```
 
-### default `buildStore`
+### `buildRootSaga`
+Optional function for custom root saga
+`(ducks, { refDucks, refErrorReporter }) => rootSaga*`
 
-If not specified store will be set to `{}`.
+* `ducks` are array of ducks
+* `refDucks.current` will hold current array of ducks.
+* `refErrorReporter.current` will hold current error reporter function.
 
-### default `buildRootReducer`
-
-Default root reducer will combine all duck root reducers via
-```js
-ducks.reduce((state, duck) => {
-  return duck(state, action)
-}, state)
-```
-with every duck root reducer wrapped in try/catch returning unmodified state in case of exception inside duck root reducer.
-
-### default `buildRootSaga`
+#### default `buildRootSaga`
 
 Default root saga will combine all duck root sagas (if exists) wrapped in try/catch restarting duck root saga in case of exception.
 
-## `.addDuck(duck)`
+## Use Pool Saga Stream
 
-Add duck to pool
 ```js
-myPool.addDuck(myDuck)
-```
-
-## `.build(props)`
-
-Build pool state from some props. `props` will be passed to `buildStore` function.
-```js
-myPool.build({ initialCounter: 0 })
-```
-
-## `.store`
-
-Reference to built redux store
-```js
-myPool.store.subscribe(/* ... */)
-```
-
-
-## `.errorReporter(reporterFn)`
-
-Set exception reporter function. Will also overwrite all added [SagaDuck](https://github.com/hitosu/duckness/tree/master/packages/saga) errorReporters.
-```js
-myPool.errorReporter(error => {
-  window.Sentry.captureException(error)
-})
+pool.addStream(PoolSagaStream())
 ```
 
 # Examples
@@ -113,7 +77,8 @@ https://github.com/hitosu/duckness/tree/master/stories
 
 * [@duckness/duck](https://github.com/hitosu/duckness/tree/master/packages/duck) - [Modular Redux Ducks](https://github.com/erikras/ducks-modular-redux) hatchery
 * [@duckness/saga](https://github.com/hitosu/duckness/tree/master/packages/saga) - [Redux Saga](https://redux-saga.js.org/) extension for [@duckness/duck](https://github.com/hitosu/duckness/tree/master/packages/duck)
-* [@duckness/pool](https://github.com/hitosu/duckness/tree/master/packages/pool) - [@duckness/duck](https://github.com/hitosu/duckness/tree/master/packages/duck) + [@duckness/saga](https://github.com/hitosu/duckness/tree/master/packages/saga) + [Redux](https://redux.js.org/)
+* [@duckness/pool](https://github.com/hitosu/duckness/tree/master/packages/pool) - [@duckness/duck](https://github.com/hitosu/duckness/tree/master/packages/duck) + [Redux](https://redux.js.org/)
+* [@duckness/pool-saga-stream](https://github.com/hitosu/duckness/tree/master/packages/pool-saga-stream) - [@duckness/saga](https://github.com/hitosu/duckness/tree/master/packages/saga) plugin for [@duckness/pool](https://github.com/hitosu/duckness/tree/master/packages/pool)
 * [@duckness/react-redux-pool](https://github.com/hitosu/duckness/tree/master/packages/react-redux-pool) - [@duckness/pool](https://github.com/hitosu/duckness/tree/master/packages/pool) + [React-Redux](https://react-redux.js.org/)
 * [@duckness/use-redux](https://github.com/hitosu/duckness/tree/master/packages/use-redux) - [React hook](https://reactjs.org/docs/hooks-intro.html) for [Redux](https://react-redux.js.org/) store
 * [@duckness/use-pool](https://github.com/hitosu/duckness/tree/master/packages/use-pool) - [React hook](https://reactjs.org/docs/hooks-intro.html) for [@duckness/pool](https://github.com/hitosu/duckness/tree/master/packages/pool).

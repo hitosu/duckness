@@ -46,7 +46,7 @@ export default function Pool({
 
     // build root reducer
     const rootReducer = buildRootReducer
-      ? buildRootReducer({ refDucks, refErrorReporter })
+      ? buildRootReducer(refDucks.current, { refDucks, refErrorReporter })
       : function defaultRootReducer(state, action) {
           return refDucks.current.reduce((state, duck) => {
             try {

@@ -14,7 +14,7 @@ export default function PoolSagaStream({ buildRootSaga } = {}) {
 
   function afterBuild({ refDucks, refErrorReporter } = {}) {
     const rootSaga = buildRootSaga
-      ? buildRootSaga({ refDucks, refErrorReporter })
+      ? buildRootSaga(refDucks.current, { refDucks, refErrorReporter })
       : function* defaultRootSaga() {
           const sagas = refDucks.current.reduce((sagas, duck) => {
             if (duck.rootSaga) {
