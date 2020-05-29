@@ -1,6 +1,6 @@
 {
   "name": "@duckness/duck",
-  "version": "0.3.5",
+  "version": "0.4.0",
   "description": "@duckness/duck - Modular Redux Ducks hatchery",
   "keywords": [
     "redux",
