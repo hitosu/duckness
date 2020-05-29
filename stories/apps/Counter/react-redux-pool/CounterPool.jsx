@@ -1,6 +1,7 @@
 import React, { Suspense } from 'react'
 import Pool from '@duckness/pool'
 import ReactReduxPool from '@duckness/react-redux-pool'
+import PoolSagaStream from '@duckness/pool-saga-stream'
 
 import CounterDuck from '../../../ducks/Counter/CounterDuck'
 export { CounterDuck }
@@ -24,5 +25,6 @@ const CounterPool = ReactReduxPool(
   RootComponent
 )
 CounterPool.addDuck(CounterDuck)
+CounterPool.addStream(PoolSagaStream())
 
 export default CounterPool
