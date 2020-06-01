@@ -1,5 +1,15 @@
 import { createStore, applyMiddleware } from 'redux'
 
+// this pool stream will send @@INIT action to every registered duck after build
+const initDucksStream = Object.freeze({
+  afterBuild({ refStore, refDucks, refProps } = {}) {
+    refDucks.current.forEach(duck => {
+      refStore.current.dispatch({ type: duck.mapActionType('@@INIT'), payload: refProps.current })
+    })
+  }
+})
+
+// POOL
 export default function Pool({
   props: initProps = {},
   ducks: initDucks = [],
@@ -12,7 +22,7 @@ export default function Pool({
 } = {}) {
   const refProps = { current: initProps || {} }
   const refDucks = { current: initDucks || [] }
-  const refStreams = { current: initStreams || [] }
+  const refStreams = { current: [...(initStreams || []), initDucksStream] }
   const refMiddlewares = { current: initMiddlewares || [] }
   const refErrorReporter = { current: ('undefined' !== typeof console && console.error) || (() => {}) } // eslint-disable-line no-console
 
@@ -25,7 +35,7 @@ export default function Pool({
   }
 
   function addStream(stream) {
-    refStreams.current.push(stream)
+    refStreams.current.unshift(stream)
   }
 
   function setErrorReporter(reporter) {
@@ -60,7 +70,7 @@ export default function Pool({
 
     // invoke beforeBuild for each pool stream
     refStreams.current.forEach(stream => {
-      if (stream.beforeBuild) stream.beforeBuild({ refDucks, refErrorReporter })
+      if (stream.beforeBuild) stream.beforeBuild({ refDucks, refProps, refErrorReporter })
     })
 
     // compose redux middlewares
@@ -72,7 +82,7 @@ export default function Pool({
       ...refStreams.current.reduce(
         (streamMiddlewares, stream) =>
           stream.middlewares
-            ? streamMiddlewares.concat(stream.middlewares({ refDucks, refErrorReporter }) || [])
+            ? streamMiddlewares.concat(stream.middlewares({ refDucks, refProps, refErrorReporter }) || [])
             : streamMiddlewares,
         []
       ),
@@ -89,12 +99,7 @@ export default function Pool({
 
     // invoke afterBuild for each pool stream
     refStreams.current.forEach(stream => {
-      if (stream.afterBuild) stream.afterBuild({ refStore, refDucks, refErrorReporter })
-    })
-
-    // run @@INIT actions for each duck after store is built
-    refDucks.current.forEach(duck => {
-      refStore.current.dispatch({ type: duck.mapActionType('@@INIT'), payload: refProps.current })
+      if (stream.afterBuild) stream.afterBuild({ refStore, refDucks, refProps, refErrorReporter })
     })
 
     // return redux store
