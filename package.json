@@ -13,12 +13,13 @@
     "lint": "lerna exec yarn lint && eslint 'stories/**/*.{js,jsx}'",
     "build": "lerna bootstrap && lerna exec --parallel -- yarn build",
     "build:watch": "lerna bootstrap && lerna exec --parallel -- yarn build:watch",
+    "publish": "lerna publish --force-publish=*",
     "storybook": "start-storybook -p 6006",
     "build-storybook": "build-storybook"
   },
   "husky": {
     "hooks": {
-      "pre-push": "yarn test"
+      "pre-push": "yarn build && yarn test"
     }
   },
   "devDependencies": {
