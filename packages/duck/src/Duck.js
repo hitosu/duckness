@@ -23,9 +23,9 @@ export default function Duck(duckName, poolName, duckContext) {
   const duck = function duckRootReducer(state, action) {
     var actionReducers = typedReducers[action.type]
     var reducedState =
-      null == actionReducers || 0 === actionReducers.length
+      null == actionReducers || 0 === actionReducers.reducers.length
         ? state
-        : 1 === actionReducers.length
+        : 1 === actionReducers.reducers.length
         ? actionReducers.reducers[0](state, action, duckFace)
         : actionReducers.reducers.reduce((state, reducer) => {
             const reducedState = reducer(state, action, duckFace)
