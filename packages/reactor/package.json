@@ -1,6 +1,6 @@
 {
   "name": "@duckness/reactor",
-  "version": "0.4.3",
+  "version": "0.4.4",
   "description": "Duckness Reactor - reactive selectors",
   "author": "Vasily Kazantsev <vasily@kazantsev.xyz>",
   "homepage": "https://github.com/hitosu/duckness/packages/reactor",

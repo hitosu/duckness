@@ -1,6 +1,6 @@
 {
   "name": "@duckness/pool-saga-stream",
-  "version": "0.4.3",
+  "version": "0.4.4",
   "description": "Duckness Pool Saga Stream - @duckness/saga plugin for @duckness/pool",
   "keywords": [
     "redux",
@@ -40,8 +40,8 @@
     "url": "https://github.com/hitosu/duckness/issues"
   },
   "dependencies": {
-    "@duckness/pool": "^0.4.3",
-    "@duckness/saga": "^0.4.3"
+    "@duckness/pool": "^0.4.4",
+    "@duckness/saga": "^0.4.4"
   },
   "peerDependencies": {
     "redux-saga": "^1.1.3"
