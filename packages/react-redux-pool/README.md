@@ -87,8 +87,8 @@ myReactReduxPool.build
 // => myPool.build
 myReactReduxPool.store
 // => myPool.store
-myReactReduxPool.errorReporter
-// => myPool.errorReporter
+myReactReduxPool.setErrorReporter
+// => myPool.setErrorReporter
 ```
 
 # Examples

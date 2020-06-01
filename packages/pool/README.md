@@ -39,7 +39,8 @@ CounterPool.store
   - [`.addDuck(duck)`](#addduckduck)
   - [`.build(props)`](#buildprops)
   - [`.store`](#store)
-  - [`.errorReporter(reporterFn)`](#errorreporterreporterfn)
+  - [`.setErrorReporter(reporterFn)`](#seterrorreporterreporterfn)
+  - [`.reportError(error)`](#reporterrorerror)
   - [`.addMiddleware(middleware)`](#addmiddlewaremiddleware)
   - [Pool Streams - Pool plugins](#pool-streams---pool-plugins)
     - [`.addStream(poolStream)`](#addstreampoolstream)
@@ -114,13 +115,20 @@ Reference to built redux store
 myPool.store.subscribe(/* ... */)
 ```
 
-## `.errorReporter(reporterFn)`
+## `.setErrorReporter(reporterFn)`
 
 Set exception reporter function. Will also overwrite all added [SagaDuck](https://github.com/hitosu/duckness/tree/master/packages/saga) errorReporters.
 ```js
-myPool.errorReporter(error => {
+myPool.setErrorReporter(error => {
   window.Sentry.captureException(error)
 })
+```
+
+## `.reportError(error)`
+
+Call assigned error reporter
+```js
+myPool.reportError(new Error('Clean pool!'))
 ```
 
 ## `.addMiddleware(middleware)`

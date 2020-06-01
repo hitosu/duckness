@@ -35,7 +35,8 @@ export const rootSaga = counterDuck.rootSaga
     - [`.saga(saga)`](#sagasaga)
     - [`.rootSaga`](#rootsaga)
   - [Error reporter](#error-reporter)
-    - [`.errorReporter`](#errorreporter)
+    - [`.setErrorReporter`](#seterrorreporter)
+    - [`.reportError(error)`](#reporterrorerror)
 - [@Duckness packages:](#duckness-packages)
 
 # API
@@ -60,13 +61,20 @@ myDuck.rootSaga
 
 ## Error reporter
 
-### `.errorReporter`
+### `.setErrorReporter`
 
 Set error reporter (default is `console.error`) that reports uncatched saga errors
 ```js
-myDuck.errorReporter(error => {
+myDuck.setErrorReporter(error => {
   window.Sentry.captureException(error)
 })
+```
+
+### `.reportError(error)`
+
+Call assigned error reporter
+```js
+myDuck.reportError(new Error('Clean duck!'))
 ```
 
 # @Duckness packages:

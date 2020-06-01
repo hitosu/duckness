@@ -40,7 +40,7 @@ export default function SagaDuck(duckName, appName, duckContext) {
 
   Object.defineProperty(duck, 'saga', { value: addSaga, writable: false, enumerable: true })
   Object.defineProperty(duck, 'rootSaga', { value: rootSaga, writable: false, enumerable: true })
-  Object.defineProperty(duck, 'errorReporter', { value: setErrorReporter, writable: false, enumerable: true })
+  Object.defineProperty(duck, 'setErrorReporter', { value: setErrorReporter, writable: false, enumerable: true })
   Object.defineProperty(duck, 'reportError', { value: reportError, writable: false, enumerable: true })
 
   return duck
