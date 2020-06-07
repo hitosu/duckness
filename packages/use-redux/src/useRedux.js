@@ -31,6 +31,10 @@ export default function useRedux(store, selector, shouldUpdate, shouldSelect) {
   return [selectedState, store.dispatch]
 }
 
+export function useDispatch(store, dispatcher) {
+  return useCallback((...args) => dispatcher(store.dispatch, ...args), [store, dispatcher])
+}
+
 export function useDispatchAction(store, actionCreator, payloadTransformer) {
   return useCallback(
     payload =>
