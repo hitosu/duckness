@@ -1,12 +1,12 @@
 import React, { useRef, useCallback } from 'react'
-import { useDispatch } from '@duckness/use-pool'
+import { useDispatchAction } from '@duckness/use-pool'
 
 import TodoListPool, { TodoDuck } from '../TodoListPool'
 
 export default function AddTodo() {
   const refInput = useRef()
 
-  const onAddTodo = useDispatch(TodoListPool, TodoDuck.action.addTodo)
+  const onAddTodo = useDispatchAction(TodoListPool, TodoDuck.action.addTodo)
 
   const onSubmit = useCallback(
     event => {

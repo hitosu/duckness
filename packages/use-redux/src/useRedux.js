@@ -31,6 +31,14 @@ export default function useRedux(store, selector, shouldUpdate, shouldSelect) {
   return [selectedState, store.dispatch]
 }
 
-export function useDispatch(store, actionCreator) {
-  return useCallback((...args) => store.dispatch(actionCreator(...args)), [store, actionCreator])
+export function useDispatchAction(store, actionCreator, payloadTransformer) {
+  return useCallback(
+    payload =>
+      void 0 === payloadTransformer
+        ? store.dispatch(actionCreator(payload))
+        : 'function' === typeof payloadTransformer
+        ? store.dispatch(actionCreator(payloadTransformer(payload)))
+        : store.dispatch(actionCreator(payloadTransformer)),
+    [store, actionCreator, payloadTransformer]
+  )
 }
