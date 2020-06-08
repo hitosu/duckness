@@ -56,7 +56,7 @@ export default counterDuck
     - [`.poolName`](#poolname)
   - [Actions](#actions)
     - [`.mapActionType(actionType)`](#mapactiontypeactiontype)
-    - [`.action(actionName, actionType, ?payloadBuilder, ?actionTransformer)`](#actionactionname-actiontype-payloadbuilder-actiontransformer)
+    - [`.action(actionName, actionType, payloadBuilder?, actionTransformer?)`](#actionactionname-actiontype-payloadbuilder-actiontransformer)
     - [`.action[]`](#action)
     - [`.listActionTypes()`](#listactiontypes)
     - [`.actionTypes[]`](#actiontypes)
@@ -115,7 +115,7 @@ myDuck.mapActionType('ACTION_TYPE')
 // => 'pool-name/duck-name/ACTION_TYPE'
 ```
 
-### `.action(actionName, actionType, ?payloadBuilder, ?actionTransformer)`
+### `.action(actionName, actionType, payloadBuilder?, actionTransformer?)`
 
 Build action creator and register it under actionName (if actionName present)
 ```js

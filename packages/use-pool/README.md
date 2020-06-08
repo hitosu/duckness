@@ -9,17 +9,51 @@
 [![vulnerabilities](https://img.shields.io/snyk/vulnerabilities/npm/@duckness/use-pool)](https://github.com/hitosu/duckness/issues)
 [![npm bundle size](https://img.shields.io/bundlephobia/min/@duckness/use-pool)](https://www.npmjs.com/package/@duckness/use-pool)
 
-> TODO: write doc
-
 # Example
 
 ```js
+import React from 'react'
+import usePool from '@duckness/use-pool'
+
+import CounterPool from './CounterPool'
+import CounterDuck from './CounterDuck'
+
+export default function Counter() {
+  const [counter] = usePool(CounterPool, CounterDuck.select.counter)
+  return <span>[ {counter} ]</span>
+}
 ```
 
 # Table of Contents <!-- omit in toc -->
 
 - [Example](#example)
+- [Shortcut to `@duckness/use-redux`](#shortcut-to-ducknessuse-redux)
 - [@Duckness packages:](#duckness-packages)
+
+# Shortcut to `@duckness/use-redux`
+
+`@duckness/use-pool` is a shortcut to [@duckness/use-redux](https://github.com/hitosu/duckness/blob/master/packages/use-redux).
+
+See [@duckness/use-redux documentation](https://github.com/hitosu/duckness/blob/master/packages/use-redux/README.md) for details.
+
+```js
+import useRedux, {
+  useDispatchAction as useReduxDispatchAction,
+  useDispatch as useReduxDispatch
+} from '@duckness/use-redux'
+
+export default function usePool(pool, selector, shouldUpdate, shouldSelect) {
+  return useRedux(pool.store, selector, shouldUpdate, shouldSelect)
+}
+
+export function useDispatchAction(pool, actionCreator, payloadTransformer) {
+  return useReduxDispatchAction(pool.store, actionCreator, payloadTransformer)
+}
+
+export function useDispatch(pool, dispatcher, deps) {
+  return useReduxDispatch(pool.store, dispatcher, deps)
+}
+```
 
 # @Duckness packages:
 

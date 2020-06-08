@@ -4,10 +4,6 @@ import usePool from '@duckness/use-pool'
 import CounterPool, { CounterDuck } from '../CounterPool'
 
 export default function Counter() {
-  const [counter] = usePool(CounterPool, CounterDuck.select.counter, shouldUpdateCounter)
+  const counter = usePool(CounterPool, CounterDuck.select.counter)
   return <span>[ {counter} ]</span>
-}
-
-function shouldUpdateCounter(nextValue, prevValue) {
-  return nextValue !== prevValue
 }

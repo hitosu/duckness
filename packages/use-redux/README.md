@@ -9,17 +9,164 @@
 [![vulnerabilities](https://img.shields.io/snyk/vulnerabilities/npm/@duckness/use-redux)](https://github.com/hitosu/duckness/issues)
 [![npm bundle size](https://img.shields.io/bundlephobia/min/@duckness/use-redux)](https://www.npmjs.com/package/@duckness/use-redux)
 
-> TODO: write doc
-
 # Example
 
 ```js
+import React from 'react'
+import useRedux from '@duckness/use-redux'
+
+const counterSelector = (state => state.counter || 0)
+
+export default function Counter() {
+  const counter = useRedux(store, counterSelector)
+  return <span>[ {counter} ]</span>
+}
 ```
 
 # Table of Contents <!-- omit in toc -->
 
 - [Example](#example)
+- [`useRedux`](#useredux)
+  - [`store`](#store)
+  - [`selector`](#selector)
+  - [`shouldSelect`](#shouldselect)
+  - [`shouldUpdate`](#shouldupdate)
+- [`useDispatchAction`](#usedispatchaction)
+  - [`actionCreator`](#actioncreator)
+  - [`payloadTransformer`](#payloadtransformer)
+- [`useDispatch`](#usedispatch)
 - [@Duckness packages:](#duckness-packages)
+
+
+# `useRedux`
+
+```js
+const selectedState = useRedux(store, selector, shouldUpdate?, shouldSelect?)
+```
+
+## `store`
+
+Redux store to subscribe to.
+
+## `selector`
+
+Select relevant data from store state.
+
+```js
+function selector(state) {
+  // ... calculate selectedState from state
+  return selectedState
+}
+```
+
+## `shouldSelect`
+
+Optional select filter. This optimization helps to avoid expensive calculations in `selector`.
+
+`selector` will be called on every redux store update if:
+1. `true === shouldSelect`
+2. `'function' === typeof shouldSelect` and `true == shouldSelect(nextStoreState, prevStoreState)`
+3. `shouldSelect` is not specified or `null` and `nextStoreState !== prevStoreState`
+
+## `shouldUpdate`
+
+Optional selectedState update filter.
+
+`useRedux` will update after every redux store update and `selector` call if:
+1. `true === shouldUpdate`
+2. `'function' === typeof shouldUpdate` and `true == shouldUpdate(nextSelectedState, prevSelectedState)`
+3. `shouldUpdate` is not specified or `null` and `nextSelectedState !== prevSelectedState`
+
+# `useDispatchAction`
+
+Binds actionCreator to `store.dispatch`.
+
+```js
+const onAction = useDispatchAction(store, actionCreator, payloadTransformer?)
+// ...
+onAction(payload)
+// => dispatch action with payload
+```
+
+## `actionCreator`
+
+```js
+function myAction(payload) {
+  type: 'MY_ACTION',
+  payload: payload
+}
+```
+
+## `payloadTransformer`
+
+Optional payload transformer.
+
+1. `undefined === payloadTransformer` - use supplied payload.
+```js
+const onAction = useDispatchAction(store, myAction)
+onAction('PAYLOAD')
+// => dispatch { type: 'MY_ACTION', payload: 'PAYLOAD' }
+```
+
+2. `'function' === typeof payloadTransformer` - transform payload.
+```js
+const onAction = useDispatchAction(store, myAction, str => str.toLowerCase())
+onAction('PAYLOAD')
+// => dispatch { type: 'MY_ACTION', payload: 'payload' }
+```
+
+3. any other values for `payloadTransformer` - use `payloadTransformer` as payload. 
+```js
+const onAction = useDispatchAction(store, myAction, null)
+onAction('PAYLOAD')
+// => dispatch { type: 'MY_ACTION', payload: null }
+```
+
+Third option is useful when using `useDispatchAction` as a callback for DOM events.
+```js
+function increment(amount) {
+  return { type: 'INC', payload: null == amount ? 1 : amount }
+}
+
+const onInc = useDispatchAction(store, increment, null)
+
+// <button onClick={onInc}>INC</button>
+
+// onInc will be called with { payload: null } instead of { payload: event }
+```
+
+# `useDispatch`
+
+```js
+useDispatch(store, dispatcher, deps)
+```
+
+Example:
+
+```js
+const onMultiAction = useDispatch(store, (dispatch, amount) => {
+  for (let i = 0; i < amount; i++) {
+    dispatch( actionCreator(i) )
+  }
+}, [actionCreator])
+// ...
+onMultiAction(10)
+// => dispatch 10 actions
+```
+
+```js
+function SetStatusButton({ status = 'ready' } = {}) {
+  const onClick = useDispatch(
+    store,
+    dispatch => {
+      dispatch(actionSetStatus(status))
+    },
+    [status]
+  )
+
+  return <button onClick={onClick}>{status}</button>
+}
+```
 
 # @Duckness packages:
 
