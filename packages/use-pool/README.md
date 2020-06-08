@@ -19,7 +19,7 @@ import CounterPool from './CounterPool'
 import CounterDuck from './CounterDuck'
 
 export default function Counter() {
-  const [counter] = usePool(CounterPool, CounterDuck.select.counter)
+  const counter = usePool(CounterPool, CounterDuck.select.counter)
   return <span>[ {counter} ]</span>
 }
 ```
