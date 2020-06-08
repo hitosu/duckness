@@ -71,6 +71,8 @@ export default counterDuck
   - [duckFace](#duckface)
     - [`duckFace.actionTypes[]`](#duckfaceactiontypes)
     - [`duckFace.action[]`](#duckfaceaction)
+    - [`duckFace.mapActionType(actionType)`](#duckfacemapactiontypeactiontype)
+    - [`duckFace.listActionTypes()`](#duckfacelistactiontypes)
     - [`duckFace.select[]`](#duckfaceselect)
     - [`duckFace.reduce(state, action)`](#duckfacereducestate-action)
     - [`duck.duckFace`](#duckduckface)
@@ -269,6 +271,22 @@ Calls registered action creator by its name
 dispatch(duckFace.action.eatFish())
 ```
 
+### `duckFace.mapActionType(actionType)`
+
+Maps short action type to long action type
+```js
+duckFace.mapActionType('ACTION_TYPE')
+// => 'pool-name/duck-name/ACTION_TYPE'
+```
+
+### `duckFace.listActionTypes()`
+
+Returns all known short action types. Type is known if `.mapActionType` or `.action` was called with it.
+
+```js
+duckFace.listActionTypes()
+// => ['EAT_FISH', 'QUACK']
+```
 
 ### `duckFace.select[]`
 

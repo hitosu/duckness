@@ -104,6 +104,8 @@ function addActionTypes(duck, duckFace, duckName, poolName) {
   Object.defineProperty(duck, 'listActionTypes', { value: listActionTypes, writable: false, enumerable: true })
 
   Object.defineProperty(duckFace, 'actionTypes', { value: actionTypes, writable: false, enumerable: true })
+  Object.defineProperty(duckFace, 'mapActionType', { value: mapActionType, writable: false, enumerable: true })
+  Object.defineProperty(duckFace, 'listActionTypes', { value: listActionTypes, writable: false, enumerable: true })
 }
 
 // ---- ACTION CONSTRUCTORS -------------------------------------------------------------------------
