@@ -1,4 +1,4 @@
-import Reagent from '../src/Reagent'
+import { Reagent } from '@duckness/reactor'
 
 describe('@duckness/reactor Reagent', () => {
   test('should build reagent constructors', () => {
