@@ -1,1 +1,0 @@
-{"version":3,"sources":["../src/Reaction.js"],"names":["Reaction"],"mappings":"6FAAe,QAASA,CAAAA,QAAT,EAAoB,CAElC","sourcesContent":["export default function Reaction() {\n  //\n}\n"],"file":"Reaction.js"}
