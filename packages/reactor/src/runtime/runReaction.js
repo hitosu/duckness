@@ -1,5 +1,6 @@
 import takeEffect from './effects/take'
 import putEffect from './effects/put'
+import delayEffect from './effects/delay'
 
 export default function runReaction(reaction, Reactor, runtime, currentValue) {
   if (!reaction.isRunning) {
@@ -23,6 +24,16 @@ export default function runReaction(reaction, Reactor, runtime, currentValue) {
         }
         case 'put': {
           putEffect(
+            effect,
+            payload => {
+              runReaction(reaction, Reactor, runtime, payload)
+            },
+            Reactor
+          )
+          break
+        }
+        case 'delay': {
+          delayEffect(
             effect,
             payload => {
               runReaction(reaction, Reactor, runtime, payload)
