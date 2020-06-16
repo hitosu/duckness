@@ -1,0 +1,1 @@
+{"version":3,"sources":["../../src/effects/index.js"],"names":["take","put"],"mappings":"aAAA,8E,+JAEO,GAAMA,CAAAA,IAAI,CAAG,+BAAkB,MAAlB,CAAb,C,kBACA,GAAMC,CAAAA,GAAG,CAAG,+BAAkB,KAAlB,CAAZ,C","sourcesContent":["import effectConstructor from './effectConstructor'\n\nexport const take = effectConstructor('take')\nexport const put = effectConstructor('put')\n"],"file":"index.js"}

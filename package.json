@@ -10,6 +10,7 @@
   "workspaces": ["packages/*"],
   "scripts": {
     "test": "yarn lint && jest",
+    "test:watch": "yarn lint && jest --watch",
     "lint": "lerna exec yarn lint && eslint 'stories/**/*.{js,jsx}'",
     "build": "lerna bootstrap && lerna exec --parallel -- yarn build",
     "build:watch": "lerna bootstrap && lerna exec --parallel -- yarn build:watch",

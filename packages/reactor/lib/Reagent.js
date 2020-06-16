@@ -1,0 +1,2 @@
+"use strict";Object.defineProperty(exports,"__esModule",{value:!0}),exports.default=Reagent;function Reagent(a,b,c){return function(d){var e={type:a,payload:b?b(d):d};return c?c(e):e}}
+//# sourceMappingURL=Reagent.js.map

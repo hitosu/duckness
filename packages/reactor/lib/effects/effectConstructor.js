@@ -1,0 +1,2 @@
+"use strict";Object.defineProperty(exports,"__esModule",{value:!0}),exports.default=effectConstructor;function effectConstructor(a){return function(b){return{type:a,payload:b}}}
+//# sourceMappingURL=effectConstructor.js.map

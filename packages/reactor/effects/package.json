@@ -1,0 +1,5 @@
+{
+  "name": "@duckness/reactor/effects",
+  "private": true,
+  "main": "../lib/effects/index.js"
+}
