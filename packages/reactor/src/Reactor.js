@@ -23,9 +23,9 @@ function addReagents(Reactor, runtime) {
       const { type: reagentType } = reagent
       if (runtime.subscriptions.has(reagentType)) {
         const listeners = [...runtime.subscriptions.get(reagentType)]
-        listeners.forEach(listener => {
-          listener(reagent)
-        })
+        for (let i = 0; i < listeners.length; i++) {
+          listeners[i](reagent)
+        }
       }
     }
   }
@@ -60,12 +60,13 @@ function addRuntime(Reactor, runtime) {
     if (!runtime.isRunning) {
       runtime.isRunning = true
       const reactions = [...runtime.reactions]
-      reactions.forEach(reaction => {
+      for (let i = 0; i < reactions.length; i++) {
+        const reaction = reactions[i]
         if (reaction.isRunning) {
           stopReaction(reaction, Reactor, runtime)
         }
         runReaction(reaction, Reactor, runtime, void 0)
-      })
+      }
       return true
     } else {
       return false
