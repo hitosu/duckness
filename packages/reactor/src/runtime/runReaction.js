@@ -1,53 +1,32 @@
-import takeEffect from './effects/take'
-import putEffect from './effects/put'
-import delayEffect from './effects/delay'
+import effects from './effects'
 
-export default function runReaction(reaction, Reactor, runtime, currentValue) {
+export default function runReaction(reaction, Reactor, currentValue, onDone) {
   if (!reaction.isRunning) {
     reaction.iterator = reaction.generator()
     reaction.isRunning = true
   }
   const nextStep = reaction.iterator.next(currentValue)
-  if (!nextStep.done) {
+  if (nextStep.done) {
+    if (onDone) {
+      onDone(nextStep.value)
+    }
+  } else {
     const { value: effect } = nextStep
     if ('object' === typeof effect && effect.type) {
-      switch (effect.type) {
-        case 'take': {
-          takeEffect(
-            effect,
-            payload => {
-              runReaction(reaction, Reactor, runtime, payload)
-            },
-            Reactor
-          )
-          break
-        }
-        case 'put': {
-          putEffect(
-            effect,
-            payload => {
-              runReaction(reaction, Reactor, runtime, payload)
-            },
-            Reactor
-          )
-          break
-        }
-        case 'delay': {
-          delayEffect(
-            effect,
-            payload => {
-              runReaction(reaction, Reactor, runtime, payload)
-            },
-            Reactor
-          )
-          break
-        }
-        default: {
-          runReaction(reaction, Reactor, runtime, void 0)
-        }
+      if (effects[effect.type]) {
+        effects[effect.type](
+          effect,
+          payload => {
+            runReaction(reaction, Reactor, payload, onDone)
+          },
+          Reactor,
+          runReaction
+        )
+      } else {
+        runReaction(reaction, Reactor, void 0, onDone)
       }
     } else {
-      runReaction(reaction, Reactor, runtime, void 0)
+      runReaction(reaction, Reactor, void 0, onDone)
     }
   }
 }

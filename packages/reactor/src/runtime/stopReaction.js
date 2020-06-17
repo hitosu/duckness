@@ -1,4 +1,4 @@
-export default function stopReaction(reaction, _Reactor, _runtime) {
+export default function stopReaction(reaction) {
   reaction.isRunning = false
   if (null != reaction.iterator) {
     reaction.iterator.return()

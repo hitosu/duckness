@@ -1,7 +1,7 @@
 import 'regenerator-runtime/runtime'
 
 import Reactor, { Reagent } from '@duckness/reactor'
-import { take, put, delay } from '@duckness/reactor/effects'
+import { take, put, delay, call } from '@duckness/reactor/effects'
 
 describe('@duckness/reactor Reactor', () => {
   test('ping reaction', () =>
@@ -90,19 +90,20 @@ describe('@duckness/reactor Reactor', () => {
 
       reactor.addReaction(function* () {
         yield take('ping')
-        yield delay(100)
-        yield put(pongReagent())
         yield delay(1000)
         yield put(pongReagent())
         yield delay(2000)
         yield put(pongReagent())
         yield delay(3000)
         yield put(pongReagent())
+        yield delay(4000)
+        yield put(pongReagent())
       })
 
       let pongsReceived = 0
       reactor.takeEvery('pong', () => {
         pongsReceived++
+        expect(setTimeout).toHaveBeenLastCalledWith(expect.any(Function), 1000 * pongsReceived)
         if (4 === pongsReceived) {
           resolve()
         }
@@ -115,5 +116,36 @@ describe('@duckness/reactor Reactor', () => {
 
       jest.runAllTimers()
       jest.useRealTimers()
+    }))
+
+  test('call effect with generator', () =>
+    new Promise(resolve => {
+      const reactor = Reactor()
+      const pingReagent = Reagent('ping')
+      const pongReagent = Reagent('pong')
+
+      reactor.addReaction(function* () {
+        yield take('ping')
+        const amount = yield call(function* (amount) {
+          for (let i = 0; i < amount; i++) {
+            yield put(pongReagent(i + 1))
+          }
+          return amount
+        }, 9)
+        expect(amount).toBe(9)
+        yield put(pongReagent(10))
+      })
+
+      let lastPongValueReceived = 0
+      reactor.takeEvery('pong', ({ payload: pongValue } = {}) => {
+        expect(pongValue).toBe(lastPongValueReceived + 1)
+        lastPongValueReceived = pongValue
+        if (10 === pongValue) {
+          resolve()
+        }
+      })
+
+      reactor.run()
+      reactor.put(pingReagent())
     }))
 })

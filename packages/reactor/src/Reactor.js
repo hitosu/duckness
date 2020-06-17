@@ -1,5 +1,6 @@
 import runReaction from './runtime/runReaction'
 import stopReaction from './runtime/stopReaction'
+import Reaction from './Reaction'
 
 export default function Reactor() {
   const runtime = {
@@ -35,18 +36,14 @@ function addReagents(Reactor, runtime) {
 
 function addReactions(Reactor, runtime) {
   function addReaction(reactionGenerator) {
-    const reaction = {
-      isRunning: false,
-      generator: reactionGenerator,
-      iterator: null
-    }
+    const reaction = Reaction(reactionGenerator)
     runtime.reactions.add(reaction)
     if (runtime.isRunning) {
-      runReaction(reaction, Reactor, runtime, void 0)
+      runReaction(reaction, Reactor, void 0)
     }
     return () => {
       if (reaction.isRunning) {
-        stopReaction(reaction, Reactor, runtime)
+        stopReaction(reaction)
       }
       runtime.reactions.delete(reaction)
     }
@@ -63,9 +60,9 @@ function addRuntime(Reactor, runtime) {
       for (let i = 0; i < reactions.length; i++) {
         const reaction = reactions[i]
         if (reaction.isRunning) {
-          stopReaction(reaction, Reactor, runtime)
+          stopReaction(reaction)
         }
-        runReaction(reaction, Reactor, runtime, void 0)
+        runReaction(reaction, Reactor, void 0)
       }
       return true
     } else {
@@ -78,7 +75,7 @@ function addRuntime(Reactor, runtime) {
       runtime.isRunning = false
       runtime.reactions.forEach(reaction => {
         if (reaction.isRunning) {
-          stopReaction(reaction, Reactor, runtime)
+          stopReaction(reaction)
         }
       })
       return true
