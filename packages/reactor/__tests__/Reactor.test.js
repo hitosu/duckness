@@ -82,70 +82,72 @@ describe('@duckness/reactor Reactor', () => {
       }
     }))
 
-  test('delay effect', () =>
-    new Promise(resolve => {
-      const reactor = Reactor()
-      const pingReagent = Reagent('ping')
-      const pongReagent = Reagent('pong')
+  describe('effects', () => {
+    test('delay effect', () =>
+      new Promise(resolve => {
+        const reactor = Reactor()
+        const pingReagent = Reagent('ping')
+        const pongReagent = Reagent('pong')
 
-      reactor.addReaction(function* () {
-        yield take('ping')
-        yield delay(1000)
-        yield put(pongReagent())
-        yield delay(2000)
-        yield put(pongReagent())
-        yield delay(3000)
-        yield put(pongReagent())
-        yield delay(4000)
-        yield put(pongReagent())
-      })
+        reactor.addReaction(function* () {
+          yield take('ping')
+          yield delay(1000)
+          yield put(pongReagent())
+          yield delay(2000)
+          yield put(pongReagent())
+          yield delay(3000)
+          yield put(pongReagent())
+          yield delay(4000)
+          yield put(pongReagent())
+        })
 
-      let pongsReceived = 0
-      reactor.takeEvery('pong', () => {
-        pongsReceived++
-        expect(setTimeout).toHaveBeenLastCalledWith(expect.any(Function), 1000 * pongsReceived)
-        if (4 === pongsReceived) {
-          resolve()
-        }
-      })
-
-      jest.useFakeTimers()
-
-      reactor.run()
-      reactor.put(pingReagent())
-
-      jest.runAllTimers()
-      jest.useRealTimers()
-    }))
-
-  test('call effect with generator', () =>
-    new Promise(resolve => {
-      const reactor = Reactor()
-      const pingReagent = Reagent('ping')
-      const pongReagent = Reagent('pong')
-
-      reactor.addReaction(function* () {
-        yield take('ping')
-        const amount = yield call(function* (amount) {
-          for (let i = 0; i < amount; i++) {
-            yield put(pongReagent(i + 1))
+        let pongsReceived = 0
+        reactor.takeEvery('pong', () => {
+          pongsReceived++
+          expect(setTimeout).toHaveBeenLastCalledWith(expect.any(Function), 1000 * pongsReceived)
+          if (4 === pongsReceived) {
+            resolve()
           }
-          return amount
-        }, 9)
-        expect(amount).toBe(9)
-        yield put(pongReagent(10))
-      })
+        })
 
-      let lastPongValueReceived = 0
-      reactor.takeEvery('pong', ({ payload: pongValue } = {}) => {
-        expect(pongValue).toBe(lastPongValueReceived + 1)
-        lastPongValueReceived = pongValue
-        if (10 === pongValue) {
-          resolve()
-        }
-      })
+        jest.useFakeTimers()
 
-      reactor.run()
-      reactor.put(pingReagent())
-    }))
+        reactor.run()
+        reactor.put(pingReagent())
+
+        jest.runAllTimers()
+        jest.useRealTimers()
+      }))
+
+    test('call effect with generator', () =>
+      new Promise(resolve => {
+        const reactor = Reactor()
+        const pingReagent = Reagent('ping')
+        const pongReagent = Reagent('pong')
+
+        reactor.addReaction(function* () {
+          yield take('ping')
+          const amount = yield call(function* (amount) {
+            for (let i = 0; i < amount; i++) {
+              yield put(pongReagent(i + 1))
+            }
+            return amount
+          }, 9)
+          expect(amount).toBe(9)
+          yield put(pongReagent(10))
+        })
+
+        let lastPongValueReceived = 0
+        reactor.takeEvery('pong', ({ payload: pongValue } = {}) => {
+          expect(pongValue).toBe(lastPongValueReceived + 1)
+          lastPongValueReceived = pongValue
+          if (10 === pongValue) {
+            resolve()
+          }
+        })
+
+        reactor.run()
+        reactor.put(pingReagent())
+      }))
+  })
 })

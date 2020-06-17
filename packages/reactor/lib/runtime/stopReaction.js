@@ -1,2 +1,2 @@
-"use strict";Object.defineProperty(exports,"__esModule",{value:!0}),exports.default=stopReaction;function stopReaction(a){a.isRunning=!1,null!=a.iterator&&a.iterator.return(),a.iterator=null}
+"use strict";Object.defineProperty(exports,"__esModule",{value:!0}),exports.default=stopReaction;function stopReaction(a){a.stop()}
 //# sourceMappingURL=stopReaction.js.map

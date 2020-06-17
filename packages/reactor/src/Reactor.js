@@ -1,29 +1,29 @@
-import runReaction from './runtime/runReaction'
-import stopReaction from './runtime/stopReaction'
+import runReactorReaction from './runtime/runReaction'
+import stopReactorReaction from './runtime/stopReaction'
 import Reaction from './Reaction'
 
 export default function Reactor() {
-  const runtime = {
+  const state = {
     isRunning: false,
     reactions: new Set(),
     subscriptions: new Map()
   }
 
   const Reactor = {}
-  addReagents(Reactor, runtime)
-  addReactions(Reactor, runtime)
-  addRuntime(Reactor, runtime)
-  addSubscriptions(Reactor, runtime)
+  addReagents(Reactor, state)
+  addReactions(Reactor, state)
+  addRuntime(Reactor, state)
+  addSubscriptions(Reactor, state)
 
   return Reactor
 }
 
-function addReagents(Reactor, runtime) {
+function addReagents(Reactor, state) {
   function put(reagent) {
-    if (runtime.isRunning) {
+    if (state.isRunning) {
       const { type: reagentType } = reagent
-      if (runtime.subscriptions.has(reagentType)) {
-        const listeners = [...runtime.subscriptions.get(reagentType)]
+      if (state.subscriptions.has(reagentType)) {
+        const listeners = [...state.subscriptions.get(reagentType)]
         for (let i = 0; i < listeners.length; i++) {
           listeners[i](reagent)
         }
@@ -34,35 +34,43 @@ function addReagents(Reactor, runtime) {
   Object.defineProperty(Reactor, 'put', { value: put, writable: false, enumerable: true })
 }
 
-function addReactions(Reactor, runtime) {
+function addReactions(Reactor, state) {
   function addReaction(reactionGenerator) {
     const reaction = Reaction(reactionGenerator)
-    runtime.reactions.add(reaction)
-    if (runtime.isRunning) {
-      runReaction(reaction, Reactor, void 0)
+    state.reactions.add(reaction)
+    if (state.isRunning) {
+      runReactorReaction(reaction, Reactor, void 0)
     }
     return () => {
       if (reaction.isRunning) {
-        stopReaction(reaction)
+        stopReactorReaction(reaction, Reactor)
       }
-      runtime.reactions.delete(reaction)
+      state.reactions.delete(reaction)
     }
   }
 
   Object.defineProperty(Reactor, 'addReaction', { value: addReaction, writable: false, enumerable: true })
 }
 
-function addRuntime(Reactor, runtime) {
+function addRuntime(Reactor, state) {
+  function runReaction(reaction, currentValue, onDone) {
+    return runReactorReaction(reaction, Reactor, currentValue, onDone)
+  }
+
+  function stopReaction(reaction) {
+    return stopReactorReaction(reaction, Reactor)
+  }
+
   function run() {
-    if (!runtime.isRunning) {
-      runtime.isRunning = true
-      const reactions = [...runtime.reactions]
+    if (!state.isRunning) {
+      state.isRunning = true
+      const reactions = [...state.reactions]
       for (let i = 0; i < reactions.length; i++) {
         const reaction = reactions[i]
         if (reaction.isRunning) {
-          stopReaction(reaction)
+          stopReactorReaction(reaction, Reactor)
         }
-        runReaction(reaction, Reactor, void 0)
+        runReactorReaction(reaction, Reactor, void 0)
       }
       return true
     } else {
@@ -71,11 +79,11 @@ function addRuntime(Reactor, runtime) {
   }
 
   function stop() {
-    if (runtime.isRunning) {
-      runtime.isRunning = false
-      runtime.reactions.forEach(reaction => {
+    if (state.isRunning) {
+      state.isRunning = false
+      state.reactions.forEach(reaction => {
         if (reaction.isRunning) {
-          stopReaction(reaction)
+          stopReactorReaction(reaction, Reactor)
         }
       })
       return true
@@ -88,22 +96,28 @@ function addRuntime(Reactor, runtime) {
   Object.defineProperty(Reactor, 'stop', { value: stop, writable: false, enumerable: true })
   Object.defineProperty(Reactor, 'isRunning', {
     get() {
-      return runtime.isRunning
+      return state.isRunning
     },
     enumerable: true
   })
+  Object.defineProperty(Reactor, 'runReaction', {
+    value: runReaction,
+    writable: false,
+    enumerable: true
+  })
+  Object.defineProperty(Reactor, 'stopReaction', { value: stopReaction, writable: false, enumerable: true })
 }
 
-function addSubscriptions(Reactor, runtime) {
+function addSubscriptions(Reactor, state) {
   function takeEvery(reagentType, listener) {
     if ('function' === typeof listener) {
-      if (!runtime.subscriptions.has(reagentType)) {
-        runtime.subscriptions.set(reagentType, new Set())
+      if (!state.subscriptions.has(reagentType)) {
+        state.subscriptions.set(reagentType, new Set())
       }
-      runtime.subscriptions.get(reagentType).add(listener)
+      state.subscriptions.get(reagentType).add(listener)
       return () => {
-        if (runtime.subscriptions.has(reagentType) && runtime.subscriptions.get(reagentType).has(listener)) {
-          runtime.subscriptions.get(reagentType).delete(listener)
+        if (state.subscriptions.has(reagentType) && state.subscriptions.get(reagentType).has(listener)) {
+          state.subscriptions.get(reagentType).delete(listener)
           return true
         } else {
           return false
