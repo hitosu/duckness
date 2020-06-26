@@ -8,6 +8,8 @@ export default function Duck(duckName, poolName, duckContext) {
   const duckFace = {
     /*
     actionTypes
+    mapActionType
+    listActionTypes
     select
     action
     reduce
