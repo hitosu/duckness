@@ -1,16 +1,24 @@
 {
   "name": "@duckness/duck",
-  "version": "0.5.2",
+  "version": "0.5.3",
   "description": "@duckness/duck - Modular Redux Ducks hatchery",
-  "keywords": ["redux", "ducks", "modular"],
+  "keywords": [
+    "redux",
+    "ducks",
+    "modular"
+  ],
   "author": "Vasily Kazantsev <vasily@kazantsev.xyz>",
   "homepage": "https://github.com/hitosu/duckness/tree/master/packages/duck",
   "license": "MIT",
   "main": "src/Duck.js",
-  "files": ["src/"],
+  "files": [
+    "src/"
+  ],
   "publishConfig": {
     "main": "lib/Duck.js",
-    "files": ["lib/"],
+    "files": [
+      "lib/"
+    ],
     "registry": "https://registry.npmjs.org",
     "access": "public"
   },

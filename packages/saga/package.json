@@ -1,16 +1,25 @@
 {
   "name": "@duckness/saga",
-  "version": "0.5.2",
+  "version": "0.5.3",
   "description": "Saga extension for @duckness/duck - Modular Redux Ducks hatchery",
-  "keywords": ["redux", "ducks", "modular", "saga"],
+  "keywords": [
+    "redux",
+    "ducks",
+    "modular",
+    "saga"
+  ],
   "author": "Vasily Kazantsev <vasily@kazantsev.xyz>",
   "homepage": "https://github.com/hitosu/duckness/tree/master/packages/saga",
   "license": "MIT",
   "main": "src/SagaDuck.js",
-  "files": ["src/"],
+  "files": [
+    "src/"
+  ],
   "publishConfig": {
     "main": "lib/SagaDuck.js",
-    "files": ["lib/"],
+    "files": [
+      "lib/"
+    ],
     "registry": "https://registry.npmjs.org",
     "access": "public"
   },
@@ -28,7 +37,7 @@
     "url": "https://github.com/hitosu/duckness/issues"
   },
   "dependencies": {
-    "@duckness/duck": "^0.5.2"
+    "@duckness/duck": "^0.5.3"
   },
   "peerDependencies": {
     "redux-saga": "^1.1.3"

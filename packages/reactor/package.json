@@ -1,15 +1,21 @@
 {
   "name": "@duckness/reactor",
-  "version": "0.5.2",
+  "version": "0.5.3",
   "description": "Duckness Reactor - reactive selectors",
   "author": "Vasily Kazantsev <vasily@kazantsev.xyz>",
   "homepage": "https://github.com/hitosu/duckness/packages/reactor",
   "license": "MIT",
   "main": "src/index.js",
-  "files": ["src/", "effects/"],
+  "files": [
+    "src/",
+    "effects/"
+  ],
   "publishConfig": {
     "main": "lib/index.js",
-    "files": ["lib/", "effects/"],
+    "files": [
+      "lib/",
+      "effects/"
+    ],
     "registry": "https://registry.npmjs.org",
     "access": "public"
   },
