@@ -2,25 +2,13 @@
   "name": "@duckness/pool-saga-stream",
   "version": "0.5.4",
   "description": "Duckness Pool Saga Stream - @duckness/saga plugin for @duckness/pool",
-  "keywords": [
-    "redux",
-    "ducks",
-    "modular",
-    "duckness",
-    "redux-saga"
-  ],
+  "keywords": ["redux", "ducks", "modular", "duckness", "redux-saga"],
   "author": "Vasily Kazantsev <vasily@kazantsev.xyz>",
   "homepage": "https://github.com/hitosu/duckness/tree/master/packages/pool-saga-stream",
   "license": "MIT",
-  "main": "src/PoolSagaStream.js",
-  "files": [
-    "src/"
-  ],
+  "main": "lib/PoolSagaStream.js",
+  "files": ["lib/"],
   "publishConfig": {
-    "main": "lib/PoolSagaStream.js",
-    "files": [
-      "lib/"
-    ],
     "registry": "https://registry.npmjs.org",
     "access": "public"
   },
