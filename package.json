@@ -7,7 +7,9 @@
   "author": "Vasily Kazantsev <vasily@kazantsev.xyz>",
   "license": "MIT",
   "private": true,
-  "workspaces": ["packages/*"],
+  "workspaces": [
+    "packages/*"
+  ],
   "scripts": {
     "test": "yarn lint && jest",
     "test:watch": "yarn lint && jest --watch",
@@ -45,12 +47,13 @@
     "jest": "^26.0.1",
     "lerna": "^3.21.0",
     "prettier": "^2.0.5",
-    "prop-types": "^15.7.2"
+    "prop-types": "^15.7.2",
+    "rimraf": "^3.0.2"
   },
   "dependencies": {
     "react": "^16.13.1",
+    "react-redux": "^7.2.0",
     "redux": "^4.0.5",
-    "redux-saga": "^1.1.3",
-    "react-redux": "^7.2.0"
+    "redux-saga": "^1.1.3"
   }
 }
