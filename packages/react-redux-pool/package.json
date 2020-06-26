@@ -1,13 +1,21 @@
 {
   "name": "@duckness/react-redux-pool",
-  "version": "0.5.4",
+  "version": "0.5.5",
   "description": "@duckness/pool + React-Redux",
-  "keywords": ["duckness", "react", "redux", "react-redux", "redux-saga"],
+  "keywords": [
+    "duckness",
+    "react",
+    "redux",
+    "react-redux",
+    "redux-saga"
+  ],
   "author": "Vasily Kazantsev <vasily@kazantsev.xyz>",
   "homepage": "https://github.com/hitosu/duckness/tree/master/packages/react-redux-pool",
   "license": "MIT",
   "main": "lib/ReactReduxPool.js",
-  "files": ["lib/"],
+  "files": [
+    "lib/"
+  ],
   "publishConfig": {
     "registry": "https://registry.npmjs.org",
     "access": "public"
@@ -26,7 +34,7 @@
     "url": "https://github.com/hitosu/duckness/issues"
   },
   "dependencies": {
-    "@duckness/pool": "^0.5.4"
+    "@duckness/pool": "^0.5.5"
   },
   "peerDependencies": {
     "react": "^16.13.1",
