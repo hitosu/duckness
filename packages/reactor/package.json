@@ -6,10 +6,11 @@
   "homepage": "https://github.com/hitosu/duckness/packages/reactor",
   "license": "MIT",
   "main": "lib/index.js",
-  "files": [
-    "lib/",
-    "effects/"
-  ],
+  "files": ["lib/", "effects/"],
+  "directories": {
+    "lib": "lib",
+    "test": "__tests__"
+  },
   "publishConfig": {
     "registry": "https://registry.npmjs.org",
     "access": "public"
