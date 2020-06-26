@@ -2,25 +2,15 @@
   "name": "@duckness/use-redux",
   "version": "0.5.2",
   "description": "React hook for Redux store",
-  "keywords": [
-    "react",
-    "react-hooks",
-    "redux"
-  ],
+  "keywords": ["react", "react-hooks", "redux"],
   "author": "Vasily Kazantsev <vasily@kazantsev.xyz>",
   "homepage": "https://github.com/hitosu/duckness/tree/master/packages/use-redux",
   "license": "MIT",
-  "main": "lib/useRedux.js",
-  "directories": {
-    "lib": "lib",
-    "src": "src",
-    "test": "__tests__"
-  },
-  "files": [
-    "lib",
-    "src"
-  ],
+  "main": "src/useRedux.js",
+  "files": ["src/"],
   "publishConfig": {
+    "main": "lib/useRedux.js",
+    "files": ["lib/"],
     "registry": "https://registry.npmjs.org",
     "access": "public"
   },
