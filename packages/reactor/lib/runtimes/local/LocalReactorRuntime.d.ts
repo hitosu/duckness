@@ -1,2 +1,2 @@
-import type { TReactorRuntime } from '../ReactorRuntime';
-export default function LocalRuntime(): TReactorRuntime;
+import type { ReactorRuntime } from '../ReactorRuntime';
+export default function LocalRuntime(): ReactorRuntime;

@@ -1,13 +1,13 @@
-export declare type TReagentType = string | symbol;
-export interface TReagent {
-    type: TReagentType;
+export declare type ReagentType = string | symbol;
+export interface Reagent {
+    type: ReagentType;
     payload: any;
     [key: string]: any;
 }
-export interface TReagentConstructor {
-    (payload: any): TReagent;
-    readonly reagentType: TReagentType;
+export interface ReagentConstructor {
+    (payload: any): Reagent;
+    readonly reagentType: ReagentType;
 }
-export declare type TPayloadBuilder = (payload: any) => any;
-export declare type TReagentTransformer = (reagent: TReagent) => TReagent;
-export default function Reagent(type: TReagentType, payloadBuilder: TPayloadBuilder, reagentTransformer: TReagentTransformer): TReagentConstructor;
+export declare type ReagentPayloadBuilder = (payload: any) => any;
+export declare type ReagentTransformer = (reagent: Reagent) => Reagent;
+export default function Reagent(type: ReagentType, payloadBuilder: ReagentPayloadBuilder, reagentTransformer: ReagentTransformer): ReagentConstructor;

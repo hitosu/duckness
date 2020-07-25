@@ -1,6 +1,6 @@
-import type { TEffectTaskWorker } from './EffectTaskWorker'
+import type { EffectTaskWorker } from './EffectTaskWorker'
 
-const putEffect: TEffectTaskWorker = function (onDone, _effect, _effectsRuntime) {
+const putEffect: EffectTaskWorker = function (onDone, _effect, _effectsRuntime) {
   onDone({})
   return {}
 }

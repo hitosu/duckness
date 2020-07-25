@@ -1,3 +1,3 @@
-import type { TEffectTaskWorker } from './EffectTaskWorker';
-declare const putEffect: TEffectTaskWorker;
+import type { EffectTaskWorker } from './EffectTaskWorker';
+declare const putEffect: EffectTaskWorker;
 export default putEffect;

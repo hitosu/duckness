@@ -1,23 +1,20 @@
-import type { TEffectTaskWorker } from './EffectTaskWorker'
-import type { TEffect, TEffectType } from '../../../effects/Effect'
+import type { EffectTaskWorker } from './EffectTaskWorker'
+import type { EffectType } from '../../../effects/Effect'
+import type { Reaction, ReactionGenerator, ReactionInstruction } from '../../ReactorRuntime'
 
-export type TReactionInstruction = TEffect
-export type TReactionGenerator = Generator<TReactionInstruction>
-export type TReaction = (...args: any[]) => TReactionGenerator
-
-const spawnEffect: TEffectTaskWorker = function (
+const spawnEffect: EffectTaskWorker = function (
   onDone,
-  effect: { type: TEffectType, payload: TReaction, args?: any[] },
+  effect: { type: EffectType, payload: Reaction, args?: any[] },
   _effectsRuntime
 ) {
-  const reactionGenerator: TReactionGenerator = effect.payload(effect.args)
+  const reactionGenerator: ReactionGenerator = effect.payload(effect.args)
 
   function advanceReaction(advanceValue?: any) {
-    const currentIteration: IteratorResult<TReactionInstruction> = reactionGenerator.next(advanceValue)
+    const currentIteration: IteratorResult<ReactionInstruction> = reactionGenerator.next(advanceValue)
     if (currentIteration.done) {
       onDone()
     } else {
-      const currentInstruction: TReactionInstruction = currentIteration.value
+      const currentInstruction: ReactionInstruction = currentIteration.value
       console.log('currentInstruction', currentInstruction)
       advanceReaction({})
     }

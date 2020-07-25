@@ -8,7 +8,7 @@ var __spreadArrays = (this && this.__spreadArrays) || function () {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var MAX_TASK_ID = Math.pow(2, 53) - 1;
-function TaskManager() {
+function buildTaskManager() {
     var state = {
         idCounter: 0,
         taskQueue: [],
@@ -82,5 +82,5 @@ function TaskManager() {
     };
     return Object.freeze(taskManager);
 }
-exports.default = TaskManager;
+exports.default = buildTaskManager;
 //# sourceMappingURL=TaskManager.js.map

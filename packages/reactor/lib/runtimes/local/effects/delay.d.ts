@@ -1,3 +1,3 @@
-import type { TEffectTaskWorker } from './EffectTaskWorker';
-declare const delayEffect: TEffectTaskWorker;
+import type { EffectTaskWorker } from './EffectTaskWorker';
+declare const delayEffect: EffectTaskWorker;
 export default delayEffect;

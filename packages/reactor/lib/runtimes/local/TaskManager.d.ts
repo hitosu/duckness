@@ -1,22 +1,22 @@
-export declare type TTaskID = number;
-export declare type TTaskOnDone = (...onDoneArgs: any[]) => void;
-export declare type TTaskOnCancel = (cancelValue?: any) => boolean;
-export declare type TTaskWorker = (onDone: TTaskOnDone, ...workerArgs: any[]) => {
-    cancel?: TTaskOnCancel;
+export declare type TaskID = number;
+export declare type TaskOnDone = (...onDoneArgs: any[]) => void;
+export declare type TaskOnCancel = (cancelValue?: any) => boolean;
+export declare type TaskWorker = (onDone: TaskOnDone, ...workerArgs: any[]) => {
+    cancel?: TaskOnCancel;
 };
-export interface TTask {
-    id: TTaskID;
-    worker: TTaskWorker;
+export interface Task {
+    id: TaskID;
+    worker: TaskWorker;
     workerArgs?: any[];
-    onDone: TTaskOnDone;
-    onCancel?: TTaskOnCancel;
+    onDone: TaskOnDone;
+    onCancel?: TaskOnCancel;
 }
-export interface TTaskManager {
-    add(worker: TTaskWorker, onDone: TTaskOnDone, ...workerArgs: any[]): TTaskID;
+export interface TaskManager {
+    add(worker: TaskWorker, onDone: TaskOnDone, ...workerArgs: any[]): TaskID;
     runQueue(resume?: boolean): void;
     pauseQueue(): void;
     resumeQueue(): void;
-    cancel(id: TTaskID, cancelValue?: any): boolean;
+    cancel(id: TaskID, cancelValue?: any): boolean;
     cancelAll(cancelValue?: any): void;
 }
-export default function TaskManager(): TTaskManager;
+export default function buildTaskManager(): TaskManager;

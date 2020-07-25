@@ -1,29 +1,29 @@
 const MAX_TASK_ID = Math.pow(2, 53) - 1
-export type TTaskID = number
-export type TTaskOnDone = (...onDoneArgs: any[]) => void
-export type TTaskOnCancel = (cancelValue?: any) => boolean
-export type TTaskWorker = (onDone: TTaskOnDone, ...workerArgs: any[]) => { cancel?: TTaskOnCancel }
-export interface TTask {
-  id: TTaskID;
-  worker: TTaskWorker;
+export type TaskID = number
+export type TaskOnDone = (...onDoneArgs: any[]) => void
+export type TaskOnCancel = (cancelValue?: any) => boolean
+export type TaskWorker = (onDone: TaskOnDone, ...workerArgs: any[]) => { cancel?: TaskOnCancel }
+export interface Task {
+  id: TaskID;
+  worker: TaskWorker;
   workerArgs?: any[];
-  onDone: TTaskOnDone;
-  onCancel?: TTaskOnCancel;
+  onDone: TaskOnDone;
+  onCancel?: TaskOnCancel;
 }
-export interface TTaskManager {
-  add(worker: TTaskWorker, onDone: TTaskOnDone, ...workerArgs: any[]): TTaskID;
+export interface TaskManager {
+  add(worker: TaskWorker, onDone: TaskOnDone, ...workerArgs: any[]): TaskID;
   runQueue(resume?: boolean): void;
   pauseQueue(): void;
   resumeQueue(): void;
-  cancel(id: TTaskID, cancelValue?: any): boolean;
+  cancel(id: TaskID, cancelValue?: any): boolean;
   cancelAll(cancelValue?: any): void;
 }
 
-export default function TaskManager(): TTaskManager {
+export default function buildTaskManager(): TaskManager {
   const state: {
     idCounter: number,
-    taskQueue: TTask[],
-    running: Map<TTaskID, TTask>,
+    taskQueue: Task[],
+    running: Map<TaskID, Task>,
     paused: boolean
   } = {
     idCounter: 0,
@@ -32,7 +32,7 @@ export default function TaskManager(): TTaskManager {
     paused: false
   }
 
-  const taskManager: TTaskManager = {
+  const taskManager: TaskManager = {
     add(worker, onDone, ...workerArgs) {
       const id = MAX_TASK_ID <= state.idCounter ? (state.idCounter = 0) : state.idCounter++
       state.taskQueue.push({

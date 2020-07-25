@@ -1,14 +1,14 @@
-import type { TReactionGenerator } from '../../ReactorRuntime';
-import type { TTaskID, TTaskManager } from '../TaskManager';
-import type { TReagent, TReagentType } from '../../../Reagent';
-export declare type TReagentListener = (reagent: TReagent) => void;
-export interface TEffectsRuntime {
-    spawn: (reactionGenerator: TReactionGenerator, ...args: any[]) => void;
-    put: (reagent: TReagent) => void;
-    takeEvery: (reagentType: TReagentType, listener: TReagentListener) => () => void;
-    take: (reagentType: TReagentType, listener: TReagentListener) => () => void;
+import type { ReactionGenerator } from '../../ReactorRuntime';
+import type { TaskID, TaskManager } from '../TaskManager';
+import type { Reagent, ReagentType } from '../../../Reagent';
+export declare type ReagentListener = (reagent: Reagent) => void;
+export interface EffectsRuntime {
+    spawn: (reactionGenerator: ReactionGenerator, ...args: any[]) => void;
+    put: (reagent: Reagent) => void;
+    takeEvery: (reagentType: ReagentType, listener: ReagentListener) => () => void;
+    take: (reagentType: ReagentType, listener: ReagentListener) => () => void;
 }
 export declare function buildEffectsRuntime(reactorState: {
-    taskManager: TTaskManager;
-    spawnedReactionIDs: Set<TTaskID>;
-}): TEffectsRuntime;
+    taskManager: TaskManager;
+    spawnedReactionIDs: Set<TaskID>;
+}): EffectsRuntime;

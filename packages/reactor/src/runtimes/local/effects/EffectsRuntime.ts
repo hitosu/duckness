@@ -1,29 +1,29 @@
-import type { TReactionGenerator } from '../../ReactorRuntime'
-import type { TTaskID, TTaskManager } from '../TaskManager'
-import type { TEffect } from '../../../effects/Effect'
-import type { TReagent, TReagentType } from '../../../Reagent'
+import type { ReactionGenerator } from '../../ReactorRuntime'
+import type { TaskID, TaskManager } from '../TaskManager'
+import type { Effect } from '../../../effects/Effect'
+import type { Reagent, ReagentType } from '../../../Reagent'
 
 import { spawn as spawnEffect } from '../../../effects'
 import spawn from './spawn'
 
-export type TReagentListener = (reagent: TReagent) => void
-export interface TEffectsRuntime {
-  spawn: (reactionGenerator: TReactionGenerator, ...args: any[]) => void;
-  put: (reagent: TReagent) => void;
-  takeEvery: (reagentType: TReagentType, listener: TReagentListener) => () => void;
-  take: (reagentType: TReagentType, listener: TReagentListener) => () => void;
+export type ReagentListener = (reagent: Reagent) => void
+export interface EffectsRuntime {
+  spawn: (reactionGenerator: ReactionGenerator, ...args: any[]) => void;
+  put: (reagent: Reagent) => void;
+  takeEvery: (reagentType: ReagentType, listener: ReagentListener) => () => void;
+  take: (reagentType: ReagentType, listener: ReagentListener) => () => void;
 }
 
 export function buildEffectsRuntime(reactorState: {
-  taskManager: TTaskManager,
-  spawnedReactionIDs: Set<TTaskID>
-}): TEffectsRuntime {
-  const reagentListeners: Map<TReagentType, Set<TReagentListener>> = new Map()
+  taskManager: TaskManager,
+  spawnedReactionIDs: Set<TaskID>
+}): EffectsRuntime {
+  const reagentListeners: Map<ReagentType, Set<ReagentListener>> = new Map()
 
-  const effectsRuntime: TEffectsRuntime = {
+  const effectsRuntime: EffectsRuntime = {
     spawn(reactionGenerator, ...args) {
-      const effect: TEffect = spawnEffect(reactionGenerator, ...args)
-      const spawnedTaskID: TTaskID = reactorState.taskManager.add(
+      const effect: Effect = spawnEffect(reactionGenerator, ...args)
+      const spawnedTaskID: TaskID = reactorState.taskManager.add(
         spawn,
         () => {
           reactorState.spawnedReactionIDs.delete(spawnedTaskID)
@@ -46,7 +46,7 @@ export function buildEffectsRuntime(reactorState: {
         const listeners = reagentListeners.get(reagentType)
         listeners.add(listener)
       } else {
-        const listeners: Set<TReagentListener> = new Set()
+        const listeners: Set<ReagentListener> = new Set()
         listeners.add(listener)
         reagentListeners.set(reagentType, listeners)
       }

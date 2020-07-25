@@ -1,31 +1,31 @@
 /* eslint-disable no-console */
 
-import type { TReagent } from '../../Reagent'
-import type { TReactorRuntime, TReactionGenerator } from '../ReactorRuntime'
-import type { TTaskManager, TTaskID } from './TaskManager'
-import type { TEffectsRuntime } from './effects/EffectsRuntime'
+import type { Reagent } from '../../Reagent'
+import type { ReactorRuntime, ReactionGenerator } from '../ReactorRuntime'
+import type { TaskManager, TaskID } from './TaskManager'
+import type { EffectsRuntime } from './effects/EffectsRuntime'
 
-import TaskManager from './TaskManager'
+import buildTaskManager from './TaskManager'
 import { buildEffectsRuntime } from './effects/EffectsRuntime'
 
-export default function LocalRuntime(): TReactorRuntime {
+export default function LocalRuntime(): ReactorRuntime {
   const state: {
-    reactions: Set<TReactionGenerator>,
-    taskManager: TTaskManager,
-    spawnedReactionIDs: Set<TTaskID>
+    reactions: Set<ReactionGenerator>,
+    taskManager: TaskManager,
+    spawnedReactionIDs: Set<TaskID>
   } = {
     reactions: new Set(),
-    taskManager: TaskManager(),
+    taskManager: buildTaskManager(),
     spawnedReactionIDs: new Set()
   }
 
-  const effectsRuntime: TEffectsRuntime = buildEffectsRuntime(state)
+  const effectsRuntime: EffectsRuntime = buildEffectsRuntime(state)
 
   const runtime = {
-    put(reagent: TReagent) {
+    put(reagent: Reagent) {
       effectsRuntime.put(reagent)
     },
-    addReaction(reactionGenerator: TReactionGenerator) {
+    addReaction(reactionGenerator: ReactionGenerator) {
       state.reactions.add(reactionGenerator)
     },
     run(...args: any[]) {

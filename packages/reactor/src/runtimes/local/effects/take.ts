@@ -1,8 +1,8 @@
-import type { TEffectTaskWorker } from './EffectTaskWorker'
-import { TReagentType } from '../../../Reagent'
+import type { EffectTaskWorker } from './EffectTaskWorker'
+import { ReagentType } from '../../../Reagent'
 
-const takeEffect: TEffectTaskWorker = function (onDone, effect, effectsRuntime) {
-  const reagentTypesToTake: Array<TReagentType> = [effect.payload, ...effect.args]
+const takeEffect: EffectTaskWorker = function (onDone, effect, effectsRuntime) {
+  const reagentTypesToTake: Array<ReagentType> = [effect.payload, ...effect.args]
 
   const unsubscribes: Array<() => void> = reagentTypesToTake.map(reagentType =>
     effectsRuntime.takeEvery(reagentType, reagent => {

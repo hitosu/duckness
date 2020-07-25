@@ -1,6 +1,6 @@
-import type { TTaskOnDone, TTaskOnCancel } from '../TaskManager';
-import type { TEffect } from '../../../effects/Effect';
-import type { TEffectsRuntime } from './EffectsRuntime';
-export declare type TEffectTaskWorker = (onDone: TTaskOnDone, effect: TEffect, effectsRuntime: TEffectsRuntime) => {
-    cancel?: TTaskOnCancel;
+import type { TaskOnDone, TaskOnCancel } from '../TaskManager';
+import type { Effect } from '../../../effects/Effect';
+import type { EffectsRuntime } from './EffectsRuntime';
+export declare type EffectTaskWorker = (onDone: TaskOnDone, effect: Effect, effectsRuntime: EffectsRuntime) => {
+    cancel?: TaskOnCancel;
 };
