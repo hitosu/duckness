@@ -3,6 +3,7 @@ import type { EffectsRuntime } from './EffectsRuntime'
 import type { TaskID, TaskOnDone, TaskOnCancel } from './TaskManager'
 
 import effects from './effects'
+import { isEffect } from '../../effects/Effect'
 
 export interface SpawnedReaction {
   cancel: TaskOnCancel;
@@ -23,21 +24,19 @@ export default function spawnReaction(
     curentInstructionTaskID: null
   }
 
-  const reactionGenerator: ReactionGenerator = reaction(reactionArgs)
+  const reactionGenerator: ReactionGenerator = reaction(...reactionArgs)
 
   function advanceReaction(advanceValue?: any) {
     const currentIteration: IteratorResult<ReactionInstruction> = reactionGenerator.next(advanceValue)
     if (currentIteration.done) {
       state.done = true
       if (onDone) {
-        onDone()
+        onDone(currentIteration.value)
       }
     } else {
       const currentInstruction: ReactionInstruction = currentIteration.value
-      if ('object' === typeof currentInstruction && currentInstruction.type) {
-        if ('spawn' === currentInstruction.type) {
-          effectsRuntime.spawnReaction(currentInstruction.payload, ...currentInstruction.args)
-        } else if (effects[currentInstruction.type]) {
+      if (isEffect(currentInstruction)) {
+        if (effects[currentInstruction.type]) {
           state.curentInstructionTaskID = effectsRuntime.addTask(
             effects[currentInstruction.type],
             (advanceValue: any) => {
@@ -48,6 +47,8 @@ export default function spawnReaction(
           )
           effectsRuntime.runTasksQueue()
         }
+      } else {
+        Promise.resolve(currentInstruction).then(value => advanceReaction(value))
       }
     }
   }
@@ -64,7 +65,6 @@ export default function spawnReaction(
           state.curentInstructionTaskID = null
         }
         reactionGenerator.return(cancelValue)
-        // TODO: reject
         state.done = true
         return true
       }

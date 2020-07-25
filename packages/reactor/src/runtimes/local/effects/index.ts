@@ -4,6 +4,8 @@ import { default as take } from './take'
 import { default as takeEvery } from './takeEvery'
 import { default as put } from './put'
 import { default as delay } from './delay'
+import { default as getContext } from './getContext'
+import { default as setContext } from './setContext'
 
 export default {
   spawn,
@@ -11,5 +13,7 @@ export default {
   take,
   takeEvery,
   put,
-  delay
+  delay,
+  getContext,
+  setContext
 }

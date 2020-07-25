@@ -9,9 +9,11 @@ export type CancelReagentListener = () => void
 
 export interface ReactorRuntime {
   put(reagent: Reagent): void;
-  takeEvery(reagentTypes: Array<ReagentType> | ReagentType, listener: ReagentListener): CancelReagentListener;
+  takeEvery(reagentTypes: ReagentType | Array<ReagentType>, listener: ReagentListener): CancelReagentListener;
   addReaction(reaction: Reaction): void;
   run(...args: any[]): boolean;
   stop(stopValue: any): boolean;
+  setContext(props: { [key: string]: any }): void;
+  getContext: (...keys: string[]) => { [key: string]: any };
   isRunning(): boolean;
 }

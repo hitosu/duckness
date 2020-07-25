@@ -5,5 +5,7 @@ declare const _default: {
     takeEvery: import("../EffectTaskWorker").EffectTaskWorker;
     put: import("../EffectTaskWorker").EffectTaskWorker;
     delay: import("../EffectTaskWorker").EffectTaskWorker;
+    getContext: import("../EffectTaskWorker").EffectTaskWorker;
+    setContext: import("../EffectTaskWorker").EffectTaskWorker;
 };
 export default _default;

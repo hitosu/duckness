@@ -11,11 +11,13 @@ export default function LocalRuntime(): ReactorRuntime {
   const state: {
     reactions: Set<Reaction>,
     taskManager: TaskManager,
-    spawnedReactions: Set<SpawnedReaction>
+    spawnedReactions: Set<SpawnedReaction>,
+    context: { [key: string]: any }
   } = {
     reactions: new Set(),
     taskManager: buildTaskManager(),
-    spawnedReactions: new Set()
+    spawnedReactions: new Set(),
+    context: {}
   }
 
   const effectsRuntime: EffectsRuntime = buildEffectsRuntime(state)
@@ -52,11 +54,21 @@ export default function LocalRuntime(): ReactorRuntime {
     },
     stop(stopValue: any) {
       if (runtime.isRunning()) {
+        state.spawnedReactions.forEach(reaction => {
+          reaction.cancel(stopValue)
+        })
+        state.spawnedReactions.clear()
         state.taskManager.cancelAll(stopValue)
         return true
       } else {
         return false
       }
+    },
+    setContext(props = {}) {
+      effectsRuntime.setContext(props)
+    },
+    getContext(...keys) {
+      return effectsRuntime.getContext(...keys)
     },
     isRunning() {
       return 0 < state.spawnedReactions.size

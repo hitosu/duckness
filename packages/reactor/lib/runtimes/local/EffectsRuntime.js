@@ -71,6 +71,22 @@ function buildEffectsRuntime(reactorState) {
                 listener(reagent);
             });
             return stopTaking;
+        },
+        setContext: function (props) {
+            if (props === void 0) { props = {}; }
+            Object.assign(reactorState.context, props);
+        },
+        getContext: function () {
+            var keys = [];
+            for (var _i = 0; _i < arguments.length; _i++) {
+                keys[_i] = arguments[_i];
+            }
+            var context = {};
+            for (var i = 0; i < keys.length; i++) {
+                var key = keys[i];
+                context[key] = reactorState.context[key];
+            }
+            return context;
         }
     };
     return effectsRuntime;

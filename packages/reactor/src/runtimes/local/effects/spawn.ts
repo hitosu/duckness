@@ -10,9 +10,9 @@ const spawnEffect: EffectTaskWorker = function (
   effectsRuntime
 ) {
   const spawnedReaction = spawnReaction(effect.payload, effect.args, null, effectsRuntime)
-  onDone()
+  onDone(spawnedReaction)
   return {
-    cancel: spawnedReaction.cancel
+    // cancel: spawnedReaction.cancel
   }
 }
 

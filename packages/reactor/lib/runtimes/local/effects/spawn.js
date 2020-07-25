@@ -3,10 +3,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var ReactionRuntime_1 = require("../ReactionRuntime");
 var spawnEffect = function (onDone, effect, effectsRuntime) {
     var spawnedReaction = ReactionRuntime_1.default(effect.payload, effect.args, null, effectsRuntime);
-    onDone();
-    return {
-        cancel: spawnedReaction.cancel
-    };
+    onDone(spawnedReaction);
+    return {};
 };
 exports.default = spawnEffect;
 //# sourceMappingURL=spawn.js.map

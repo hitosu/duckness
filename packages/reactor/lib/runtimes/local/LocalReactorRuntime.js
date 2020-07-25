@@ -13,7 +13,8 @@ function LocalRuntime() {
     var state = {
         reactions: new Set(),
         taskManager: TaskManager_1.default(),
-        spawnedReactions: new Set()
+        spawnedReactions: new Set(),
+        context: {}
     };
     var effectsRuntime = EffectsRuntime_1.buildEffectsRuntime(state);
     var runtime = {
@@ -52,12 +53,27 @@ function LocalRuntime() {
         },
         stop: function (stopValue) {
             if (runtime.isRunning()) {
+                state.spawnedReactions.forEach(function (reaction) {
+                    reaction.cancel(stopValue);
+                });
+                state.spawnedReactions.clear();
                 state.taskManager.cancelAll(stopValue);
                 return true;
             }
             else {
                 return false;
             }
+        },
+        setContext: function (props) {
+            if (props === void 0) { props = {}; }
+            effectsRuntime.setContext(props);
+        },
+        getContext: function () {
+            var keys = [];
+            for (var _i = 0; _i < arguments.length; _i++) {
+                keys[_i] = arguments[_i];
+            }
+            return effectsRuntime.getContext.apply(effectsRuntime, keys);
         },
         isRunning: function () {
             return 0 < state.spawnedReactions.size;

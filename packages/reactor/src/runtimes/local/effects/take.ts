@@ -3,7 +3,7 @@ import type { ReagentType } from '../../../Reagent'
 import type { CancelReagentListener } from '../../ReactorRuntime'
 
 const takeEffect: EffectTaskWorker = function (onDone, effect, effectsRuntime) {
-  const reagentTypesToTake: Array<ReagentType> = [effect.payload, ...effect.args]
+  const reagentTypesToTake: Array<ReagentType> = Array.isArray(effect.payload) ? effect.payload : [effect.payload]
 
   const unsubscribes: Array<CancelReagentListener> = reagentTypesToTake.map(reagentType =>
     effectsRuntime.takeEvery(reagentType, reagent => {

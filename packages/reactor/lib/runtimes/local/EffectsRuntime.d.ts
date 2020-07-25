@@ -11,8 +11,17 @@ export interface EffectsRuntime {
     put: (reagent: Reagent) => void;
     takeEvery: (reagentType: ReagentType, listener: ReagentListener) => CancelReagentListener;
     take: (reagentType: ReagentType, listener: ReagentListener) => CancelReagentListener;
+    setContext: (props: {
+        [key: string]: any;
+    }) => void;
+    getContext: (...keys: string[]) => {
+        [key: string]: any;
+    };
 }
 export declare function buildEffectsRuntime(reactorState: {
     taskManager: TaskManager;
     spawnedReactions: Set<SpawnedReaction>;
+    context: {
+        [key: string]: any;
+    };
 }): EffectsRuntime;

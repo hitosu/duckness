@@ -1,0 +1,1 @@
+{"version":3,"file":"setContext.js","sourceRoot":"","sources":["../../../../src/runtimes/local/effects/setContext.ts"],"names":[],"mappings":";;AAEA,IAAM,gBAAgB,GAAqB,UAAU,MAAM,EAAE,MAAM,EAAE,cAAc;IACjF,IAAM,OAAO,GAAG,MAAM,CAAC,OAAO,IAAI,EAAE,CAAA;IACpC,cAAc,CAAC,UAAU,CAAC,OAAO,CAAC,CAAA;IAClC,MAAM,EAAE,CAAA;IACR,OAAO,EAAE,CAAA;AACX,CAAC,CAAA;AAED,kBAAe,gBAAgB,CAAA"}

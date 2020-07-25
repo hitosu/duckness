@@ -6,12 +6,16 @@ var take_1 = require("./take");
 var takeEvery_1 = require("./takeEvery");
 var put_1 = require("./put");
 var delay_1 = require("./delay");
+var getContext_1 = require("./getContext");
+var setContext_1 = require("./setContext");
 exports.default = {
     spawn: spawn_1.default,
     call: call_1.default,
     take: take_1.default,
     takeEvery: takeEvery_1.default,
     put: put_1.default,
-    delay: delay_1.default
+    delay: delay_1.default,
+    getContext: getContext_1.default,
+    setContext: setContext_1.default
 };
 //# sourceMappingURL=index.js.map

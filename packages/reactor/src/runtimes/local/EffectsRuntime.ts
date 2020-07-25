@@ -13,11 +13,14 @@ export interface EffectsRuntime {
   put: (reagent: Reagent) => void;
   takeEvery: (reagentType: ReagentType, listener: ReagentListener) => CancelReagentListener;
   take: (reagentType: ReagentType, listener: ReagentListener) => CancelReagentListener;
+  setContext: (props: { [key: string]: any }) => void;
+  getContext: (...keys: string[]) => { [key: string]: any };
 }
 
 export function buildEffectsRuntime(reactorState: {
   taskManager: TaskManager,
-  spawnedReactions: Set<SpawnedReaction>
+  spawnedReactions: Set<SpawnedReaction>,
+  context: { [key: string]: any }
 }): EffectsRuntime {
   const reagentListeners: Map<ReagentType, Set<ReagentListener>> = new Map()
 
@@ -77,6 +80,17 @@ export function buildEffectsRuntime(reactorState: {
         listener(reagent)
       })
       return stopTaking
+    },
+    setContext(props = {}) {
+      Object.assign(reactorState.context, props)
+    },
+    getContext(...keys) {
+      const context: { [key: string]: any } = {}
+      for (let i = 0; i < keys.length; i++) {
+        const key = keys[i]
+        context[key] = reactorState.context[key]
+      }
+      return context
     }
   }
   return effectsRuntime
