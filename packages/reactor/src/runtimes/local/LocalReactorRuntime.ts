@@ -1,20 +1,21 @@
 import type { Reagent } from '../../Reagent'
-import type { ReactorRuntime, ReactionGenerator, CancelReagentListener } from '../ReactorRuntime'
-import type { TaskManager, TaskID } from './TaskManager'
-import type { EffectsRuntime } from './effects/EffectsRuntime'
+import type { ReactorRuntime, CancelReagentListener, Reaction } from '../ReactorRuntime'
+import type { TaskManager } from './TaskManager'
+import type { EffectsRuntime } from './EffectsRuntime'
+import type { SpawnedReaction } from './ReactionRuntime'
 
 import buildTaskManager from './TaskManager'
-import { buildEffectsRuntime } from './effects/EffectsRuntime'
+import { buildEffectsRuntime } from './EffectsRuntime'
 
 export default function LocalRuntime(): ReactorRuntime {
   const state: {
-    reactions: Set<ReactionGenerator>,
+    reactions: Set<Reaction>,
     taskManager: TaskManager,
-    spawnedReactionIDs: Set<TaskID>
+    spawnedReactions: Set<SpawnedReaction>
   } = {
     reactions: new Set(),
     taskManager: buildTaskManager(),
-    spawnedReactionIDs: new Set()
+    spawnedReactions: new Set()
   }
 
   const effectsRuntime: EffectsRuntime = buildEffectsRuntime(state)
@@ -23,8 +24,8 @@ export default function LocalRuntime(): ReactorRuntime {
     put(reagent: Reagent) {
       effectsRuntime.put(reagent)
     },
-    addReaction(reactionGenerator: ReactionGenerator) {
-      state.reactions.add(reactionGenerator)
+    addReaction(reaction: Reaction) {
+      state.reactions.add(reaction)
     },
     takeEvery(reagentTypes, listener) {
       const unsubscribes: Array<CancelReagentListener> = (Array.isArray(reagentTypes)
@@ -39,8 +40,8 @@ export default function LocalRuntime(): ReactorRuntime {
     run(...args: any[]) {
       if (!runtime.isRunning()) {
         state.taskManager.pauseQueue()
-        state.reactions.forEach(reactionGenerator => {
-          effectsRuntime.spawn(reactionGenerator, ...args)
+        state.reactions.forEach(reaction => {
+          effectsRuntime.spawnReaction(reaction, ...args)
         })
         state.taskManager.resumeQueue()
         state.taskManager.runQueue()
@@ -58,7 +59,7 @@ export default function LocalRuntime(): ReactorRuntime {
       }
     },
     isRunning() {
-      return 0 < state.spawnedReactionIDs.size
+      return 0 < state.spawnedReactions.size
     }
   }
   return Object.freeze(runtime)

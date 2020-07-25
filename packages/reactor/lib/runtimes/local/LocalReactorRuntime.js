@@ -8,20 +8,20 @@ var __spreadArrays = (this && this.__spreadArrays) || function () {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var TaskManager_1 = require("./TaskManager");
-var EffectsRuntime_1 = require("./effects/EffectsRuntime");
+var EffectsRuntime_1 = require("./EffectsRuntime");
 function LocalRuntime() {
     var state = {
         reactions: new Set(),
         taskManager: TaskManager_1.default(),
-        spawnedReactionIDs: new Set()
+        spawnedReactions: new Set()
     };
     var effectsRuntime = EffectsRuntime_1.buildEffectsRuntime(state);
     var runtime = {
         put: function (reagent) {
             effectsRuntime.put(reagent);
         },
-        addReaction: function (reactionGenerator) {
-            state.reactions.add(reactionGenerator);
+        addReaction: function (reaction) {
+            state.reactions.add(reaction);
         },
         takeEvery: function (reagentTypes, listener) {
             var unsubscribes = (Array.isArray(reagentTypes)
@@ -39,8 +39,8 @@ function LocalRuntime() {
             }
             if (!runtime.isRunning()) {
                 state.taskManager.pauseQueue();
-                state.reactions.forEach(function (reactionGenerator) {
-                    effectsRuntime.spawn.apply(effectsRuntime, __spreadArrays([reactionGenerator], args));
+                state.reactions.forEach(function (reaction) {
+                    effectsRuntime.spawnReaction.apply(effectsRuntime, __spreadArrays([reaction], args));
                 });
                 state.taskManager.resumeQueue();
                 state.taskManager.runQueue();
@@ -60,7 +60,7 @@ function LocalRuntime() {
             }
         },
         isRunning: function () {
-            return 0 < state.spawnedReactionIDs.size;
+            return 0 < state.spawnedReactions.size;
         }
     };
     return Object.freeze(runtime);

@@ -1,4 +1,4 @@
-import type { EffectTaskWorker } from './EffectTaskWorker'
+import type { EffectTaskWorker } from '../EffectTaskWorker'
 import type { ReagentType } from '../../../Reagent'
 import type { CancelReagentListener } from '../../ReactorRuntime'
 
@@ -18,6 +18,7 @@ const takeEffect: EffectTaskWorker = function (onDone, effect, effectsRuntime) {
       if (unsubscribes.length) {
         unsubscribes.forEach(unsubscribe => unsubscribe())
         unsubscribes.splice(0, unsubscribes.length)
+        // TODO: reject
         return true
       } else {
         return false

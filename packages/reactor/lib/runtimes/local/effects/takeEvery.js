@@ -7,19 +7,21 @@ var __spreadArrays = (this && this.__spreadArrays) || function () {
     return r;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+var ReactionRuntime_1 = require("../ReactionRuntime");
 var takeEveryEffect = function (onDone, effect, effectsRuntime) {
-    var reagentTypesToTake = __spreadArrays([effect.payload], effect.args);
+    var reagentTypesToTake = Array.isArray(effect.payload) ? effect.payload : [effect.payload];
+    var reaction = effect.args[0];
+    var reactionArgs = effect.args.slice(1);
     var unsubscribes = reagentTypesToTake.map(function (reagentType) {
         return effectsRuntime.takeEvery(reagentType, function (reagent) {
-            unsubscribes.forEach(function (unsubscribe) { return unsubscribe(); });
-            unsubscribes.splice(0, unsubscribes.length);
-            onDone(reagent);
+            ReactionRuntime_1.default(reaction, __spreadArrays(reactionArgs, [reagent]), null, effectsRuntime);
         });
     });
     return {
         cancel: function () {
             if (unsubscribes.length) {
                 unsubscribes.forEach(function (unsubscribe) { return unsubscribe(); });
+                onDone();
                 return true;
             }
             else {

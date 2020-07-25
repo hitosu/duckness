@@ -1,8 +1,18 @@
-import type { EffectTaskWorker } from './EffectTaskWorker'
+import type { EffectTaskWorker } from '../EffectTaskWorker'
+import type { EffectType } from '../../../effects/Effect'
+import type { Reaction } from '../../ReactorRuntime'
 
-const callEffect: EffectTaskWorker = function (onDone, _effect, _effectsRuntime) {
-  onDone({})
-  return {}
+import spawnReaction from '../ReactionRuntime'
+
+const spawnEffect: EffectTaskWorker = function (
+  onDone,
+  effect: { type: EffectType, payload: Reaction, args?: any[] },
+  effectsRuntime
+) {
+  const spawnedReaction = spawnReaction(effect.payload, effect.args, onDone, effectsRuntime)
+  return {
+    cancel: spawnedReaction.cancel
+  }
 }
 
-export default callEffect
+export default spawnEffect

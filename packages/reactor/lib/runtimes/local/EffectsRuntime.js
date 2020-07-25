@@ -8,8 +8,7 @@ var __spreadArrays = (this && this.__spreadArrays) || function () {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.buildEffectsRuntime = void 0;
-var effects_1 = require("../../../effects");
-var spawn_1 = require("./spawn");
+var ReactionRuntime_1 = require("./ReactionRuntime");
 function buildEffectsRuntime(reactorState) {
     var reagentListeners = new Map();
     var effectsRuntime = {
@@ -27,17 +26,17 @@ function buildEffectsRuntime(reactorState) {
         runTasksQueue: function (resume) {
             reactorState.taskManager.runQueue(resume);
         },
-        spawn: function (reactionGenerator) {
+        spawnReaction: function (reaction) {
             var args = [];
             for (var _i = 1; _i < arguments.length; _i++) {
                 args[_i - 1] = arguments[_i];
             }
-            var effect = effects_1.spawn.apply(void 0, __spreadArrays([reactionGenerator], args));
-            var spawnedTaskID = reactorState.taskManager.add(spawn_1.default, function () {
-                reactorState.spawnedReactionIDs.delete(spawnedTaskID);
-            }, effect, effectsRuntime);
-            reactorState.spawnedReactionIDs.add(spawnedTaskID);
+            var spawnedReaction = ReactionRuntime_1.default(reaction, args, function () {
+                reactorState.spawnedReactions.delete(spawnedReaction);
+            }, effectsRuntime);
+            reactorState.spawnedReactions.add(spawnedReaction);
             reactorState.taskManager.runQueue();
+            return spawnedReaction;
         },
         put: function (reagent) {
             if (reagentListeners.has(reagent.type)) {

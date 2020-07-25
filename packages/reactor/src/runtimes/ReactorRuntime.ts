@@ -10,7 +10,7 @@ export type CancelReagentListener = () => void
 export interface ReactorRuntime {
   put(reagent: Reagent): void;
   takeEvery(reagentTypes: Array<ReagentType> | ReagentType, listener: ReagentListener): CancelReagentListener;
-  addReaction(reactionGenerator: ReactionGenerator): void;
+  addReaction(reaction: Reaction): void;
   run(...args: any[]): boolean;
   stop(stopValue: any): boolean;
   isRunning(): boolean;

@@ -1,3 +1,3 @@
-import type { EffectTaskWorker } from './EffectTaskWorker';
-declare const callEffect: EffectTaskWorker;
-export default callEffect;
+import type { EffectTaskWorker } from '../EffectTaskWorker';
+declare const spawnEffect: EffectTaskWorker;
+export default spawnEffect;

@@ -1,17 +1,15 @@
-import type { ReactionGenerator, ReagentListener, CancelReagentListener } from '../../ReactorRuntime'
-import type { TaskID, TaskManager, TaskOnDone } from '../TaskManager'
-import type { Effect } from '../../../effects/Effect'
-import type { Reagent, ReagentType } from '../../../Reagent'
+import type { ReagentListener, CancelReagentListener, Reaction } from '../ReactorRuntime'
+import type { TaskID, TaskManager, TaskOnDone } from './TaskManager'
+import type { Reagent, ReagentType } from '../../Reagent'
 import type { EffectTaskWorker } from './EffectTaskWorker'
 
-import { spawn as spawnEffect } from '../../../effects'
-import spawn from './spawn'
+import spawnReaction, { SpawnedReaction } from './ReactionRuntime'
 
 export interface EffectsRuntime {
   addTask(worker: EffectTaskWorker, onDone: TaskOnDone, ...workerArgs: any[]): TaskID;
   cancelTask(id: TaskID, cancelValue?: any): boolean;
   runTasksQueue(resume?: boolean): void;
-  spawn: (reactionGenerator: ReactionGenerator, ...args: any[]) => void;
+  spawnReaction: (reaction: Reaction, ...args: any[]) => SpawnedReaction;
   put: (reagent: Reagent) => void;
   takeEvery: (reagentType: ReagentType, listener: ReagentListener) => CancelReagentListener;
   take: (reagentType: ReagentType, listener: ReagentListener) => CancelReagentListener;
@@ -19,7 +17,7 @@ export interface EffectsRuntime {
 
 export function buildEffectsRuntime(reactorState: {
   taskManager: TaskManager,
-  spawnedReactionIDs: Set<TaskID>
+  spawnedReactions: Set<SpawnedReaction>
 }): EffectsRuntime {
   const reagentListeners: Map<ReagentType, Set<ReagentListener>> = new Map()
 
@@ -33,18 +31,18 @@ export function buildEffectsRuntime(reactorState: {
     runTasksQueue(resume) {
       reactorState.taskManager.runQueue(resume)
     },
-    spawn(reactionGenerator, ...args) {
-      const effect: Effect = spawnEffect(reactionGenerator, ...args)
-      const spawnedTaskID: TaskID = reactorState.taskManager.add(
-        spawn,
+    spawnReaction(reaction, ...args) {
+      const spawnedReaction: SpawnedReaction = spawnReaction(
+        reaction,
+        args,
         () => {
-          reactorState.spawnedReactionIDs.delete(spawnedTaskID)
+          reactorState.spawnedReactions.delete(spawnedReaction)
         },
-        effect,
         effectsRuntime
       )
-      reactorState.spawnedReactionIDs.add(spawnedTaskID)
+      reactorState.spawnedReactions.add(spawnedReaction)
       reactorState.taskManager.runQueue()
+      return spawnedReaction
     },
     put(reagent) {
       if (reagentListeners.has(reagent.type)) {
