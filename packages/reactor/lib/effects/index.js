@@ -1,2 +1,11 @@
-"use strict";var _effectConstructor=_interopRequireDefault(require("./effectConstructor"));Object.defineProperty(exports,"__esModule",{value:!0}),exports.call=exports.delay=exports.put=exports.take=void 0;function _interopRequireDefault(a){return a&&a.__esModule?a:{default:a}}var take=(0,_effectConstructor.default)("take");exports.take=take;var put=(0,_effectConstructor.default)("put");exports.put=put;var delay=(0,_effectConstructor.default)("delay");exports.delay=delay;var call=(0,_effectConstructor.default)("call");exports.call=call;
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.delay = exports.put = exports.takeEvery = exports.take = exports.call = exports.spawn = void 0;
+var Effect_1 = require("./Effect");
+exports.spawn = Effect_1.default('spawn');
+exports.call = Effect_1.default('call');
+exports.take = Effect_1.default('take');
+exports.takeEvery = Effect_1.default('takeEvery');
+exports.put = Effect_1.default('put');
+exports.delay = Effect_1.default('delay');
 //# sourceMappingURL=index.js.map

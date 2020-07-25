@@ -21,9 +21,10 @@
   },
   "scripts": {
     "test": "echo \"Error: run tests from root\" && exit 1",
-    "build": "rimraf lib && babel src --out-dir lib --source-maps",
-    "build:watch": "rimraf lib && babel src --out-dir lib --source-maps --watch",
-    "lint": "eslint '{src,__tests__}/**/*.{js,jsx}'"
+    "build": "tsc",
+    "rebuild": "rimraf lib && tsc",
+    "build:watch": "rimraf lib && tsc --watch --preserveWatchOutput",
+    "lint": "eslint '{src,__tests__}/**/*.{ts,tsx,js,jsx}'"
   },
   "bugs": {
     "url": "https://github.com/hitosu/duckness/issues"

@@ -1,2 +1,0 @@
-"use strict";Object.defineProperty(exports,"__esModule",{value:!0}),exports.default=effectConstructor;function effectConstructor(a){return function(b){for(var c=arguments.length,d=Array(1<c?c-1:0),e=1;e<c;e++)d[e-1]=arguments[e];return{type:a,payload:b,args:d}}}
-//# sourceMappingURL=effectConstructor.js.map

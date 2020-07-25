@@ -1,2 +1,0 @@
-"use strict";Object.defineProperty(exports,"__esModule",{value:!0}),exports.default=delayEffect;function delayEffect(a,b){var c=a.payload;setTimeout(function(){b()},c)}
-//# sourceMappingURL=delay.js.map

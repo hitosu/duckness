@@ -15,6 +15,7 @@
     "test:watch": "yarn lint && jest --watch",
     "lint": "lerna exec yarn lint && eslint 'stories/**/*.{js,jsx}'",
     "build": "lerna bootstrap && lerna exec --parallel -- yarn build",
+    "rebuild": "lerna bootstrap && lerna exec --parallel -- yarn rebuild",
     "build:watch": "lerna bootstrap && lerna exec --parallel -- yarn build:watch",
     "lerna:publish": "lerna publish --force-publish=*",
     "storybook": "start-storybook -p 6006",
@@ -36,6 +37,8 @@
     "@storybook/addons": "^5.3.18",
     "@storybook/cli": "^5.3.18",
     "@storybook/react": "^5.3.18",
+    "@typescript-eslint/eslint-plugin": "^3.6.1",
+    "@typescript-eslint/parser": "^3.6.1",
     "babel-jest": "^26.0.1",
     "babel-loader": "^8.1.0",
     "babel-preset-minify": "^0.5.1",
@@ -48,7 +51,8 @@
     "lerna": "^3.21.0",
     "prettier": "^2.0.5",
     "prop-types": "^15.7.2",
-    "rimraf": "^3.0.2"
+    "rimraf": "^3.0.2",
+    "typescript": "^3.9.7"
   },
   "dependencies": {
     "react": "^16.13.1",

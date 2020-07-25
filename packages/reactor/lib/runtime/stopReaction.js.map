@@ -1,1 +1,0 @@
-{"version":3,"sources":["../../src/runtime/stopReaction.js"],"names":["stopReaction","reaction","stop"],"mappings":"iGAAe,QAASA,CAAAA,YAAT,CAAsBC,CAAtB,CAA0C,CACvDA,CAAQ,CAACC,IAAT,EACD","sourcesContent":["export default function stopReaction(reaction, _Reactor) {\n  reaction.stop()\n}\n"],"file":"stopReaction.js"}

@@ -1,2 +1,7 @@
-"use strict";Object.defineProperty(exports,"__esModule",{value:!0}),Object.defineProperty(exports,"Reagent",{enumerable:!0,get:function get(){return _Reagent.default}}),Object.defineProperty(exports,"Reaction",{enumerable:!0,get:function get(){return _Reaction.default}}),Object.defineProperty(exports,"default",{enumerable:!0,get:function get(){return _Reactor.default}});var _Reagent=_interopRequireDefault(require("./Reagent")),_Reaction=_interopRequireDefault(require("./Reaction")),_Reactor=_interopRequireDefault(require("./Reactor"));function _interopRequireDefault(a){return a&&a.__esModule?a:{default:a}}
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+var Reagent_1 = require("./Reagent");
+Object.defineProperty(exports, "Reagent", { enumerable: true, get: function () { return Reagent_1.default; } });
+var Reactor_1 = require("./Reactor");
+Object.defineProperty(exports, "default", { enumerable: true, get: function () { return Reactor_1.default; } });
 //# sourceMappingURL=index.js.map
