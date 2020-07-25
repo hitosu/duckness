@@ -1,17 +1,20 @@
-import type { ReactionGenerator } from '../../ReactorRuntime'
-import type { TaskID, TaskManager } from '../TaskManager'
+import type { ReactionGenerator, ReagentListener, CancelReagentListener } from '../../ReactorRuntime'
+import type { TaskID, TaskManager, TaskOnDone } from '../TaskManager'
 import type { Effect } from '../../../effects/Effect'
 import type { Reagent, ReagentType } from '../../../Reagent'
+import type { EffectTaskWorker } from './EffectTaskWorker'
 
 import { spawn as spawnEffect } from '../../../effects'
 import spawn from './spawn'
 
-export type ReagentListener = (reagent: Reagent) => void
 export interface EffectsRuntime {
+  addTask(worker: EffectTaskWorker, onDone: TaskOnDone, ...workerArgs: any[]): TaskID;
+  cancelTask(id: TaskID, cancelValue?: any): boolean;
+  runTasksQueue(resume?: boolean): void;
   spawn: (reactionGenerator: ReactionGenerator, ...args: any[]) => void;
   put: (reagent: Reagent) => void;
-  takeEvery: (reagentType: ReagentType, listener: ReagentListener) => () => void;
-  take: (reagentType: ReagentType, listener: ReagentListener) => () => void;
+  takeEvery: (reagentType: ReagentType, listener: ReagentListener) => CancelReagentListener;
+  take: (reagentType: ReagentType, listener: ReagentListener) => CancelReagentListener;
 }
 
 export function buildEffectsRuntime(reactorState: {
@@ -21,6 +24,15 @@ export function buildEffectsRuntime(reactorState: {
   const reagentListeners: Map<ReagentType, Set<ReagentListener>> = new Map()
 
   const effectsRuntime: EffectsRuntime = {
+    addTask(worker, onDone, ...workerArgs) {
+      return reactorState.taskManager.add(worker, onDone, ...workerArgs)
+    },
+    cancelTask(id: TaskID, cancelValue?: any) {
+      return reactorState.taskManager.cancel(id, cancelValue)
+    },
+    runTasksQueue(resume) {
+      reactorState.taskManager.runQueue(resume)
+    },
     spawn(reactionGenerator, ...args) {
       const effect: Effect = spawnEffect(reactionGenerator, ...args)
       const spawnedTaskID: TaskID = reactorState.taskManager.add(

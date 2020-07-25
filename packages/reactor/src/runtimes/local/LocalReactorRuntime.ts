@@ -1,7 +1,5 @@
-/* eslint-disable no-console */
-
 import type { Reagent } from '../../Reagent'
-import type { ReactorRuntime, ReactionGenerator } from '../ReactorRuntime'
+import type { ReactorRuntime, ReactionGenerator, CancelReagentListener } from '../ReactorRuntime'
 import type { TaskManager, TaskID } from './TaskManager'
 import type { EffectsRuntime } from './effects/EffectsRuntime'
 
@@ -21,12 +19,22 @@ export default function LocalRuntime(): ReactorRuntime {
 
   const effectsRuntime: EffectsRuntime = buildEffectsRuntime(state)
 
-  const runtime = {
+  const runtime: ReactorRuntime = {
     put(reagent: Reagent) {
       effectsRuntime.put(reagent)
     },
     addReaction(reactionGenerator: ReactionGenerator) {
       state.reactions.add(reactionGenerator)
+    },
+    takeEvery(reagentTypes, listener) {
+      const unsubscribes: Array<CancelReagentListener> = (Array.isArray(reagentTypes)
+        ? reagentTypes
+        : [reagentTypes]
+      ).map(reagentType => effectsRuntime.takeEvery(reagentType, listener))
+      return () => {
+        unsubscribes.forEach(unsubscribe => unsubscribe())
+        unsubscribes.splice(0, unsubscribes.length)
+      }
     },
     run(...args: any[]) {
       if (!runtime.isRunning()) {

@@ -1,10 +1,11 @@
 import type { EffectTaskWorker } from './EffectTaskWorker'
-import { ReagentType } from '../../../Reagent'
+import type { ReagentType } from '../../../Reagent'
+import type { CancelReagentListener } from '../../ReactorRuntime'
 
 const takeEffect: EffectTaskWorker = function (onDone, effect, effectsRuntime) {
   const reagentTypesToTake: Array<ReagentType> = [effect.payload, ...effect.args]
 
-  const unsubscribes: Array<() => void> = reagentTypesToTake.map(reagentType =>
+  const unsubscribes: Array<CancelReagentListener> = reagentTypesToTake.map(reagentType =>
     effectsRuntime.takeEvery(reagentType, reagent => {
       unsubscribes.forEach(unsubscribe => unsubscribe())
       unsubscribes.splice(0, unsubscribes.length)
@@ -16,6 +17,7 @@ const takeEffect: EffectTaskWorker = function (onDone, effect, effectsRuntime) {
     cancel() {
       if (unsubscribes.length) {
         unsubscribes.forEach(unsubscribe => unsubscribe())
+        unsubscribes.splice(0, unsubscribes.length)
         return true
       } else {
         return false

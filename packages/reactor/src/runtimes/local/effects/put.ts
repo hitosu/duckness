@@ -1,7 +1,9 @@
 import type { EffectTaskWorker } from './EffectTaskWorker'
 
-const putEffect: EffectTaskWorker = function (onDone, _effect, _effectsRuntime) {
-  onDone({})
+const putEffect: EffectTaskWorker = function (onDone, effect, effectsRuntime) {
+  const { payload: reagent } = effect
+  effectsRuntime.put(reagent)
+  onDone(reagent)
   return {}
 }
 

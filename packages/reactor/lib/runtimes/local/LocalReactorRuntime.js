@@ -23,6 +23,15 @@ function LocalRuntime() {
         addReaction: function (reactionGenerator) {
             state.reactions.add(reactionGenerator);
         },
+        takeEvery: function (reagentTypes, listener) {
+            var unsubscribes = (Array.isArray(reagentTypes)
+                ? reagentTypes
+                : [reagentTypes]).map(function (reagentType) { return effectsRuntime.takeEvery(reagentType, listener); });
+            return function () {
+                unsubscribes.forEach(function (unsubscribe) { return unsubscribe(); });
+                unsubscribes.splice(0, unsubscribes.length);
+            };
+        },
         run: function () {
             var args = [];
             for (var _i = 0; _i < arguments.length; _i++) {

@@ -23,7 +23,7 @@
     "test": "echo \"Error: run tests from root\" && exit 1",
     "build": "tsc",
     "rebuild": "rimraf lib && tsc",
-    "build:watch": "rimraf lib && tsc --watch --preserveWatchOutput",
+    "build:watch": "tsc --watch --preserveWatchOutput",
     "lint": "eslint '{src,__tests__}/**/*.{ts,tsx,js,jsx}'"
   },
   "bugs": {

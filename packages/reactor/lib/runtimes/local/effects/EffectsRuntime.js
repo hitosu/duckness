@@ -13,6 +13,20 @@ var spawn_1 = require("./spawn");
 function buildEffectsRuntime(reactorState) {
     var reagentListeners = new Map();
     var effectsRuntime = {
+        addTask: function (worker, onDone) {
+            var _a;
+            var workerArgs = [];
+            for (var _i = 2; _i < arguments.length; _i++) {
+                workerArgs[_i - 2] = arguments[_i];
+            }
+            return (_a = reactorState.taskManager).add.apply(_a, __spreadArrays([worker, onDone], workerArgs));
+        },
+        cancelTask: function (id, cancelValue) {
+            return reactorState.taskManager.cancel(id, cancelValue);
+        },
+        runTasksQueue: function (resume) {
+            reactorState.taskManager.runQueue(resume);
+        },
         spawn: function (reactionGenerator) {
             var args = [];
             for (var _i = 1; _i < arguments.length; _i++) {

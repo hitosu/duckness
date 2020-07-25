@@ -20,6 +20,7 @@ var takeEffect = function (onDone, effect, effectsRuntime) {
         cancel: function () {
             if (unsubscribes.length) {
                 unsubscribes.forEach(function (unsubscribe) { return unsubscribe(); });
+                unsubscribes.splice(0, unsubscribes.length);
                 return true;
             }
             else {
