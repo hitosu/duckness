@@ -3,13 +3,10 @@
   "version": "0.6.0",
   "description": "Duckness Reactor - reactive selectors",
   "author": "Vasily Kazantsev <vasily@kazantsev.xyz>",
-  "homepage": "https://github.com/hitosu/duckness/packages/reactor",
+  "homepage": "https://github.com/hitosu/duckness/tree/master/packages/reactor",
   "license": "MIT",
   "main": "lib/index.js",
-  "files": [
-    "lib/",
-    "effects/"
-  ],
+  "files": ["lib/", "effects/"],
   "directories": {
     "lib": "lib",
     "test": "__tests__"
