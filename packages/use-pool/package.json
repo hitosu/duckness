@@ -1,13 +1,20 @@
 {
   "name": "@duckness/use-pool",
-  "version": "0.5.5",
+  "version": "0.6.0",
   "description": "React hook for @duckness/pool",
-  "keywords": ["react", "react-hooks", "duckness", "duckness-pool"],
+  "keywords": [
+    "react",
+    "react-hooks",
+    "duckness",
+    "duckness-pool"
+  ],
   "author": "Vasily Kazantsev <vasily@kazantsev.xyz>",
   "homepage": "https://github.com/hitosu/duckness/tree/master/packages/use-pool",
   "license": "MIT",
   "main": "lib/usePool.js",
-  "files": ["lib/"],
+  "files": [
+    "lib/"
+  ],
   "directories": {
     "lib": "lib",
     "test": "__tests__"
@@ -31,6 +38,6 @@
     "url": "https://github.com/hitosu/duckness/issues"
   },
   "dependencies": {
-    "@duckness/use-redux": "^0.5.5"
+    "@duckness/use-redux": "^0.6.0"
   }
 }
