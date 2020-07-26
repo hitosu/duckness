@@ -5,6 +5,8 @@ import { take, takeEvery, put, delay, getContext, setContext } from '@duckness/r
 const pingReagent = Reagent('ping')
 const ping1Reagent = Reagent('ping1')
 const ping2Reagent = Reagent('ping2')
+const ping3Reagent = Reagent('ping3')
+const ping4Reagent = Reagent('ping4')
 const pongReagent = Reagent('pong')
 
 describe('@duckness/reactor Reactor [basic]', () => {
@@ -103,5 +105,45 @@ describe('@duckness/reactor Reactor [basic]', () => {
     reactor.stop()
     expect(reactor.isRunning()).toBeFalsy()
     expect(takeEveryStopped).toBeTruthy()
+  })
+
+  test('cascade', () => {
+    const reactor = Reactor()
+    const pongsReceived = []
+
+    reactor.addReaction(function* () {
+      yield takeEvery(ping1Reagent.reagentType, function* (reagent) {
+        yield put(ping2Reagent(`${reagent.payload}2`))
+      })
+    })
+    reactor.addReaction(function* () {
+      yield takeEvery(ping2Reagent.reagentType, function* (reagent) {
+        yield put(ping3Reagent(`${reagent.payload}3`))
+      })
+    })
+    reactor.addReaction(function* () {
+      yield takeEvery(ping3Reagent.reagentType, function* (reagent) {
+        yield put(ping4Reagent(`${reagent.payload}4`))
+      })
+    })
+    reactor.addReaction(function* () {
+      yield takeEvery(ping4Reagent.reagentType, function* (reagent) {
+        yield put(pongReagent(`${reagent.payload}|`))
+      })
+    })
+
+    reactor.takeEvery('pong', reagent => {
+      pongsReceived.push(reagent.payload)
+    })
+
+    reactor.run()
+    reactor.put(ping1Reagent('1'))
+    reactor.put(ping2Reagent('2'))
+    reactor.put(ping3Reagent('3'))
+    reactor.put(ping4Reagent('4'))
+    expect(reactor.isRunning()).toBeTruthy()
+    reactor.stop()
+    expect(reactor.isRunning()).toBeFalsy()
+    expect(pongsReceived).toEqual(['1234|', '234|', '34|', '4|'])
   })
 })
