@@ -1,9 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.isEffect = void 0;
-var registeredEffects = new WeakMap();
 function isEffect(effect) {
-    return registeredEffects.has(effect);
+    return effect instanceof Object && Boolean(effect.type);
 }
 exports.isEffect = isEffect;
 function effectConstructor(type) {
@@ -13,7 +12,6 @@ function effectConstructor(type) {
             args[_i - 1] = arguments[_i];
         }
         var effect = { type: type, payload: payload, args: args };
-        registeredEffects.set(effect, true);
         return effect;
     };
 }
