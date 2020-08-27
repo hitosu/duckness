@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useCallback, useRef } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 
 /*
  * shouldUpdate:
@@ -12,17 +12,30 @@ import { useState, useEffect, useMemo, useCallback, useRef } from 'react'
  */
 
 export default function useRedux(store, selector, shouldUpdate, shouldSelect) {
-  const [selectedState, setSelectedState] = useState(() => selector(store.getState()))
+  const [{ selectedState }, setSelectedState] = useState(() => {
+    return { selectedState: selector(store.getState()) }
+  })
 
   const customShouldSelect = 'function' === typeof shouldSelect
+  const customShouldUpdate = 'function' === typeof shouldUpdate
 
-  const refPrevStoreState = useRef(null)
-  refPrevStoreState.current = useMemo(() => (customShouldSelect ? store.getState() : null), [store, customShouldSelect])
-
-  const refPrevSelectedState = useRef(null)
-  if (true !== shouldUpdate) {
-    refPrevSelectedState.current = selectedState
-  }
+  const refPrevStoreState = useRef(void 0)
+  const refPrevSelectedState = useRef(void 0)
+  useEffect(() => {
+    refPrevStoreState.current = customShouldSelect ? store.getState() : null
+    if (customShouldUpdate) {
+      let prevSelectedStateUpdated = false
+      shouldUpdate(selectedState, refPrevSelectedState.current, prevSelectedState => {
+        refPrevSelectedState.current = prevSelectedState
+        prevSelectedStateUpdated = true
+      })
+      if (!prevSelectedStateUpdated) {
+        refPrevSelectedState.current = selectedState
+      }
+    } else if (true !== shouldUpdate) {
+      refPrevSelectedState.current = selectedState
+    }
+  }, [store, selector, shouldUpdate, shouldSelect])
 
   const refSubscription = useRef(null)
   refSubscription.current = useCallback(
@@ -32,14 +45,14 @@ export default function useRedux(store, selector, shouldUpdate, shouldSelect) {
         let prevSelectedStateUpdated = false
         if (
           true === shouldUpdate ||
-          ('function' === typeof shouldUpdate &&
+          (customShouldUpdate &&
             shouldUpdate(nextSelectedState, refPrevSelectedState.current, prevSelectedState => {
               refPrevSelectedState.current = prevSelectedState
               prevSelectedStateUpdated = true
             })) ||
           nextSelectedState !== refPrevSelectedState.current
         ) {
-          setSelectedState(nextSelectedState)
+          setSelectedState({ selectedState: nextSelectedState })
           if (!prevSelectedStateUpdated && true !== shouldUpdate) {
             refPrevSelectedState.current = nextSelectedState
           }
@@ -49,7 +62,7 @@ export default function useRedux(store, selector, shouldUpdate, shouldSelect) {
         refPrevStoreState.current = nextStoreState
       }
     },
-    [selector, shouldUpdate, shouldSelect, customShouldSelect]
+    [selector, shouldUpdate, shouldSelect]
   )
 
   useEffect(() => {
