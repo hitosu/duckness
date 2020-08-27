@@ -3,11 +3,11 @@ import { useState, useEffect, useMemo, useCallback, useRef } from 'react'
 /*
  * shouldUpdate:
  *   true - always update
- *   function - update if shouldUpdate(nextSelectedState, prevSelectedState)
+ *   function - update if true == shouldUpdate(nextSelectedState, prevSelectedState, ?storePrevSelectedState(prevSelectedState))
  *   (default) - update if nextSelectedState !== prevSelectedState
  *
  * shouldSelect:
- *   function - select if shouldSelect(nextStoreState, prevStoreState)
+ *   function - select if true == shouldSelect(nextStoreState, prevStoreState)
  *   (default) - always select
  */
 
@@ -15,6 +15,7 @@ export default function useRedux(store, selector, shouldUpdate, shouldSelect) {
   const [selectedState, setSelectedState] = useState(() => selector(store.getState()))
 
   const customShouldSelect = 'function' === typeof shouldSelect
+
   const refPrevStoreState = useRef(null)
   refPrevStoreState.current = useMemo(() => (customShouldSelect ? store.getState() : null), [store, customShouldSelect])
 
@@ -28,13 +29,18 @@ export default function useRedux(store, selector, shouldUpdate, shouldSelect) {
     nextStoreState => {
       if (!customShouldSelect || shouldSelect(nextStoreState, refPrevStoreState.current)) {
         const nextSelectedState = selector(nextStoreState)
+        let prevSelectedStateUpdated = false
         if (
           true === shouldUpdate ||
-          ('function' === typeof shouldUpdate && shouldUpdate(nextSelectedState, refPrevSelectedState.current)) ||
+          ('function' === typeof shouldUpdate &&
+            shouldUpdate(nextSelectedState, refPrevSelectedState.current, prevSelectedState => {
+              refPrevSelectedState.current = prevSelectedState
+              prevSelectedStateUpdated = true
+            })) ||
           nextSelectedState !== refPrevSelectedState.current
         ) {
           setSelectedState(nextSelectedState)
-          if (true !== shouldUpdate) {
+          if (!prevSelectedStateUpdated && true !== shouldUpdate) {
             refPrevSelectedState.current = nextSelectedState
           }
         }
