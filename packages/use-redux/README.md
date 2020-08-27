@@ -64,9 +64,8 @@ function selector(state) {
 Optional select filter. This optimization helps to avoid expensive calculations in `selector`.
 
 `selector` will be called on every redux store update if:
-1. `true === shouldSelect`
+1. `shouldSelect` is not specified or `null`
 2. `'function' === typeof shouldSelect` and `true == shouldSelect(nextStoreState, prevStoreState)`
-3. `shouldSelect` is not specified or `null` and `nextStoreState !== prevStoreState`
 
 ## `shouldUpdate`
 

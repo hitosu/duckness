@@ -3,20 +3,20 @@ import { useState, useEffect, useMemo, useCallback, useRef } from 'react'
 /*
  * shouldUpdate:
  *   true - always update
- *   function - shouldUpdate(nextSelectedState, prevSelectedState)
+ *   function - update if shouldUpdate(nextSelectedState, prevSelectedState)
  *   (default) - update if nextSelectedState !== prevSelectedState
  *
  * shouldSelect:
- *   true - always update
- *   function - shouldSelect(nextStoreState, prevStoreState)
- *   (default) - update if nextStoreState !== prevStoreState
+ *   function - select if shouldSelect(nextStoreState, prevStoreState)
+ *   (default) - always select
  */
 
 export default function useRedux(store, selector, shouldUpdate, shouldSelect) {
   const [selectedState, setSelectedState] = useState(() => selector(store.getState()))
 
+  const customShouldSelect = 'function' === typeof shouldSelect
   const refPrevStoreState = useRef(null)
-  refPrevStoreState.current = useMemo(() => (true === shouldSelect ? null : store.getState()), [store, shouldSelect])
+  refPrevStoreState.current = useMemo(() => (customShouldSelect ? store.getState() : null), [store, customShouldSelect])
 
   const refPrevSelectedState = useRef(null)
   if (true !== shouldUpdate) {
@@ -26,11 +26,7 @@ export default function useRedux(store, selector, shouldUpdate, shouldSelect) {
   const refSubscription = useRef(null)
   refSubscription.current = useCallback(
     nextStoreState => {
-      if (
-        true === shouldSelect ||
-        ('function' === typeof shouldSelect && shouldSelect(nextStoreState, refPrevStoreState.current)) ||
-        nextStoreState !== refPrevStoreState.current
-      ) {
+      if (!customShouldSelect || shouldSelect(nextStoreState, refPrevStoreState.current)) {
         const nextSelectedState = selector(nextStoreState)
         if (
           true === shouldUpdate ||
@@ -43,11 +39,11 @@ export default function useRedux(store, selector, shouldUpdate, shouldSelect) {
           }
         }
       }
-      if (true !== shouldSelect) {
+      if (customShouldSelect) {
         refPrevStoreState.current = nextStoreState
       }
     },
-    [selector, shouldUpdate, shouldSelect]
+    [selector, shouldUpdate, shouldSelect, customShouldSelect]
   )
 
   useEffect(() => {
