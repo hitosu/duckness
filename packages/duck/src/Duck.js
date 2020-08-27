@@ -113,7 +113,7 @@ function addActionTypes(duck, duckFace, duckName, poolName) {
 // ---- ACTION CONSTRUCTORS -------------------------------------------------------------------------
 
 function addActionConstructors(duck, duckFace) {
-  function actionConstructor(actionName, actionType, payloadBuilder, actionTransformer) {
+  function actionConstructor(actionName, actionType = actionName, payloadBuilder, actionTransformer) {
     if ('string' !== typeof actionType || !actionType) {
       throw new Error('@duckness/duck.action: - actionType must be a non empty String')
     }

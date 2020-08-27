@@ -73,6 +73,18 @@ describe('@duckness/duck', () => {
         error: false
       })
     })
+
+    it('defaults actionType to actionName', () => {
+      expect(duck.action('quackSilently')).toBeInstanceOf(Function)
+      expect(duck.action.quackSilently).toBeInstanceOf(Function)
+      expect(duck.action.quackSilently.actionType).toBe('quackSilently')
+      expect(duck.actionTypes.quackSilently).toBe('Lake/Donald/quackSilently')
+      expect(duck.action.quackSilently({ times: 9000 })).toEqual({
+        type: 'Lake/Donald/quackSilently',
+        payload: { times: 9000 },
+        error: false
+      })
+    })
   })
 
   // -----------------------------------------------------
