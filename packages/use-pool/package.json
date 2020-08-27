@@ -1,6 +1,6 @@
 {
   "name": "@duckness/use-pool",
-  "version": "0.6.4",
+  "version": "0.6.5",
   "description": "React hook for @duckness/pool",
   "keywords": [
     "react",
@@ -38,6 +38,6 @@
     "url": "https://github.com/hitosu/duckness/issues"
   },
   "dependencies": {
-    "@duckness/use-redux": "^0.6.4"
+    "@duckness/use-redux": "^0.6.5"
   }
 }
