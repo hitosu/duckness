@@ -50,7 +50,7 @@ export default function useRedux(store, selector, shouldUpdate, shouldSelect) {
               refPrevSelectedState.current = prevSelectedState
               prevSelectedStateUpdated = true
             })) ||
-          nextSelectedState !== refPrevSelectedState.current
+          (!customShouldUpdate && nextSelectedState !== refPrevSelectedState.current)
         ) {
           setSelectedState({ selectedState: nextSelectedState })
           if (!prevSelectedStateUpdated && true !== shouldUpdate) {
