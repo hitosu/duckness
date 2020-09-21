@@ -1,6 +1,6 @@
 {
   "name": "@duckness/use-redux",
-  "version": "0.6.7",
+  "version": "0.6.8",
   "description": "React hook for Redux store",
   "keywords": [
     "react",
