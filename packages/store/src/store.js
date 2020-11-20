@@ -91,11 +91,16 @@ export default function createStore({ initState = {}, actions = {} } = {}) {
     }
   }
 
+  function getState(selector) {
+    return selector ? selector(refStore.current) : refStore.current
+  }
+
   return Object.freeze({
     useStore,
     Consumer,
     actions: boundActions,
     updateStore,
+    getState,
     subscribe,
     destroy
   })
