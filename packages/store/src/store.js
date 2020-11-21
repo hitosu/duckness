@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 
 export function selectAll(value) {
   return value
@@ -37,14 +37,35 @@ export default function createStore({ initState = {}, actions = {} } = {}) {
     return refStore.current
   }
 
-  function useStore({ updateOnMount, updateOnUnmount, selector, shouldSelect, shouldUpdate = whenChanged } = {}) {
+  function useStore({
+    updateOnMount,
+    updateOnUnmount,
+    selector,
+    shouldSelect,
+    shouldUpdate = whenChanged,
+    debounce
+  } = {}) {
     const [value, setValue] = useState(function () {
       return selector(updateOnMount ? updateStore(updateOnMount) : refStore.current)
     })
 
+    const debounceDuration = useRef()
+    debounceDuration.current = debounce
+    const debounceTimer = useRef()
+
     useEffect(function () {
       const listener = function (nextValue) {
-        setValue(nextValue)
+        if (debounceTimer.current) {
+          clearTimeout(debounceTimer.current)
+        }
+        if (null == debounceDuration.current) {
+          setValue(nextValue)
+        } else {
+          debounceTimer.current = setTimeout(function () {
+            debounceTimer.current = null
+            setValue(nextValue)
+          }, debounceDuration.current)
+        }
       }
       listener.selector = selector
       listener.shouldSelect = shouldSelect
@@ -65,7 +86,8 @@ export default function createStore({ initState = {}, actions = {} } = {}) {
       updateOnUnmount: props.updateOnUnmount,
       selector: props.selector,
       shouldSelect: props.shouldSelect,
-      shouldUpdate: props.shouldUpdate
+      shouldUpdate: props.shouldUpdate,
+      debounce: props.debounce
     })
 
     return props.children(value)
