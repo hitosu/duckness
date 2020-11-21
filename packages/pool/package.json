@@ -1,6 +1,6 @@
 {
   "name": "@duckness/pool",
-  "version": "0.6.10",
+  "version": "0.6.11",
   "description": "Duckness Pool - @duckness/duck + Redux",
   "keywords": [
     "redux",
@@ -37,7 +37,7 @@
     "url": "https://github.com/hitosu/duckness/issues"
   },
   "dependencies": {
-    "@duckness/duck": "^0.6.10"
+    "@duckness/duck": "^0.6.11"
   },
   "peerDependencies": {
     "redux": "^4.0.5"
