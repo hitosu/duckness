@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.default = exports.Reagent = void 0;
 var Reagent_1 = require("./Reagent");
 Object.defineProperty(exports, "Reagent", { enumerable: true, get: function () { return Reagent_1.default; } });
 var Reactor_1 = require("./Reactor");
