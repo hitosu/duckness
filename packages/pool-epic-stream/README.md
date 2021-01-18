@@ -1,62 +1,77 @@
-# `@duckness/use-pool` <!-- omit in toc -->
+# `@duckness/pool-epic-stream` <!-- omit in toc -->
 
-[React hook](https://reactjs.org/docs/hooks-intro.html) for [@duckness/pool](https://github.com/hitosu/duckness/tree/master/packages/pool).
+[@duckness/epic](https://github.com/hitosu/duckness/tree/master/packages/epic) plugin for [@duckness/pool](https://github.com/hitosu/duckness/tree/master/packages/pool)
 
-[![NPM](https://img.shields.io/npm/v/@duckness/use-pool)](https://www.npmjs.com/package/@duckness/use-pool)
+[![NPM](https://img.shields.io/npm/v/@duckness/pool-epic-stream)](https://www.npmjs.com/package/@duckness/pool-epic-stream)
 [![License](https://img.shields.io/github/license/hitosu/duckness)](https://github.com/hitosu/duckness/blob/master/LICENSE)
-[![Libraries.io dependency status for latest release, scoped npm package](https://img.shields.io/librariesio/release/npm/@duckness/use-pool)](https://www.npmjs.com/package/@duckness/use-pool?activeTab=dependencies)
+[![Libraries.io dependency status for latest release, scoped npm package](https://img.shields.io/librariesio/release/npm/@duckness/pool-epic-stream)](https://www.npmjs.com/package/@duckness/pool-epic-stream?activeTab=dependencies)
 [![GitHub issues](https://img.shields.io/github/issues/hitosu/duckness)](https://github.com/hitosu/duckness/issues)
-[![vulnerabilities](https://img.shields.io/snyk/vulnerabilities/npm/@duckness/use-pool)](https://github.com/hitosu/duckness/issues)
-[![npm bundle size](https://img.shields.io/bundlephobia/min/@duckness/use-pool)](https://www.npmjs.com/package/@duckness/use-pool)
+[![vulnerabilities](https://img.shields.io/snyk/vulnerabilities/npm/@duckness/pool-epic-stream)](https://github.com/hitosu/duckness/issues)
+[![npm bundle size](https://img.shields.io/bundlephobia/min/@duckness/pool-epic-stream)](https://www.npmjs.com/package/@duckness/pool-epic-stream)
 
 # Example
 
 ```js
-import React from 'react'
-import usePool from '@duckness/use-pool'
+import Pool from '@duckness/pool'
+import PoolEpicStream from '@duckness/pool-epic-stream'
+import CounterEpicDuck from './ducks/CounterEpicDuck'
 
-import CounterPool from './CounterPool'
-import CounterDuck from './CounterDuck'
+const CounterPool = Pool({
+  buildStore: ({ initialCounter = 0 } = {}) => {
+    return { counter: initialCounter }
+  }
+})
+CounterPool.addDuck(CounterEpicDuck)
+CounterPool.addStream(PoolEpicStream())
 
-export default function Counter() {
-  const counter = usePool(CounterPool, CounterDuck.select.counter)
-  return <span>[ {counter} ]</span>
-}
+CounterPool.build({initialCounter: 0})
+CounterPool.store
+// => [redux store]
 ```
 
 # Table of Contents <!-- omit in toc -->
 
 - [Example](#example)
-- [Shortcut to `@duckness/use-redux`](#shortcut-to-ducknessuse-redux)
+- [API](#api)
+  - [Create Pool Epic Stream](#create-pool-epic-stream)
+    - [`buildRootEpic`](#buildrootepic)
+      - [default `buildRootEpic`](#default-buildrootepic)
+  - [Use Pool Epic Stream](#use-pool-epic-stream)
+- [Examples](#examples)
 - [@Duckness packages:](#duckness-packages)
 
-# Shortcut to `@duckness/use-redux`
+# API
 
-`@duckness/use-pool` is a shortcut to [@duckness/use-redux](https://github.com/hitosu/duckness/blob/master/packages/use-redux).
-
-See [@duckness/use-redux documentation](https://github.com/hitosu/duckness/blob/master/packages/use-redux/README.md) for details.
+## Create Pool Epic Stream
 
 ```js
-import useRedux, {
-  useDispatchAction as useReduxDispatchAction,
-  useDispatch as useReduxDispatch,
-  combineSelectors
-} from '@duckness/use-redux'
-
-export default function usePool(pool, selector, shouldUpdate, shouldSelect) {
-  return useRedux(pool.store, selector, shouldUpdate, shouldSelect)
-}
-
-export function useDispatchAction(pool, actionCreator, payloadTransformer) {
-  return useReduxDispatchAction(pool.store, actionCreator, payloadTransformer)
-}
-
-export function useDispatch(pool, dispatcher, deps) {
-  return useReduxDispatch(pool.store, dispatcher, deps)
-}
-
-export { combineSelectors }
+PoolEpicStream({
+  // build custom root epic from ducks instead of default root epic
+  ?buildRootEpic: (ducks, { refDucks, refErrorReporter }) => rootEpic
+})
 ```
+
+### `buildRootEpic`
+Optional function for custom root epic
+`(ducks, { refDucks, refErrorReporter }) => rootEpic`
+
+* `ducks` are array of ducks
+* `refDucks.current` will hold current array of ducks.
+* `refErrorReporter.current` will hold current error reporter function.
+
+#### default `buildRootEpic`
+
+Default root epic will combine all duck root epics (if exists).
+
+## Use Pool Epic Stream
+
+```js
+pool.addStream(PoolEpicStream())
+```
+
+# Examples
+
+https://github.com/hitosu/duckness/tree/master/stories
 
 # @Duckness packages:
 

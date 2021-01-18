@@ -1,8 +1,8 @@
 import React, { Suspense } from 'react'
 import Pool from '@duckness/pool'
-import PoolSagaStream from '@duckness/pool-saga-stream'
+import PoolEpicStream from '@duckness/pool-epic-stream'
 
-import CounterDuck from '../../../ducks/Counter/CounterDuck'
+import CounterDuck from '../../../ducks/Counter/CounterEpicDuck'
 export { CounterDuck }
 
 const CounterPool = Pool({
@@ -11,7 +11,7 @@ const CounterPool = Pool({
   }
 })
 CounterPool.addDuck(CounterDuck)
-CounterPool.addStream(PoolSagaStream())
+CounterPool.addStream(PoolEpicStream())
 
 CounterPool.preReducer(state => ((state.actionsDispatched = CounterDuck.select.actionsDispatched(state) + 1), state))
 CounterPool.postReducer(state => ((state.lastActionDispatchedAt = Date.now()), state))

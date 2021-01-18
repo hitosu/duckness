@@ -35,6 +35,7 @@ export default function Counter() {
   - [`actionCreator`](#actioncreator)
   - [`payloadTransformer`](#payloadtransformer)
 - [`useDispatch`](#usedispatch)
+- [`combineSelectors`](#combineselectors)
 - [@Duckness packages:](#duckness-packages)
 
 
@@ -167,12 +168,46 @@ function SetStatusButton({ status = 'ready' } = {}) {
 }
 ```
 
+# `combineSelectors`
+
+Produces two functions from a map of selectors:
+1. `selector` - combined selector
+2. `shouldUpdate` - selectedState update filter (see above)
+
+```js
+const { selector: actionCounterSelector, shouldUpdate: shouldUpdateActionCounter } = combineSelectors({
+  actionsDispatched: CounterDuck.select.actionsDispatched,
+  lastActionDispatchedAt: CounterDuck.select.lastActionDispatchedAt
+})
+export default function ActionCounter() {
+  const { actionsDispatched, lastActionDispatchedAt } = usePool(
+    CounterPool,
+    actionCounterSelector,
+    shouldUpdateActionCounter
+  )
+  return (
+    <span>
+      (ACTIONS: {actionsDispatched}, LAST: {lastActionDispatchedAt})
+    </span>
+  )
+}
+```
+
+Passing custom `selectedStatesEqual` function that compares selected states
+```js
+combineSelectors(selectorsMap, { selectedStatesEqual } = {})
+
+selectedStatesEqual(selectorKey, nextSelectedState[selectorKey], prevSelectedState[selectorKey]): Boolean
+```
+
 # @Duckness packages:
 
 * [@duckness/duck](https://github.com/hitosu/duckness/tree/master/packages/duck) - [Modular Redux Ducks](https://github.com/erikras/ducks-modular-redux) hatchery
 * [@duckness/saga](https://github.com/hitosu/duckness/tree/master/packages/saga) - [Redux Saga](https://redux-saga.js.org/) extension for [@duckness/duck](https://github.com/hitosu/duckness/tree/master/packages/duck)
+* [@duckness/epic](https://github.com/hitosu/duckness/tree/master/packages/epic) - [Redux-Observable](https://redux-observable.js.org/) extension for [@duckness/duck](https://github.com/hitosu/duckness/tree/master/packages/duck)
 * [@duckness/pool](https://github.com/hitosu/duckness/tree/master/packages/pool) - [@duckness/duck](https://github.com/hitosu/duckness/tree/master/packages/duck) + [Redux](https://redux.js.org/)
 * [@duckness/pool-saga-stream](https://github.com/hitosu/duckness/tree/master/packages/pool-saga-stream) - [@duckness/saga](https://github.com/hitosu/duckness/tree/master/packages/saga) plugin for [@duckness/pool](https://github.com/hitosu/duckness/tree/master/packages/pool)
+* [@duckness/pool-epic-stream](https://github.com/hitosu/duckness/tree/master/packages/pool-epic-stream) - [@duckness/epic](https://github.com/hitosu/duckness/tree/master/packages/epic) plugin for [@duckness/pool](https://github.com/hitosu/duckness/tree/master/packages/pool)
 * [@duckness/react-redux-pool](https://github.com/hitosu/duckness/tree/master/packages/react-redux-pool) - [@duckness/pool](https://github.com/hitosu/duckness/tree/master/packages/pool) + [React-Redux](https://react-redux.js.org/)
 * [@duckness/use-redux](https://github.com/hitosu/duckness/tree/master/packages/use-redux) - [React hook](https://reactjs.org/docs/hooks-intro.html) for [Redux](https://react-redux.js.org/) store
 * [@duckness/use-pool](https://github.com/hitosu/duckness/tree/master/packages/use-pool) - [React hook](https://reactjs.org/docs/hooks-intro.html) for [@duckness/pool](https://github.com/hitosu/duckness/tree/master/packages/pool).

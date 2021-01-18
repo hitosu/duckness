@@ -49,28 +49,100 @@ export default function Pool({
   }
 
   const refStore = { current: null }
+  function dispatch(action) {
+    if (refStore.current) {
+      refStore.current.dispatch(action)
+    } else {
+      const error = new Error('Received action dispatch but pool is not built yet')
+      error.dispatchedAction = action
+      reportError(error, '@duckness/pool', 'dispatch', action)
+    }
+  }
+
+  const refReducers = { root: null, pre: null, post: null }
+  function reduce(stateOrAction, andAction) {
+    if (void 0 === andAction && !refStore.current) {
+      const error = new Error('Reducing state but pool is not built yet')
+      error.dispatchedAction = stateOrAction
+      reportError(error, '@duckness/pool', 'reduce', stateOrAction)
+      return stateOrAction
+    }
+    const state = void 0 === andAction ? refStore.current.getState() : stateOrAction
+    const action = void 0 === andAction ? stateOrAction : andAction
+    if (refReducers.root) {
+      return refReducers.root(state, action)
+    } else {
+      const error = new Error('Reducing state but pool is not built yet')
+      error.dispatchedAction = action
+      reportError(error, '@duckness/pool', 'reduce', action)
+      return state
+    }
+  }
+
+  function setPreReducer(reducer) {
+    refReducers.pre = (state, action) => {
+      try {
+        return reducer(state, action)
+      } catch (error) {
+        try {
+          error.dispatchedAction = action
+        } catch {
+          // skip
+        }
+        reportError(error, '@duckness/pool', 'pre reducer')
+        return state
+      }
+    }
+  }
+  function setPostReducer(reducer) {
+    refReducers.post = (state, action) => {
+      try {
+        return reducer(state, action)
+      } catch (error) {
+        try {
+          error.dispatchedAction = action
+        } catch {
+          // skip
+        }
+        reportError(error, '@duckness/pool', 'post reducer')
+        return state
+      }
+    }
+  }
 
   function build(props = refProps.current) {
     // save props
     refProps.current = props || {}
 
     // build root reducer
-    const rootReducer = buildRootReducer
-      ? buildRootReducer(refDucks.current, { refDucks, refErrorReporter })
+    refReducers.root = buildRootReducer
+      ? buildRootReducer(refDucks.current, { refProps, refReducers, refDucks, refErrorReporter })
       : function defaultRootReducer(state, action) {
-          return refDucks.current.reduce((state, duck) => {
+          // pre reducer
+          const preState = refReducers.pre ? refReducers.pre(state, action) : state
+          // duck reducers
+          const ducksReducedState = refDucks.current.reduce((state, duck) => {
             try {
               return duck(state, action)
             } catch (error) {
+              try {
+                error.poolName = duck.poolName
+                error.duckName = duck.duckName
+                error.dispatchedAction = action
+              } catch {
+                // skip
+              }
               reportError(error, '@duckness/pool', 'reducer', duck.poolName, duck.duckName)
               return state
             }
-          }, state)
+          }, preState)
+          // post reducer
+          return refReducers.post ? refReducers.post(ducksReducedState, action) : ducksReducedState
         }
 
     // invoke beforeBuild for each pool stream
     refStreams.current.forEach(stream => {
-      if (stream.beforeBuild) stream.beforeBuild({ refDucks, refProps, refErrorReporter })
+      if (stream.beforeBuild) stream.beforeBuild({ refDucks, refProps, refReducers, refErrorReporter })
     })
 
     // compose redux middlewares
@@ -82,7 +154,7 @@ export default function Pool({
       ...refStreams.current.reduce(
         (streamMiddlewares, stream) =>
           stream.middlewares
-            ? streamMiddlewares.concat(stream.middlewares({ refDucks, refProps, refErrorReporter }) || [])
+            ? streamMiddlewares.concat(stream.middlewares({ refDucks, refProps, refReducers, refErrorReporter }) || [])
             : streamMiddlewares,
         []
       ),
@@ -92,14 +164,14 @@ export default function Pool({
 
     // create store
     refStore.current = createStore(
-      rootReducer,
-      buildStore ? buildStore(refProps.current, { refProps, refDucks, refErrorReporter }) || {} : {},
+      refReducers.root,
+      buildStore ? buildStore(refProps.current, { refProps, refDucks, refReducers, refErrorReporter }) || {} : {},
       enhancer
     )
 
     // invoke afterBuild for each pool stream
     refStreams.current.forEach(stream => {
-      if (stream.afterBuild) stream.afterBuild({ refStore, refDucks, refProps, refErrorReporter })
+      if (stream.afterBuild) stream.afterBuild({ refStore, refDucks, refProps, refReducers, refErrorReporter })
     })
 
     // return redux store
@@ -111,6 +183,8 @@ export default function Pool({
   Object.defineProperty(pool, 'addDuck', { value: addDuck, writable: false, enumerable: true })
   Object.defineProperty(pool, 'addMiddleware', { value: addMiddleware, writable: false, enumerable: true })
   Object.defineProperty(pool, 'addStream', { value: addStream, writable: false, enumerable: true })
+  Object.defineProperty(pool, 'preReducer', { value: setPreReducer, writable: false, enumerable: true })
+  Object.defineProperty(pool, 'postReducer', { value: setPostReducer, writable: false, enumerable: true })
   Object.defineProperty(pool, 'build', { value: build, writable: false, enumerable: true })
   Object.defineProperty(pool, 'reportError', { value: reportError, writable: false, enumerable: true })
   Object.defineProperty(pool, 'setErrorReporter', { value: setErrorReporter, writable: false, enumerable: true })
@@ -120,6 +194,8 @@ export default function Pool({
     },
     enumerable: true
   })
+  Object.defineProperty(pool, 'dispatch', { value: dispatch, writable: false, enumerable: true })
+  Object.defineProperty(pool, 'reduce', { value: reduce, writable: false, enumerable: true })
   Object.defineProperty(pool, 'ducks', {
     get() {
       return [...(refDucks.current || [])]

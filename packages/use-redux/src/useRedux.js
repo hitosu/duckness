@@ -1,5 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 
+const UNSET_MARKER = {}
+
 /*
  * shouldUpdate:
  *   true - always update
@@ -20,15 +22,19 @@ export default function useRedux(store, selector, shouldUpdate, shouldSelect) {
   const customShouldUpdate = 'function' === typeof shouldUpdate
 
   const refPrevStoreState = useRef(void 0)
-  const refPrevSelectedState = useRef(void 0)
+  const refPrevSelectedState = useRef(UNSET_MARKER)
   useEffect(() => {
     refPrevStoreState.current = customShouldSelect ? store.getState() : null
     if (customShouldUpdate) {
       let prevSelectedStateUpdated = false
-      shouldUpdate(selectedState, refPrevSelectedState.current, prevSelectedState => {
-        refPrevSelectedState.current = prevSelectedState
-        prevSelectedStateUpdated = true
-      })
+      shouldUpdate(
+        selectedState,
+        UNSET_MARKER === refPrevSelectedState.current ? selectedState : refPrevSelectedState.current,
+        prevSelectedState => {
+          refPrevSelectedState.current = prevSelectedState
+          prevSelectedStateUpdated = true
+        }
+      )
       if (!prevSelectedStateUpdated) {
         refPrevSelectedState.current = selectedState
       }
@@ -91,4 +97,39 @@ export function useDispatchAction(store, actionCreator, payloadTransformer) {
 
 export function useDispatch(store, dispatcher, deps = []) {
   return useCallback((...args) => dispatcher(store.dispatch, ...args), [store, ...deps])
+}
+
+export function combineSelectors(selectorsMap, { selectedStatesEqual } = {}) {
+  const selectorKeys = Object.keys(selectorsMap)
+  return {
+    selector: state => {
+      const selectedState = {}
+      for (let i = 0; i < selectorKeys.length; i++) {
+        const selectorKey = selectorKeys[i]
+        selectedState[selectorKey] = selectorsMap[selectorKey](state)
+      }
+      return selectedState
+    },
+    shouldUpdate: selectedStatesEqual
+      ? (nextSelectedState, prevSelectedState, storePrevSelectedState) => {
+          for (let i = 0; i < selectorKeys.length; i++) {
+            const selectorKey = selectorKeys[i]
+            if (!selectedStatesEqual(selectorKey, nextSelectedState[selectorKey], prevSelectedState[selectorKey])) {
+              return true
+            }
+          }
+          storePrevSelectedState(prevSelectedState)
+          return false
+        }
+      : (nextSelectedState, prevSelectedState, storePrevSelectedState) => {
+          for (let i = 0; i < selectorKeys.length; i++) {
+            const selectorKey = selectorKeys[i]
+            if (nextSelectedState[selectorKey] !== prevSelectedState[selectorKey]) {
+              return true
+            }
+          }
+          storePrevSelectedState(prevSelectedState)
+          return false
+        }
+  }
 }

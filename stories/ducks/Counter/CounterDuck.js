@@ -4,6 +4,10 @@ import { call, put, race, take, takeLatest, delay } from 'redux-saga/effects'
 const CounterDuck = SagaDuck('counter', 'counter-pool')
 
 CounterDuck.selector('counter', state => state.counter || 0)
+CounterDuck.selector('actionsDispatched', state => state.actionsDispatched || 0)
+CounterDuck.selector('lastActionDispatchedAt', state =>
+  state.lastActionDispatchedAt ? `${+state.lastActionDispatchedAt}` : ''
+)
 
 CounterDuck.action('increment', 'INCREMENT')
 CounterDuck.action('decrement', 'DECREMENT')

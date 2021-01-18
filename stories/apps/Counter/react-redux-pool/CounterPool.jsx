@@ -27,4 +27,7 @@ const CounterPool = ReactReduxPool(
 CounterPool.addDuck(CounterDuck)
 CounterPool.addStream(PoolSagaStream())
 
+CounterPool.preReducer(state => ((state.actionsDispatched = CounterDuck.select.actionsDispatched(state) + 1), state))
+CounterPool.postReducer(state => ((state.lastActionDispatchedAt = Date.now()), state))
+
 export default CounterPool

@@ -5,6 +5,7 @@ import { connect } from 'react-redux'
 import { CounterDuck } from '../CounterPool'
 
 const Counter = React.lazy(() => import('./Counter'))
+const ActionCounter = React.lazy(() => import('./ActionCounter'))
 
 App.propTypes = {
   onInc: PropTypes.func.isRequired,
@@ -24,7 +25,8 @@ export function App(props) {
       <button onClick={props.onReset}>&nbsp;0&nbsp;</button>&nbsp;&nbsp;
       <button onClick={props.onStartTimer}>&nbsp;&gt;&nbsp;</button>&nbsp;&nbsp;
       <button onClick={props.onStartFastTimer}>&nbsp;&gt;&gt;&gt;&nbsp;</button>&nbsp;&nbsp;
-      <button onClick={props.onStopTimer}>&nbsp;||&nbsp;</button>&nbsp;
+      <button onClick={props.onStopTimer}>&nbsp;||&nbsp;</button>&nbsp;&nbsp;
+      <ActionCounter />
     </div>
   )
 }

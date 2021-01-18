@@ -1,61 +1,89 @@
-# `@duckness/use-pool` <!-- omit in toc -->
+# `@duckness/epic` <!-- omit in toc -->
 
-[React hook](https://reactjs.org/docs/hooks-intro.html) for [@duckness/pool](https://github.com/hitosu/duckness/tree/master/packages/pool).
+[Redux-Observable](https://redux-observable.js.org/) extension for [@duckness/duck](https://github.com/hitosu/duckness/tree/master/packages/duck)
 
-[![NPM](https://img.shields.io/npm/v/@duckness/use-pool)](https://www.npmjs.com/package/@duckness/use-pool)
+[![NPM](https://img.shields.io/npm/v/@duckness/epic)](https://www.npmjs.com/package/@duckness/epic)
 [![License](https://img.shields.io/github/license/hitosu/duckness)](https://github.com/hitosu/duckness/blob/master/LICENSE)
-[![Libraries.io dependency status for latest release, scoped npm package](https://img.shields.io/librariesio/release/npm/@duckness/use-pool)](https://www.npmjs.com/package/@duckness/use-pool?activeTab=dependencies)
+[![Libraries.io dependency status for latest release, scoped npm package](https://img.shields.io/librariesio/release/npm/@duckness/epic)](https://www.npmjs.com/package/@duckness/epic?activeTab=dependencies)
 [![GitHub issues](https://img.shields.io/github/issues/hitosu/duckness)](https://github.com/hitosu/duckness/issues)
-[![vulnerabilities](https://img.shields.io/snyk/vulnerabilities/npm/@duckness/use-pool)](https://github.com/hitosu/duckness/issues)
-[![npm bundle size](https://img.shields.io/bundlephobia/min/@duckness/use-pool)](https://www.npmjs.com/package/@duckness/use-pool)
+[![vulnerabilities](https://img.shields.io/snyk/vulnerabilities/npm/@duckness/epic)](https://github.com/hitosu/duckness/issues)
+[![npm bundle size](https://img.shields.io/bundlephobia/min/@duckness/epic)](https://www.npmjs.com/package/@duckness/epic)
 
 # Example
 
 ```js
-import React from 'react'
-import usePool from '@duckness/use-pool'
+// counterDuck.js
+import EpicDuck from '@duckness/epic'
+import { map, delay } from 'rxjs/operators'
+import { ofType } from 'redux-observable'
 
-import CounterPool from './CounterPool'
-import CounterDuck from './CounterDuck'
+// Create duck with the name 'counter' for 'counter-app' app
+const counterDuck = EpicDuck('counter', 'counter-app')
+// Add actions
+counterDuck.action('increment', 'INCREMENT')
+counterDuck.action('incrementAsync', 'INCREMENT_ASYNC')
 
-export default function Counter() {
-  const counter = usePool(CounterPool, CounterDuck.select.counter)
-  return <span>[ {counter} ]</span>
-}
+// add epic
+counterDuck.epic(function incrementAsync(action$, state$, duckFace) {
+  return action$.pipe(
+    ofType(duckFace.actionTypes.INCREMENT_ASYNC),
+    delay(1000),
+    map(action => duckFace.action.increment(action.payload))
+  )
+})
+
+// root epic
+export const rootEpic = counterDuck.rootEpic
 ```
 
 # Table of Contents <!-- omit in toc -->
 
 - [Example](#example)
-- [Shortcut to `@duckness/use-redux`](#shortcut-to-ducknessuse-redux)
+- [API](#api)
+  - [Epic](#epic)
+    - [`.epic(epic)`](#epicepic)
+    - [`.rootEpic`](#rootepic)
+  - [Error reporter](#error-reporter)
+    - [`.setErrorReporter`](#seterrorreporter)
+    - [`.reportError(error)`](#reporterrorerror)
 - [@Duckness packages:](#duckness-packages)
 
-# Shortcut to `@duckness/use-redux`
+# API
 
-`@duckness/use-pool` is a shortcut to [@duckness/use-redux](https://github.com/hitosu/duckness/blob/master/packages/use-redux).
+`EpicDuck` extends `duckness` `Duck`
 
-See [@duckness/use-redux documentation](https://github.com/hitosu/duckness/blob/master/packages/use-redux/README.md) for details.
+## Epic
 
+### `.epic(epic)`
+
+Adds a new epic to the duck
 ```js
-import useRedux, {
-  useDispatchAction as useReduxDispatchAction,
-  useDispatch as useReduxDispatch,
-  combineSelectors
-} from '@duckness/use-redux'
+myDuck.epic(function myEpic(action$, state$, duckFace) { /*...*/ })
+```
 
-export default function usePool(pool, selector, shouldUpdate, shouldSelect) {
-  return useRedux(pool.store, selector, shouldUpdate, shouldSelect)
-}
+### `.rootEpic`
 
-export function useDispatchAction(pool, actionCreator, payloadTransformer) {
-  return useReduxDispatchAction(pool.store, actionCreator, payloadTransformer)
-}
+Duck's root epic with epics isolation (exceptions in one epic will not break other epics).
+```js
+myDuck.rootEpic
+```
 
-export function useDispatch(pool, dispatcher, deps) {
-  return useReduxDispatch(pool.store, dispatcher, deps)
-}
+## Error reporter
 
-export { combineSelectors }
+### `.setErrorReporter`
+
+Set error reporter (default is `console.error`) that reports uncatched epic errors
+```js
+myDuck.setErrorReporter(error => {
+  window.Sentry.captureException(error)
+})
+```
+
+### `.reportError(error)`
+
+Call assigned error reporter
+```js
+myDuck.reportError(new Error('Clean duck!'))
 ```
 
 # @Duckness packages:

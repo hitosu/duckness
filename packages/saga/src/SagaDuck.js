@@ -27,6 +27,12 @@ export default function SagaDuck(duckName, appName, duckContext) {
             yield call(saga, duck.duckFace)
             break
           } catch (error) {
+            try {
+              error.poolName = duck.poolName
+              error.duckName = duck.duckName
+            } catch {
+              // skip
+            }
             reportError(error, '@duckness/saga', duck.poolName, duck.duckName)
           }
         }

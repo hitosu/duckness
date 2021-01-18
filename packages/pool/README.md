@@ -37,8 +37,12 @@ CounterPool.store
     - [`buildRootReducer`](#buildrootreducer)
       - [default `buildRootReducer`](#default-buildrootreducer)
   - [`.addDuck(duck)`](#addduckduck)
+  - [`.preReducer(reducer)`](#prereducerreducer)
+  - [`.postReducer(reducer)`](#postreducerreducer)
   - [`.build(props)`](#buildprops)
   - [`.store`](#store)
+  - [`.dispatch(action)`](#dispatchaction)
+  - [`.reduce([state,] action)`](#reducestate-action)
   - [`.setErrorReporter(reporterFn)`](#seterrorreporterreporterfn)
   - [`.reportError(error)`](#reporterrorerror)
   - [`.addMiddleware(middleware)`](#addmiddlewaremiddleware)
@@ -65,12 +69,15 @@ const myPool = Pool({
 ### `buildStore`
 
 Optional function to build init store state
-`(props, { refProps, refDucks, refErrorReporter }) => storeState`
+`(props, { refProps, refDucks, refReducers, refErrorReporter }) => storeState`
 
 * `props` are passed to pool when `pool.build(props)` are called.
-* `refProps.current` will hold current build props.
-* `refDucks.current` will hold current array of ducks.
-* `refErrorReporter.current` will hold current error reporter function.
+* `refProps.current` - props passed to `pool.build(props)` function
+* `refDucks.current` - current array of ducks.
+* `refReducers.root` - pool root reducer
+* `refReducers.pre` - pool pre reducer
+* `refReducers.post` - pool post reducer
+* `refErrorReporter.current` - current error reporter function.
 
 #### default `buildStore`
 
@@ -78,11 +85,14 @@ If not specified store state will be set to `{}`.
 
 ### `buildRootReducer`
 Optional function for custom root reducer
-`(ducks, { refDucks, refErrorReporter }) => rootReducer`
+`(ducks, { refProps, refDucks, refReducers, refErrorReporter }) => rootReducer`
 
-* `ducks` are array of ducks
-* `refDucks.current` will hold current array of ducks.
-* `refErrorReporter.current` will hold current error reporter function.
+* `ducks` - array of ducks
+* `refProps.current` - props passed to `pool.build(props)` function
+* `refDucks.current` - current array of ducks.
+* `refReducers.pre` - pool pre reducer
+* `refReducers.post` - pool post reducer
+* `refErrorReporter.current` - current error reporter function.
 
 #### default `buildRootReducer`
 
@@ -96,9 +106,27 @@ with every duck root reducer wrapped in try/catch returning unmodified state in 
 
 ## `.addDuck(duck)`
 
-Add duck to pool
+Add duck to pool.
 ```js
 myPool.addDuck(myDuck)
+```
+
+## `.preReducer(reducer)`
+
+Add pool pre reducer.
+Pre reducers will run BEFORE duck reducers and will receive all actions.
+Will replace previously set pre reducer.
+```js
+myPool.preReducer(function globalPreReducer(state, action) {/* ... */} )
+```
+
+## `.postReducer(reducer)`
+
+Add pool post reducer.
+Post reducers will run AFTER duck reducers and will receive all actions.
+Will replace previously set post reducer.
+```js
+myPool.postReducer(function globalPostReducer(state, action) {/* ... */} )
 ```
 
 ## `.build(props)`
@@ -110,14 +138,29 @@ myPool.build({ initialCounter: 0 })
 
 ## `.store`
 
-Reference to built redux store
+Reference to built redux store.
 ```js
 myPool.store.subscribe(/* ... */)
 ```
 
+## `.dispatch(action)`
+
+Dispatches an action.
+```js
+myPool.dispatch(action)
+```
+
+## `.reduce([state,] action)`
+
+Reduce state with action. Does not change pool's store. Can be used to look ahead what the state will be after dispatching an action.
+```js
+myPool.reduce(action) // reduce pool's store state
+myPool.reduce(state, action) // reduce custom state
+```
+
 ## `.setErrorReporter(reporterFn)`
 
-Set exception reporter function. Will also overwrite all added [SagaDuck](https://github.com/hitosu/duckness/tree/master/packages/saga) errorReporters.
+Set exception reporter function. Will also overwrite errorReporters set in ducks.
 ```js
 myPool.setErrorReporter(error => {
   window.Sentry.captureException(error)
@@ -148,22 +191,34 @@ Adds Pool Stream to Pool
 ```js
 {
   // array of middlewares for Redux store
-  middlewares({ refDucks, refErrorReporter }) {
+  middlewares({ refDucks, refProps, refReducers, refErrorReporter }) {
     // refDucks.current - current array of ducks
+    // refProps.current - props passed to build function
+    // refReducers.root - root reducer function
+    // refReducers.pre - pool pre reducer function
+    // refReducers.post - pool post reducer function
     // refErrorReporter.current - current error reporter function
     // ...
     return [...streamMiddlewares] 
   },
   // called before redux store is built
-  beforeBuild({ refDucks, refErrorReporter }) {
+  beforeBuild({ refDucks, refProps, refReducers, refErrorReporter }) {
     // refDucks.current - current array of ducks
+    // refProps.current - props passed to build function
+    // refReducers.root - root reducer function
+    // refReducers.pre - pool pre reducer function
+    // refReducers.post - pool post reducer function
     // refErrorReporter.current - current error reporter function
     // ...
   },
   // called after redux store is built
-  afterBuild({ refStore, refDucks, refErrorReporter }) {
+  afterBuild({ refStore, refDucks, refProps, refReducers, refErrorReporter }) {
     // refStore.current - current Redux store
     // refDucks.current - current array of ducks
+    // refProps.current - props passed to build function
+    // refReducers.root - root reducer function
+    // refReducers.pre - pool pre reducer function
+    // refReducers.post - pool post reducer function
     // refErrorReporter.current - current error reporter function
     // ...
   }
@@ -178,8 +233,10 @@ https://github.com/hitosu/duckness/tree/master/stories
 
 * [@duckness/duck](https://github.com/hitosu/duckness/tree/master/packages/duck) - [Modular Redux Ducks](https://github.com/erikras/ducks-modular-redux) hatchery
 * [@duckness/saga](https://github.com/hitosu/duckness/tree/master/packages/saga) - [Redux Saga](https://redux-saga.js.org/) extension for [@duckness/duck](https://github.com/hitosu/duckness/tree/master/packages/duck)
+* [@duckness/epic](https://github.com/hitosu/duckness/tree/master/packages/epic) - [Redux-Observable](https://redux-observable.js.org/) extension for [@duckness/duck](https://github.com/hitosu/duckness/tree/master/packages/duck)
 * [@duckness/pool](https://github.com/hitosu/duckness/tree/master/packages/pool) - [@duckness/duck](https://github.com/hitosu/duckness/tree/master/packages/duck) + [Redux](https://redux.js.org/)
 * [@duckness/pool-saga-stream](https://github.com/hitosu/duckness/tree/master/packages/pool-saga-stream) - [@duckness/saga](https://github.com/hitosu/duckness/tree/master/packages/saga) plugin for [@duckness/pool](https://github.com/hitosu/duckness/tree/master/packages/pool)
+* [@duckness/pool-epic-stream](https://github.com/hitosu/duckness/tree/master/packages/pool-epic-stream) - [@duckness/epic](https://github.com/hitosu/duckness/tree/master/packages/epic) plugin for [@duckness/pool](https://github.com/hitosu/duckness/tree/master/packages/pool)
 * [@duckness/react-redux-pool](https://github.com/hitosu/duckness/tree/master/packages/react-redux-pool) - [@duckness/pool](https://github.com/hitosu/duckness/tree/master/packages/pool) + [React-Redux](https://react-redux.js.org/)
 * [@duckness/use-redux](https://github.com/hitosu/duckness/tree/master/packages/use-redux) - [React hook](https://reactjs.org/docs/hooks-intro.html) for [Redux](https://react-redux.js.org/) store
 * [@duckness/use-pool](https://github.com/hitosu/duckness/tree/master/packages/use-pool) - [React hook](https://reactjs.org/docs/hooks-intro.html) for [@duckness/pool](https://github.com/hitosu/duckness/tree/master/packages/pool).

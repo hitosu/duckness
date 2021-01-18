@@ -9,11 +9,7 @@ export default {
 }
 
 export const ReactReduxTodoListStory = () => ReactReduxTodoListPool.render()
-ReactReduxTodoListStory.story = {
-  name: 'react-redux-pool'
-}
+ReactReduxTodoListStory.storyName = 'react-redux-pool'
 
 export const UsePoolTodoListStory = () => UsePoolTodoListPool_render()
-UsePoolTodoListStory.story = {
-  name: 'use-pool'
-}
+UsePoolTodoListStory.storyName = 'use-pool'

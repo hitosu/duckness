@@ -1,12 +1,12 @@
 {
-  "name": "@duckness/react-redux-pool",
+  "name": "@duckness/pool-epic-stream",
   "version": "0.6.11",
-  "description": "@duckness/pool + React-Redux",
-  "keywords": ["duckness", "react", "redux", "react-redux", "redux-saga"],
+  "description": "Duckness Pool Epic Stream - @duckness/epic plugin for @duckness/pool",
+  "keywords": ["redux", "ducks", "modular", "duckness", "redux-observable"],
   "author": "Vasily Kazantsev <vasily@kazantsev.xyz>",
-  "homepage": "https://github.com/hitosu/duckness/tree/master/packages/react-redux-pool",
+  "homepage": "https://github.com/hitosu/duckness/tree/master/packages/pool-saga-stream",
   "license": "MIT",
-  "main": "lib/ReactReduxPool.js",
+  "main": "lib/PoolEpicStream.js",
   "files": ["lib/"],
   "directories": {
     "lib": "lib",
@@ -31,10 +31,10 @@
     "url": "https://github.com/hitosu/duckness/issues"
   },
   "dependencies": {
-    "@duckness/pool": "^0.6.11"
+    "@duckness/pool": "^0.6.11",
+    "@duckness/epic": "^0.6.11"
   },
   "peerDependencies": {
-    "react": "^16.14.0",
-    "react-redux": "^7.2.2"
+    "redux-observable": "^1.2.0"
   }
 }
