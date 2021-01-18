@@ -1,6 +1,6 @@
 {
   "name": "@duckness/pool-epic-stream",
-  "version": "0.7.0",
+  "version": "0.7.1",
   "description": "Duckness Pool Epic Stream - @duckness/epic plugin for @duckness/pool",
   "keywords": [
     "redux",
@@ -39,8 +39,8 @@
     "url": "https://github.com/hitosu/duckness/issues"
   },
   "dependencies": {
-    "@duckness/epic": "^0.7.0",
-    "@duckness/pool": "^0.7.0"
+    "@duckness/epic": "^0.7.1",
+    "@duckness/pool": "^0.7.1"
   },
   "peerDependencies": {
     "redux-observable": "^1.2.0"
