@@ -1,13 +1,20 @@
 {
   "name": "@duckness/epic",
-  "version": "0.6.11",
+  "version": "0.7.0",
   "description": "Redux-Observable extension for @duckness/duck - Modular Redux Ducks hatchery",
-  "keywords": ["redux", "ducks", "modular", "saga"],
+  "keywords": [
+    "redux",
+    "ducks",
+    "modular",
+    "saga"
+  ],
   "author": "Vasily Kazantsev <vasily@kazantsev.xyz>",
   "homepage": "https://github.com/hitosu/duckness/tree/master/packages/epic",
   "license": "MIT",
   "main": "lib/EpicDuck.js",
-  "files": ["lib/"],
+  "files": [
+    "lib/"
+  ],
   "directories": {
     "lib": "lib",
     "test": "__tests__"
@@ -31,7 +38,7 @@
     "url": "https://github.com/hitosu/duckness/issues"
   },
   "dependencies": {
-    "@duckness/duck": "^0.6.11"
+    "@duckness/duck": "^0.7.0"
   },
   "peerDependencies": {
     "redux-observable": "^1.2.0",
