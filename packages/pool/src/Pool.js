@@ -9,8 +9,20 @@ const initDucksStream = Object.freeze({
   }
 })
 
+function mapDuck(map = {}, duck) {
+  const { poolName, duckName } = duck
+  if (null != poolName && null != duckName) {
+    if (null == map[poolName]) {
+      map[poolName] = {}
+    }
+    map[poolName][duckName] = duck
+  }
+  return map
+}
+
 // POOL
 export default function Pool({
+  poolName = 'pool',
   props: initProps = {},
   ducks: initDucks = [],
   middlewares: initMiddlewares = [],
@@ -21,13 +33,14 @@ export default function Pool({
   buildRootReducer
 } = {}) {
   const refProps = { current: initProps || {} }
-  const refDucks = { current: initDucks || [] }
+  const refDucks = { current: initDucks || [], map: (initDucks || []).reduce((map, duck) => mapDuck(map, duck), {}) }
   const refStreams = { current: [...(initStreams || []), initDucksStream] }
   const refMiddlewares = { current: initMiddlewares || [] }
   const refErrorReporter = { current: ('undefined' !== typeof console && console.error) || (() => {}) } // eslint-disable-line no-console
 
   function addDuck(duck) {
     refDucks.current.push(duck)
+    refDucks.map = mapDuck(refDucks.map, duck)
   }
 
   function addMiddleware(middleware) {
@@ -49,14 +62,65 @@ export default function Pool({
   }
 
   const refStore = { current: null }
-  function dispatch(action) {
-    if (refStore.current) {
-      refStore.current.dispatch(action)
+
+  function getDuckByName(duckPath) {
+    if ('string' === typeof duckPath || Array.isArray(duckPath)) {
+      const [duckPoolName, duckName] = 'string' === typeof duckPath ? [poolName, duckPath] : [duckPath[0], duckPath[1]]
+      return refDucks.map[duckPoolName] ? refDucks.map[duckPoolName][duckName] : null
     } else {
-      const error = new Error('Received action dispatch but pool is not built yet')
-      error.dispatchedAction = action
-      reportError(error, '@duckness/pool', 'dispatch', action)
+      return null
     }
+  }
+  function getDispatchActionFromDispatchArgs(args) {
+    // dispatch(action)
+    // dispatch(duckName, actionName, ...actionArgs)
+    // dispatch([poolName, duckName], actionName, ...actionArgs)
+    if (1 === args.length) {
+      return args[0]
+    } else if (args.length > 1) {
+      const [duckPath, actionName, ...actionArgs] = args
+      const duck = getDuckByName(duckPath)
+      if (null == duck) {
+        const error = new Error(`Received action '${actionName}' dispatch but duck '${duckPath}' is not found`)
+        error.actionName = actionName
+        error.duckPath = duckPath
+        reportError(error, '@duckness/pool', 'dispatch')
+        return null
+      } else {
+        const actionCreator = duck.action[actionName]
+        if (null == actionCreator) {
+          const error = new Error(
+            `Received action dispatch but action '${actionName}' for duck '${duckPath}' is not found`
+          )
+          error.actionName = actionName
+          error.duckPath = duckPath
+          reportError(error, '@duckness/pool', 'dispatch')
+          return null
+        } else {
+          return actionCreator(...actionArgs)
+        }
+      }
+    } else {
+      return null
+    }
+  }
+  function dispatch(...args) {
+    const action = getDispatchActionFromDispatchArgs(args)
+    if (null == action) {
+      const error = new Error('Received action dispatch without action')
+      error.poolName = poolName
+      reportError(error, '@duckness/pool', 'dispatch')
+    } else {
+      if (refStore.current) {
+        return refStore.current.dispatch(action)
+      } else {
+        const error = new Error('Received action dispatch but pool is not built yet')
+        error.dispatchedAction = action
+        error.poolName = poolName
+        reportError(error, '@duckness/pool', 'dispatch', action)
+      }
+    }
+    return void 0
   }
 
   const refReducers = { root: null, pre: null, post: null }
@@ -64,6 +128,7 @@ export default function Pool({
     if (void 0 === andAction && !refStore.current) {
       const error = new Error('Reducing state but pool is not built yet')
       error.dispatchedAction = stateOrAction
+      error.poolName = poolName
       reportError(error, '@duckness/pool', 'reduce', stateOrAction)
       return stateOrAction
     }
@@ -74,6 +139,7 @@ export default function Pool({
     } else {
       const error = new Error('Reducing state but pool is not built yet')
       error.dispatchedAction = action
+      error.poolName = poolName
       reportError(error, '@duckness/pool', 'reduce', action)
       return state
     }
@@ -86,6 +152,7 @@ export default function Pool({
       } catch (error) {
         try {
           error.dispatchedAction = action
+          error.poolName = poolName
         } catch {
           // skip
         }
@@ -101,6 +168,7 @@ export default function Pool({
       } catch (error) {
         try {
           error.dispatchedAction = action
+          error.poolName = poolName
         } catch {
           // skip
         }
@@ -126,7 +194,8 @@ export default function Pool({
               return duck(state, action)
             } catch (error) {
               try {
-                error.poolName = duck.poolName
+                error.poolName = poolName
+                error.duckPoolName = duck.poolName
                 error.duckName = duck.duckName
                 error.dispatchedAction = action
               } catch {
@@ -202,6 +271,7 @@ export default function Pool({
     },
     enumerable: true
   })
+  Object.defineProperty(pool, 'getDuckByName', { value: getDuckByName, writable: false, enumerable: true })
   Object.defineProperty(pool, 'middlewares', {
     get() {
       return [...(refMiddlewares.current || [])]

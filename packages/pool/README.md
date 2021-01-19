@@ -41,7 +41,7 @@ CounterPool.store
   - [`.postReducer(reducer)`](#postreducerreducer)
   - [`.build(props)`](#buildprops)
   - [`.store`](#store)
-  - [`.dispatch(action)`](#dispatchaction)
+  - [`.dispatch(...)`](#dispatch)
   - [`.reduce([state,] action)`](#reducestate-action)
   - [`.setErrorReporter(reporterFn)`](#seterrorreporterreporterfn)
   - [`.reportError(error)`](#reporterrorerror)
@@ -49,6 +49,12 @@ CounterPool.store
   - [Pool Streams - Pool plugins](#pool-streams---pool-plugins)
     - [`.addStream(poolStream)`](#addstreampoolstream)
     - [`PoolStream` API](#poolstream-api)
+  - [`.ducks`](#ducks)
+  - [`.getDuckByName(duckPath)`](#getduckbynameduckpath)
+    - [`duckPath`:](#duckpath)
+  - [`.middlewares`](#middlewares)
+  - [`.streams`](#streams)
+  - [`.props`](#props)
 - [Examples](#examples)
 - [@Duckness packages:](#duckness-packages)
 
@@ -58,6 +64,7 @@ CounterPool.store
 
 ```js
 const myPool = Pool({
+  ?poolName: String, // pool name, default is 'pool'
   ?ducks: Array<Duck>, // array of pool ducks
   ?middlewares: Array<Middleware>, // additional middlewares for Redux store
   ?streams: Array<PoolStream>, // pool plugins
@@ -143,12 +150,40 @@ Reference to built redux store.
 myPool.store.subscribe(/* ... */)
 ```
 
-## `.dispatch(action)`
+## `.dispatch(...)`
 
-Dispatches an action.
+1. Dispatches an action (action is a plain object).
 ```js
+const action = { type: 'actionType', payload: {} }
 myPool.dispatch(action)
 ```
+
+2. Dispatches and action from 'poolName/duckName' duck.
+This will first look for a duck by 'duckName' and current 'poolName', then duck's action creator by 'actionName' and call it with 'actionParams' to build action to dispatch.
+```js
+myPool.dispatch('duckName', 'actionName', ...actionParams)
+```
+
+Example:
+
+```js
+const MyDuck = Duck('myDuck', 'myPool')
+MyDuck.action('someAction')
+
+const MyPool = Pool({ poolName: 'myPool' })
+MyPool.addDuck(MyDuck)
+MyPool.dispatch('myDuck', 'someAction', ...actionParams)
+
+// equal to
+MyPool.dispatch(MyDuck.action.someAction(...actionParams))
+```
+
+3. Dispatches and action from 'customPoolName/duckName' duck.
+This will first look for a duck by 'duckName' and 'poolName', then duck's action creator by 'actionName' and call it with 'actionParams' to build action to dispatch.
+```js
+myPool.dispatch(['customPoolName', 'duckName'], 'actionName', ...actionParams)
+```
+
 
 ## `.reduce([state,] action)`
 
@@ -224,6 +259,30 @@ Adds Pool Stream to Pool
   }
 }
 ```
+
+## `.ducks`
+
+Array of added ducks (read only)
+
+## `.getDuckByName(duckPath)`
+
+Find added duck by it's path. Returns `null` if duck is not found.
+
+### `duckPath`:
+   * Array: `[poolName, duckName]`
+   * String: `duckName` (use current poolName)
+
+## `.middlewares`
+
+Array of added middlewares (read only)
+
+## `.streams`
+
+Array of added streams (read only)
+
+## `.props`
+
+Props used to build pool (read only)
 
 # Examples
 
