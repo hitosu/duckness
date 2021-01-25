@@ -2,18 +2,12 @@
   "name": "@duckness/pool",
   "version": "0.7.2",
   "description": "Duckness Pool - @duckness/duck + Redux",
-  "keywords": [
-    "redux",
-    "ducks",
-    "modular"
-  ],
+  "keywords": ["redux", "ducks", "modular"],
   "author": "Vasily Kazantsev <vasily@kazantsev.xyz>",
   "homepage": "https://github.com/hitosu/duckness/tree/master/packages/pool",
   "license": "MIT",
   "main": "lib/Pool.js",
-  "files": [
-    "lib/"
-  ],
+  "files": ["lib/"],
   "directories": {
     "lib": "lib",
     "test": "__tests__"
@@ -40,6 +34,6 @@
     "@duckness/duck": "^0.7.2"
   },
   "peerDependencies": {
-    "redux": "^4.0.5"
+    "redux": ">= 4"
   }
 }
