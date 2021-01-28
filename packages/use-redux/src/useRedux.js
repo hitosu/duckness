@@ -142,13 +142,19 @@ export function combineSelectors(selectorsMap, { selectedStatesEqual } = {}) {
 }
 
 export function connect(store, selector, shouldUpdate, shouldSelect, dispatch = store.dispatch) {
+  const emptyObject = {}
+  const emptySelector = () => emptyObject
+
   return function (Component, mapToProps) {
     function ConnectedComponent(props) {
       const refProps = useRef(props)
       refProps.current = props
-      const safeSelector = useCallback(selector ? state => selector(state, refProps.current) : () => {}, [])
+      const safeSelector = useCallback(
+        selector ? state => selector(state, refProps.current) || emptyObject : emptySelector,
+        []
+      )
       const selected = useRedux(store, safeSelector, shouldUpdate, shouldSelect)
-      const connectedProps = (mapToProps ? mapToProps(selected, props, dispatch) : selected) || {}
+      const connectedProps = (mapToProps ? mapToProps(selected, props, dispatch) : selected) || emptyObject
       return <Component {...props} {...connectedProps} />
     }
     ConnectedComponent.displayName = `connect(${Component.displayName || Component.name || 'Component'})`
