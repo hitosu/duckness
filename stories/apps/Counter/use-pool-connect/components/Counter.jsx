@@ -5,11 +5,6 @@ import { connect, combineSelectors } from '@duckness/use-pool'
 import CounterPool, { CounterDuck } from '../CounterPool'
 
 export class Counter extends Component {
-  static propTypes = {
-    counter: PropTypes.number.isRequired,
-    children: PropTypes.any
-  }
-
   render() {
     const { counter, children } = this.props
     return (
@@ -18,6 +13,10 @@ export class Counter extends Component {
       </span>
     )
   }
+}
+Counter.propTypes = {
+  counter: PropTypes.number.isRequired,
+  children: PropTypes.any
 }
 
 const { selector, shouldUpdate } = combineSelectors({

@@ -5,11 +5,6 @@ import { connect, combineSelectors } from '@duckness/use-pool'
 import CounterPool, { CounterDuck } from '../CounterPool'
 
 export class ActionCounter extends Component {
-  static propTypes = {
-    actionsDispatched: PropTypes.number.isRequired,
-    lastActionDispatchedAt: PropTypes.string.isRequired
-  }
-
   render() {
     const { actionsDispatched, lastActionDispatchedAt } = this.props
     return (
@@ -18,6 +13,10 @@ export class ActionCounter extends Component {
       </span>
     )
   }
+}
+ActionCounter.propTypes = {
+  actionsDispatched: PropTypes.number.isRequired,
+  lastActionDispatchedAt: PropTypes.string.isRequired
 }
 
 const { selector, shouldUpdate } = combineSelectors({
