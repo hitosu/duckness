@@ -210,7 +210,9 @@ Creates HOC connected to Redux store.
 connect(store, selector, shouldUpdate, shouldSelect, dispatch = store.dispatch) => (Component, ?mapToProps) => ConnectedComponent
 ```
 
-`store`, `selector`, `shouldUpdate`, `shouldSelect` are the same arguments used in [`useRedux`](#useredux).
+`store`, `shouldUpdate`, `shouldSelect` are the same arguments used in [`useRedux`](#useredux).
+
+`selector` is the same function used in [`useRedux`](#useredux) but with `ownProps` added: `selector(state, ownProps)`
 
 `mapToProps` is an optional props mapper in form of
 ```
@@ -220,12 +222,14 @@ connect(store, selector, shouldUpdate, shouldSelect, dispatch = store.dispatch) 
 Example:
 
 ```js
-import { connect, combineSelectors } from '@duckness/use-pool'
+import { connect, combineSelectors } from '@duckness/use-redux'
 
 import TodoList from '../../components/TodoList'
 import TodoListPool, { TodoDuck } from '../TodoListPool'
 
 const { selector, shouldUpdate } = combineSelectors({
+  // we should wrap selector because TodoDuck.select.visibleTodos expects (state, duckFace) with duckFace added by Duck,
+  // but connected selector is called as (state, ownProps) that would lead to (state, ownProps, duckFace) call.
   todos: state => TodoDuck.select.visibleTodos(state)
 })
 
@@ -233,9 +237,9 @@ export default connect(
   TodoListPool.store,
   selector,
   shouldUpdate
-)(TodoList, (selected, props, dispatch) => {
+)(TodoList, (selectedState, ownProps, dispatch) => {
   return {
-    ...props,
+    ...selectedState,
     ...selected,
     onToggleTodo: id => void dispatch(TodoDuck.action.toggleTodo(id))
   }
