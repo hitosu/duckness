@@ -7,13 +7,16 @@ const { selector, shouldUpdate } = combineSelectors({
   todos: state => TodoDuck.select.visibleTodos(state)
 })
 
+const onToggleTodo = id => void TodoListPool.dispatch('todo', 'toggleTodo', id)
+
 export default connect(
   TodoListPool,
   selector,
   shouldUpdate
-)(TodoList, (selected, _props, dispatch) => {
+)(TodoList, (selected, props) => {
   return {
+    ...props,
     ...selected,
-    onToggleTodo: id => void dispatch('todo', 'toggleTodo', id)
+    onToggleTodo
   }
 })
