@@ -237,7 +237,7 @@ export default connect(
   return {
     ...props,
     ...selected,
-    onToggleTodo: id => void dispatch('todo', 'toggleTodo', id)
+    onToggleTodo: id => void dispatch(TodoDuck.action.toggleTodo(id))
   }
 })
 ```
