@@ -230,7 +230,7 @@ const { selector, shouldUpdate } = combineSelectors({
 })
 
 export default connect(
-  TodoListPool,
+  TodoListPool.store,
   selector,
   shouldUpdate
 )(TodoList, (selected, props, dispatch) => {
