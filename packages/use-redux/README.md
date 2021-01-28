@@ -239,8 +239,8 @@ export default connect(
   shouldUpdate
 )(TodoList, (selectedState, ownProps, dispatch) => {
   return {
+    ...ownProps,
     ...selectedState,
-    ...selected,
     onToggleTodo: id => void dispatch(TodoDuck.action.toggleTodo(id))
   }
 })
