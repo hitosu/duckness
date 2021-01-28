@@ -1,13 +1,19 @@
 {
   "name": "@duckness/store",
-  "version": "0.7.2",
+  "version": "0.7.3",
   "description": "Simple store for React components",
-  "keywords": ["store", "react", "react-hooks"],
+  "keywords": [
+    "store",
+    "react",
+    "react-hooks"
+  ],
   "author": "Vasily Kazantsev <vasily@kazantsev.xyz>",
   "homepage": "https://github.com/hitosu/duckness/tree/master/packages/store",
   "license": "MIT",
   "main": "lib/store.js",
-  "files": ["lib/"],
+  "files": [
+    "lib/"
+  ],
   "directories": {
     "lib": "lib",
     "test": "__tests__"
