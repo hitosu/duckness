@@ -36,6 +36,7 @@ export default function Counter() {
   - [`payloadTransformer`](#payloadtransformer)
 - [`useDispatch`](#usedispatch)
 - [`combineSelectors`](#combineselectors)
+- [`connect`](#connect)
 - [@Duckness packages:](#duckness-packages)
 
 
@@ -170,9 +171,10 @@ function SetStatusButton({ status = 'ready' } = {}) {
 
 # `combineSelectors`
 
-Produces two functions from a map of selectors:
+Produces three functions from a map of selectors:
 1. `selector` - combined selector
 2. `shouldUpdate` - selectedState update filter (see above)
+3. `areEqual` - negative of `shouldUpdate`
 
 ```js
 const { selector: actionCounterSelector, shouldUpdate: shouldUpdateActionCounter } = combineSelectors({
@@ -199,6 +201,48 @@ combineSelectors(selectorsMap, { selectedStatesEqual } = {})
 
 selectedStatesEqual(selectorKey, nextSelectedState[selectorKey], prevSelectedState[selectorKey]): Boolean
 ```
+
+# `connect`
+
+Creates HOC connected to Redux store.
+
+```
+connect(store, selector, shouldUpdate, shouldSelect, dispatch = store.dispatch) => (Component, ?mapToProps) => ConnectedComponent
+```
+
+`store`, `selector`, `shouldUpdate`, `shouldSelect` are the same arguments used in [`useRedux`](#useredux).
+
+`mapToProps` is an optional props mapper in form of
+```
+(selectedState, ownProps, dispatch) => componentProps
+```
+
+Example:
+
+```js
+import { connect, combineSelectors } from '@duckness/use-pool'
+
+import TodoList from '../../components/TodoList'
+import TodoListPool, { TodoDuck } from '../TodoListPool'
+
+const { selector, shouldUpdate } = combineSelectors({
+  todos: state => TodoDuck.select.visibleTodos(state)
+})
+
+export default connect(
+  TodoListPool,
+  selector,
+  shouldUpdate
+)(TodoList, (selected, props, dispatch) => {
+  return {
+    ...props,
+    ...selected,
+    onToggleTodo: id => void dispatch('todo', 'toggleTodo', id)
+  }
+})
+```
+
+
 
 # @Duckness packages:
 

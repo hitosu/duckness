@@ -40,6 +40,7 @@ See [@duckness/use-redux documentation](https://github.com/hitosu/duckness/blob/
 import useRedux, {
   useDispatchAction as useReduxDispatchAction,
   useDispatch as useReduxDispatch,
+  connect as useReduxConnect,
   combineSelectors
 } from '@duckness/use-redux'
 
@@ -56,6 +57,10 @@ export function useDispatch(pool, dispatcher, deps) {
 }
 
 export { combineSelectors }
+
+export function connect(pool, selector, shouldUpdate, shouldSelect, dispatch = pool.dispatch) {
+  return useReduxConnect(pool.store, selector, shouldUpdate, shouldSelect, dispatch)
+}
 ```
 
 # @Duckness packages:

@@ -1,6 +1,7 @@
 import useRedux, {
   useDispatchAction as useReduxDispatchAction,
   useDispatch as useReduxDispatch,
+  connect as useReduxConnect,
   combineSelectors
 } from '@duckness/use-redux'
 
@@ -14,6 +15,10 @@ export function useDispatchAction(pool, actionCreator, payloadTransformer) {
 
 export function useDispatch(pool, dispatcher, deps) {
   return useReduxDispatch(pool.store, dispatcher, deps)
+}
+
+export function connect(pool, selector, shouldUpdate, shouldSelect, dispatch = pool.dispatch) {
+  return useReduxConnect(pool.store, selector, shouldUpdate, shouldSelect, dispatch)
 }
 
 export { combineSelectors }

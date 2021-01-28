@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from 'react'
+import React, { useState, useEffect, useCallback, useRef } from 'react'
 
 const UNSET_MARKER = {}
 
@@ -101,12 +101,12 @@ export function useDispatch(store, dispatcher, deps = []) {
 
 export function combineSelectors(selectorsMap, { selectedStatesEqual } = {}) {
   const selectorKeys = Object.keys(selectorsMap)
-  return {
-    selector: state => {
+  const combinedSelectors = {
+    selector: (...state) => {
       const selectedState = {}
       for (let i = 0; i < selectorKeys.length; i++) {
         const selectorKey = selectorKeys[i]
-        selectedState[selectorKey] = selectorsMap[selectorKey](state)
+        selectedState[selectorKey] = selectorsMap[selectorKey](...state)
       }
       return selectedState
     },
@@ -118,7 +118,9 @@ export function combineSelectors(selectorsMap, { selectedStatesEqual } = {}) {
               return true
             }
           }
-          storePrevSelectedState(prevSelectedState)
+          if (storePrevSelectedState) {
+            storePrevSelectedState(prevSelectedState)
+          }
           return false
         }
       : (nextSelectedState, prevSelectedState, storePrevSelectedState) => {
@@ -128,8 +130,28 @@ export function combineSelectors(selectorsMap, { selectedStatesEqual } = {}) {
               return true
             }
           }
-          storePrevSelectedState(prevSelectedState)
+          if (storePrevSelectedState) {
+            storePrevSelectedState(prevSelectedState)
+          }
           return false
-        }
+        },
+    areEqual: (nextSelectedState, prevSelectedState) =>
+      !combinedSelectors.shouldUpdate(nextSelectedState, prevSelectedState)
+  }
+  return combinedSelectors
+}
+
+export function connect(store, selector, shouldUpdate, shouldSelect, dispatch = store.dispatch) {
+  return function (Component, mapToProps) {
+    function ConnectedComponent(props) {
+      const refProps = useRef(props)
+      refProps.current = props
+      const safeSelector = useCallback(selector ? state => selector(state, refProps.current) : () => {}, [])
+      const selected = useRedux(store, safeSelector, shouldUpdate, shouldSelect)
+      const connectedProps = (mapToProps ? mapToProps(selected, props, dispatch) : selected) || {}
+      return <Component {...props} {...connectedProps} />
+    }
+    ConnectedComponent.displayName = `connect(${Component.displayName || Component.name || 'Component'})`
+    return ConnectedComponent
   }
 }
