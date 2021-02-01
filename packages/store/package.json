@@ -1,6 +1,6 @@
 {
   "name": "@duckness/store",
-  "version": "0.7.5",
+  "version": "0.8.0",
   "description": "Simple store for React components",
   "keywords": [
     "store",

@@ -1,6 +1,6 @@
 {
   "name": "@duckness/saga",
-  "version": "0.7.5",
+  "version": "0.8.0",
   "description": "Saga extension for @duckness/duck - Modular Redux Ducks hatchery",
   "keywords": [
     "redux",
@@ -38,7 +38,7 @@
     "url": "https://github.com/hitosu/duckness/issues"
   },
   "dependencies": {
-    "@duckness/duck": "^0.7.5"
+    "@duckness/duck": "^0.8.0"
   },
   "peerDependencies": {
     "redux-saga": ">= 1"
