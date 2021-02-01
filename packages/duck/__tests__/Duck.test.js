@@ -38,7 +38,7 @@ describe('@duckness/duck', () => {
     it('that accepts payload', () => {
       expect(duck.action('quackLoudly', 'QUACK')).toBeInstanceOf(Function)
       expect(duck.action.quackLoudly).toBeInstanceOf(Function)
-      expect(duck.action.quackLoudly.actionType).toBe('QUACK')
+      expect(duck.action.quackLoudly.actionType).toBe('Lake/Donald/QUACK')
       expect(duck.action.quackLoudly({ loudness: 9000 })).toEqual({
         type: 'Lake/Donald/QUACK',
         payload: { loudness: 9000 },
@@ -77,7 +77,7 @@ describe('@duckness/duck', () => {
     it('defaults actionType to actionName', () => {
       expect(duck.action('quackSilently')).toBeInstanceOf(Function)
       expect(duck.action.quackSilently).toBeInstanceOf(Function)
-      expect(duck.action.quackSilently.actionType).toBe('quackSilently')
+      expect(duck.action.quackSilently.actionType).toBe('Lake/Donald/quackSilently')
       expect(duck.actionTypes.quackSilently).toBe('Lake/Donald/quackSilently')
       expect(duck.action.quackSilently({ times: 9000 })).toEqual({
         type: 'Lake/Donald/quackSilently',

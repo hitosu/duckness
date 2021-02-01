@@ -11,28 +11,28 @@ CounterEpicDuck.selector('lastActionDispatchedAt', state =>
   state.lastActionDispatchedAt ? `${+state.lastActionDispatchedAt}` : ''
 )
 
-CounterEpicDuck.action('increment', 'INCREMENT')
-CounterEpicDuck.action('decrement', 'DECREMENT')
-CounterEpicDuck.action('reset', 'RESET')
-CounterEpicDuck.action('startTimer', 'START_TIMER')
-CounterEpicDuck.action('startFastTimer', 'START_FAST_TIMER')
-CounterEpicDuck.action('stopTimer', 'STOP_TIMER')
+CounterEpicDuck.action('increment')
+CounterEpicDuck.action('decrement')
+CounterEpicDuck.action('reset')
+CounterEpicDuck.action('startTimer')
+CounterEpicDuck.action('startFastTimer')
+CounterEpicDuck.action('stopTimer')
 
-CounterEpicDuck.reducer('INCREMENT', (state, _action, duckFace) => {
+CounterEpicDuck.reducer('increment', (state, _action, duckFace) => {
   return {
     ...state,
     counter: duckFace.select.counter(state) + 1
   }
 })
 
-CounterEpicDuck.reducer('DECREMENT', (state, _action, duckFace) => {
+CounterEpicDuck.reducer('decrement', (state, _action, duckFace) => {
   return {
     ...state,
     counter: duckFace.select.counter(state) - 1
   }
 })
 
-CounterEpicDuck.reducer('RESET', (state, _action, _duckFace) => {
+CounterEpicDuck.reducer('reset', (state, _action, _duckFace) => {
   return {
     ...state,
     counter: 0
@@ -41,15 +41,15 @@ CounterEpicDuck.reducer('RESET', (state, _action, _duckFace) => {
 
 CounterEpicDuck.epic((action$, _state$, duckFace) => {
   return action$.pipe(
-    ofType(duckFace.actionTypes.START_TIMER),
+    ofType(duckFace.action.startTimer.actionType),
     mergeMap(_action => {
       return interval(1000).pipe(
         takeUntil(
           action$.pipe(
             ofType(
-              duckFace.actionTypes.STOP_TIMER,
-              duckFace.actionTypes.START_FAST_TIMER,
-              duckFace.actionTypes.START_TIMER
+              duckFace.action.stopTimer.actionType,
+              duckFace.action.startFastTimer.actionType,
+              duckFace.action.startTimer.actionType
             )
           )
         ),
@@ -61,12 +61,16 @@ CounterEpicDuck.epic((action$, _state$, duckFace) => {
 
 CounterEpicDuck.epic((action$, _state$, duckFace) => {
   return action$.pipe(
-    ofType(duckFace.actionTypes.START_FAST_TIMER),
+    ofType(duckFace.action.startFastTimer.actionType),
     mergeMap(_action => {
       return interval(100).pipe(
         takeUntil(
           action$.pipe(
-            ofType(duckFace.actionTypes.STOP_TIMER, duckFace.actionTypes.START_TIMER, duckFace.actionTypes.START_TIMER)
+            ofType(
+              duckFace.action.stopTimer.actionType,
+              duckFace.action.startTimer.actionType,
+              duckFace.action.startTimer.actionType
+            )
           )
         ),
         map(_ => duckFace.action.increment())

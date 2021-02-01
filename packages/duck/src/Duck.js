@@ -127,7 +127,8 @@ function addActionConstructors(duck, duckFace) {
       }
       return actionTransformer ? actionTransformer(action, duckFace) : action
     }
-    Object.defineProperty(constructAction, 'actionType', { value: actionType, writable: false, enumerable: true })
+    Object.defineProperty(constructAction, 'actionType', { value: fullActionType, writable: false, enumerable: true })
+    Object.defineProperty(constructAction, 'duckActionType', { value: actionType, writable: false, enumerable: true })
     Object.defineProperty(constructAction, 'payloadBuilder', {
       value: payloadBuilder,
       writable: false,
@@ -235,7 +236,7 @@ function addCloning(duck, typedReducers, customReducers) {
     Object.keys(duck.action).forEach(actionName => {
       const actionConstructor = duck.action[actionName]
       if ('function' === typeof actionConstructor && actionConstructor.actionType) {
-        clonedDuck.action(actionName, actionConstructor.actionType)
+        clonedDuck.action(actionName, actionConstructor.duckActionType)
       }
     })
 
