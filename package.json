@@ -17,12 +17,8 @@
     "build:watch": "lerna bootstrap && lerna exec --parallel -- yarn build:watch",
     "lerna:publish": "lerna publish --force-publish=*",
     "storybook": "start-storybook -p 6006",
-    "build-storybook": "build-storybook"
-  },
-  "husky": {
-    "hooks": {
-      "pre-push": "yarn build && yarn test"
-    }
+    "build-storybook": "build-storybook",
+    "prepare": "husky install"
   },
   "devDependencies": {
     "@babel/cli": "^7.14.5",
