@@ -1,10 +1,8 @@
 "use strict";
-var __spreadArrays = (this && this.__spreadArrays) || function () {
-    for (var s = 0, i = 0, il = arguments.length; i < il; i++) s += arguments[i].length;
-    for (var r = Array(s), k = 0, i = 0; i < il; i++)
-        for (var a = arguments[i], j = 0, jl = a.length; j < jl; j++, k++)
-            r[k] = a[j];
-    return r;
+var __spreadArray = (this && this.__spreadArray) || function (to, from) {
+    for (var i = 0, il = from.length, j = to.length; i < il; i++, j++)
+        to[j] = from[i];
+    return to;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var MAX_TASK_ID = Math.pow(2, 53) - 1;
@@ -38,7 +36,7 @@ function buildTaskManager() {
             if (!state.paused) {
                 var _loop_1 = function () {
                     var task = state.taskQueue.shift();
-                    var cancel = task.worker.apply(task, __spreadArrays([function () {
+                    var cancel = task.worker.apply(task, __spreadArray([function () {
                             var onDoneArgs = [];
                             for (var _i = 0; _i < arguments.length; _i++) {
                                 onDoneArgs[_i] = arguments[_i];
