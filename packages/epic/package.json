@@ -1,6 +1,6 @@
 {
   "name": "@duckness/epic",
-  "version": "0.8.0",
+  "version": "0.8.1",
   "description": "Redux-Observable extension for @duckness/duck - Modular Redux Ducks hatchery",
   "keywords": [
     "redux",
@@ -38,7 +38,7 @@
     "url": "https://github.com/hitosu/duckness/issues"
   },
   "dependencies": {
-    "@duckness/duck": "^0.8.0"
+    "@duckness/duck": "^0.8.1"
   },
   "peerDependencies": {
     "redux-observable": ">= 1",
