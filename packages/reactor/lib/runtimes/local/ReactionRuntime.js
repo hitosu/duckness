@@ -18,7 +18,7 @@ function spawnReaction(reaction, reactionArgs, onDone, effectsRuntime) {
         }
         else {
             var currentInstruction = currentIteration.value;
-            if (Effect_1.isEffect(currentInstruction)) {
+            if ((0, Effect_1.isEffect)(currentInstruction)) {
                 if (effects_1.default[currentInstruction.type]) {
                     state.curentInstructionTaskID = effectsRuntime.addTask(effects_1.default[currentInstruction.type], function (advanceValue) {
                         advanceReaction(advanceValue);

@@ -1,8 +1,12 @@
 "use strict";
-var __spreadArray = (this && this.__spreadArray) || function (to, from) {
-    for (var i = 0, il = from.length, j = to.length; i < il; i++, j++)
-        to[j] = from[i];
-    return to;
+var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
+    if (pack || arguments.length === 2) for (var i = 0, l = from.length, ar; i < l; i++) {
+        if (ar || !(i in from)) {
+            if (!ar) ar = Array.prototype.slice.call(from, 0, i);
+            ar[i] = from[i];
+        }
+    }
+    return to.concat(ar || Array.prototype.slice.call(from));
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var TaskManager_1 = require("./TaskManager");
@@ -10,11 +14,11 @@ var EffectsRuntime_1 = require("./EffectsRuntime");
 function LocalRuntime() {
     var state = {
         reactions: new Set(),
-        taskManager: TaskManager_1.default(),
+        taskManager: (0, TaskManager_1.default)(),
         spawnedReactions: new Set(),
         context: {}
     };
-    var effectsRuntime = EffectsRuntime_1.buildEffectsRuntime(state);
+    var effectsRuntime = (0, EffectsRuntime_1.buildEffectsRuntime)(state);
     var runtime = {
         put: function (reagent) {
             effectsRuntime.put(reagent);
@@ -39,7 +43,7 @@ function LocalRuntime() {
             if (!runtime.isRunning()) {
                 state.taskManager.pauseQueue();
                 state.reactions.forEach(function (reaction) {
-                    effectsRuntime.spawnReaction.apply(effectsRuntime, __spreadArray([reaction], args));
+                    effectsRuntime.spawnReaction.apply(effectsRuntime, __spreadArray([reaction], args, false));
                 });
                 state.taskManager.resumeQueue();
                 state.taskManager.runQueue();
