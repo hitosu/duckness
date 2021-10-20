@@ -43,6 +43,9 @@ CounterPool.store
   - [`.store`](#store)
   - [`.dispatch(...)`](#dispatch)
   - [`.reduce([state,] action)`](#reducestate-action)
+  - [`.select(?selector)`](#selectselector)
+  - [`.fetch(selector, ?resolver)`](#fetchselector-resolver)
+  - [`.trigger(selector, callback, ?resolver)`](#triggerselector-callback-resolver)
   - [`.setErrorReporter(reporterFn)`](#seterrorreporterreporterfn)
   - [`.reportError(error)`](#reporterrorerror)
   - [`.addMiddleware(middleware)`](#addmiddlewaremiddleware)
@@ -115,7 +118,7 @@ with every duck root reducer wrapped in try/catch returning unmodified state in 
 
 Add duck to pool.
 ```js
-myPool.addDuck(myDuck)
+MyPool.addDuck(myDuck)
 ```
 
 ## `.preReducer(reducer)`
@@ -124,7 +127,7 @@ Add pool pre reducer.
 Pre reducers will run BEFORE duck reducers and will receive all actions.
 Will replace previously set pre reducer.
 ```js
-myPool.preReducer(function globalPreReducer(state, action) {/* ... */} )
+MyPool.preReducer(function globalPreReducer(state, action) {/* ... */} )
 ```
 
 ## `.postReducer(reducer)`
@@ -133,21 +136,21 @@ Add pool post reducer.
 Post reducers will run AFTER duck reducers and will receive all actions.
 Will replace previously set post reducer.
 ```js
-myPool.postReducer(function globalPostReducer(state, action) {/* ... */} )
+MyPool.postReducer(function globalPostReducer(state, action) {/* ... */} )
 ```
 
 ## `.build(props)`
 
 Build pool state from some props. `props` will be passed to `buildStore` function.
 ```js
-myPool.build({ initialCounter: 0 })
+MyPool.build({ initialCounter: 0 })
 ```
 
 ## `.store`
 
 Reference to built redux store.
 ```js
-myPool.store.subscribe(/* ... */)
+MyPool.store.subscribe(/* ... */)
 ```
 
 ## `.dispatch(...)`
@@ -155,13 +158,13 @@ myPool.store.subscribe(/* ... */)
 1. Dispatches an action (action is a plain object).
 ```js
 const action = { type: 'actionType', payload: {} }
-myPool.dispatch(action)
+MyPool.dispatch(action)
 ```
 
 2. Dispatches and action from 'poolName/duckName' duck.
 This will first look for a duck by 'duckName' and current 'poolName', then duck's action creator by 'actionName' and call it with 'actionParams' to build action to dispatch.
 ```js
-myPool.dispatch('duckName', 'actionName', ...actionParams)
+MyPool.dispatch('duckName', 'actionName', ...actionParams)
 ```
 
 Example:
@@ -181,7 +184,7 @@ MyPool.dispatch(MyDuck.action.someAction(...actionParams))
 3. Dispatches and action from 'customPoolName/duckName' duck.
 This will first look for a duck by 'duckName' and 'poolName', then duck's action creator by 'actionName' and call it with 'actionParams' to build action to dispatch.
 ```js
-myPool.dispatch(['customPoolName', 'duckName'], 'actionName', ...actionParams)
+MyPool.dispatch(['customPoolName', 'duckName'], 'actionName', ...actionParams)
 ```
 
 
@@ -189,15 +192,79 @@ myPool.dispatch(['customPoolName', 'duckName'], 'actionName', ...actionParams)
 
 Reduce state with action. Does not change pool's store. Can be used to look ahead what the state will be after dispatching an action.
 ```js
-myPool.reduce(action) // reduce pool's store state
-myPool.reduce(state, action) // reduce custom state
+MyPool.reduce(action) // reduce pool's store state
+MyPool.reduce(state, action) // reduce custom state
+```
+
+## `.select(?selector)`
+
+Select something from store. Returns store state if `selector` undefined.
+```js
+MyPool.select(MyDuck.select.something)
+// => selected value
+MyPool.select()
+// => current store state
+```
+
+## `.fetch(selector, ?resolver)`
+
+Returns `Promise`
+
+`function resolver(selected, resolve, prevSelected)`
+
+Fetch value from the store:
+- first `selector` is called to produce selected value
+- if `resolver` is defined: selected value is passed to resolver with previous selected value (`undefined` for the first run) and `resolve` function that can be used to resolve this `fetch`
+- if `resolver` is not defined: selected value will be resolved if it is not `undefined`
+- if nothing was resolved: repeat when store is updated (after next action dispatch).
+
+`fetch` will subscribe to store updates (if it was not resolved after first select) and unsubscribe when it is resolved.
+
+```js
+// resolves with items when items are loaded into store or are already present
+const items = await ListPool.fetch(ItemsDuck.select.items)
+
+// resolves when counter is reset, returning counter value before reset
+const counterResetFrom = await MyPool.fetch(
+  state => state.counter,
+  (selected, resolve, prevSelected) => {
+    if (null != prevSelected && 0 !== prevSelected && 0 === selected) {
+      resolve(selected)
+    }
+  }
+)
+```
+
+## `.trigger(selector, callback, ?resolver)`
+
+Returns clear trigger function.
+
+`function callback(selected)`
+
+`function resolver(selected, resolve, prevSelected)`
+
+Trigger `callback` every time:
+- selected value changes (`resolver` is undefined)
+- or `resolver` calls `resolve`
+
+`trigger` calls `resolver` first time trigger is set and later on store updates.
+
+To unsubscribe call clear trigger function.
+
+```js
+// console.log value for 10 seconds
+const clearTrigger = MyPool.trigger(
+    MyDuck.select.someValue,
+    console.log
+  )
+setTimeout(clearTrigger, 10000)
 ```
 
 ## `.setErrorReporter(reporterFn)`
 
 Set exception reporter function. Will also overwrite errorReporters set in ducks.
 ```js
-myPool.setErrorReporter(error => {
+MyPool.setErrorReporter(error => {
   window.Sentry.captureException(error)
 })
 ```
@@ -206,7 +273,7 @@ myPool.setErrorReporter(error => {
 
 Call assigned error reporter
 ```js
-myPool.reportError(new Error('Clean pool!'))
+MyPool.reportError(new Error('Clean pool!'))
 ```
 
 ## `.addMiddleware(middleware)`

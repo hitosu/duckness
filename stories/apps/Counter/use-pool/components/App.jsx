@@ -5,6 +5,7 @@ import CounterPool, { CounterDuck } from '../CounterPool'
 
 const Counter = React.lazy(() => import('./Counter'))
 const ActionCounter = React.lazy(() => import('./ActionCounter'))
+const FetchCounter = React.lazy(() => import('./FetchCounter'))
 
 export default function App() {
   const onInc = useDispatchAction(CounterPool, CounterDuck.action.increment, null)
@@ -15,16 +16,21 @@ export default function App() {
   const onStopTimer = useDispatchAction(CounterPool, CounterDuck.action.stopTimer, null)
 
   return (
-    <div>
-      <Counter />
-      &nbsp;&nbsp;&nbsp;
-      <button onClick={onInc}>&nbsp;+&nbsp;</button>&nbsp;&nbsp;
-      <button onClick={onDec}>&nbsp;-&nbsp;</button>&nbsp;&nbsp;
-      <button onClick={onReset}>&nbsp;0&nbsp;</button>&nbsp;&nbsp;
-      <button onClick={onStartTimer}>&nbsp;&gt;&nbsp;</button>&nbsp;&nbsp;
-      <button onClick={onStartFastTimer}>&nbsp;&gt;&gt;&gt;&nbsp;</button>&nbsp;&nbsp;
-      <button onClick={onStopTimer}>&nbsp;||&nbsp;</button>&nbsp;&nbsp;
-      <ActionCounter />
-    </div>
+    <>
+      <div>
+        <Counter />
+        &nbsp;&nbsp;&nbsp;
+        <button onClick={onInc}>&nbsp;+&nbsp;</button>&nbsp;&nbsp;
+        <button onClick={onDec}>&nbsp;-&nbsp;</button>&nbsp;&nbsp;
+        <button onClick={onReset}>&nbsp;0&nbsp;</button>&nbsp;&nbsp;
+        <button onClick={onStartTimer}>&nbsp;&gt;&nbsp;</button>&nbsp;&nbsp;
+        <button onClick={onStartFastTimer}>&nbsp;&gt;&gt;&gt;&nbsp;</button>&nbsp;&nbsp;
+        <button onClick={onStopTimer}>&nbsp;||&nbsp;</button>&nbsp;&nbsp;
+        <ActionCounter />
+      </div>
+      <br />
+      <br />
+      <FetchCounter />
+    </>
   )
 }

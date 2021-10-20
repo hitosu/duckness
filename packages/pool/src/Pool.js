@@ -145,6 +145,75 @@ export default function Pool({
     }
   }
 
+  function select(selector) {
+    if (refStore.current) {
+      return 'function' === typeof selector ? selector(refStore.current.getState()) : refStore.current.getState()
+    } else {
+      return void 0
+    }
+  }
+
+  function fetch(selector, resolver) {
+    return new Promise((resolve, reject) => {
+      if (refStore.current) {
+        let prevSelectedValue = void 0
+        let resolved = false
+        let unsubscribe = void 0
+        const resolveValue = value => {
+          if (unsubscribe) {
+            unsubscribe()
+          }
+          resolved = true
+          resolve(value)
+        }
+        const tryResolve = currentState => {
+          const selectedValue = 'function' === typeof selector ? selector(currentState) : currentState
+          if ('function' === typeof resolver) {
+            resolver(selectedValue, resolveValue, prevSelectedValue)
+            prevSelectedValue = selectedValue
+          } else if (void 0 !== selectedValue) {
+            resolveValue(selectedValue)
+          }
+        }
+        tryResolve(refStore.current.getState())
+        if (!resolved) {
+          unsubscribe = refStore.current.subscribe(() => {
+            tryResolve(refStore.current.getState())
+          })
+        }
+      } else {
+        const error = new Error('Fetching state but pool is not built yet')
+        error.poolName = poolName
+        reportError(error, '@duckness/pool', 'fetch')
+        reject(error)
+      }
+    })
+  }
+
+  function trigger(selector, callback, resolver) {
+    if (refStore.current) {
+      let prevSelectedValue = void 0
+      const tryResolve = currentState => {
+        const selectedValue = 'function' === typeof selector ? selector(currentState) : currentState
+        if ('function' === typeof resolver) {
+          resolver(selectedValue, callback, prevSelectedValue)
+          prevSelectedValue = selectedValue
+        } else if (prevSelectedValue !== selectedValue) {
+          callback(selectedValue)
+        }
+      }
+      tryResolve(refStore.current.getState())
+      return refStore.current.subscribe(() => {
+        tryResolve(refStore.current.getState())
+      })
+    } else {
+      const error = new Error('Fetching state but pool is not built yet')
+      error.poolName = poolName
+      reportError(error, '@duckness/pool', 'trigger')
+      return void 0
+    }
+  }
+
   function setPreReducer(reducer) {
     refReducers.pre = (state, action) => {
       try {
@@ -264,6 +333,9 @@ export default function Pool({
     enumerable: true
   })
   Object.defineProperty(pool, 'dispatch', { value: dispatch, writable: false, enumerable: true })
+  Object.defineProperty(pool, 'select', { value: select, writable: false, enumerable: true })
+  Object.defineProperty(pool, 'fetch', { value: fetch, writable: false, enumerable: true })
+  Object.defineProperty(pool, 'trigger', { value: trigger, writable: false, enumerable: true })
   Object.defineProperty(pool, 'reduce', { value: reduce, writable: false, enumerable: true })
   Object.defineProperty(pool, 'ducks', {
     get() {
