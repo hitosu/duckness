@@ -1,6 +1,6 @@
 {
   "name": "@duckness/store",
-  "version": "0.9.0",
+  "version": "0.10.0",
   "description": "Simple store for React components",
   "keywords": ["store", "react", "react-hooks"],
   "author": "Vasily Kazantsev <vasily@kazantsev.xyz>",

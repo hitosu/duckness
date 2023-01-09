@@ -1,6 +1,6 @@
 {
   "name": "@duckness/pool",
-  "version": "0.9.0",
+  "version": "0.10.0",
   "description": "Duckness Pool - @duckness/duck + Redux",
   "keywords": ["redux", "ducks", "modular"],
   "author": "Vasily Kazantsev <vasily@kazantsev.xyz>",
@@ -30,7 +30,7 @@
     "url": "https://github.com/hitosu/duckness/issues"
   },
   "dependencies": {
-    "@duckness/duck": "*"
+    "@duckness/duck": "^0.10.0"
   },
   "peerDependencies": {
     "redux": "^4.2.0"
