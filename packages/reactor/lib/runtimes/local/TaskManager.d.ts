@@ -1,7 +1,7 @@
-export declare type TaskID = number;
-export declare type TaskOnDone = (...onDoneArgs: any[]) => void;
-export declare type TaskOnCancel = (cancelValue?: any) => boolean;
-export declare type TaskWorker = (onDone: TaskOnDone, ...workerArgs: any[]) => {
+export type TaskID = number;
+export type TaskOnDone = (...onDoneArgs: any[]) => void;
+export type TaskOnCancel = (cancelValue?: any) => boolean;
+export type TaskWorker = (onDone: TaskOnDone, ...workerArgs: any[]) => {
     cancel?: TaskOnCancel;
 };
 export interface Task {

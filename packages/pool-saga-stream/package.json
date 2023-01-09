@@ -2,20 +2,12 @@
   "name": "@duckness/pool-saga-stream",
   "version": "0.9.0",
   "description": "Duckness Pool Saga Stream - @duckness/saga plugin for @duckness/pool",
-  "keywords": [
-    "redux",
-    "ducks",
-    "modular",
-    "duckness",
-    "redux-saga"
-  ],
+  "keywords": ["redux", "ducks", "modular", "duckness", "redux-saga"],
   "author": "Vasily Kazantsev <vasily@kazantsev.xyz>",
   "homepage": "https://github.com/hitosu/duckness/tree/master/packages/pool-saga-stream",
   "license": "MIT",
   "main": "lib/PoolSagaStream.js",
-  "files": [
-    "lib/"
-  ],
+  "files": ["lib/"],
   "directories": {
     "lib": "lib",
     "test": "__tests__"
@@ -29,7 +21,6 @@
     "url": "git+https://github.com/hitosu/duckness.git"
   },
   "scripts": {
-    "test": "echo \"Error: run tests from root\" && exit 1",
     "build": "babel src --out-dir lib --source-maps",
     "rebuild": "rimraf lib && babel src --out-dir lib --source-maps",
     "build:watch": "babel src --out-dir lib --source-maps --watch",
@@ -39,10 +30,10 @@
     "url": "https://github.com/hitosu/duckness/issues"
   },
   "dependencies": {
-    "@duckness/pool": "^0.9.0",
-    "@duckness/saga": "^0.9.0"
+    "@duckness/pool": "*",
+    "@duckness/saga": "*"
   },
   "peerDependencies": {
-    "redux-saga": ">= 1"
+    "redux-saga": "^1.2.2"
   }
 }

@@ -1,4 +1,4 @@
-export declare type ReagentType = string | symbol;
+export type ReagentType = string | symbol;
 export interface Reagent {
     type: ReagentType;
     payload: any;
@@ -8,6 +8,6 @@ export interface ReagentConstructor {
     (payload: any): Reagent;
     readonly reagentType: ReagentType;
 }
-export declare type ReagentPayloadBuilder = (payload: any) => any;
-export declare type ReagentTransformer = (reagent: Reagent) => Reagent;
+export type ReagentPayloadBuilder = (payload: any) => any;
+export type ReagentTransformer = (reagent: Reagent) => Reagent;
 export default function Reagent(type: ReagentType, payloadBuilder: ReagentPayloadBuilder, reagentTransformer: ReagentTransformer): ReagentConstructor;
