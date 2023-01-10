@@ -1,4 +1,4 @@
-import Duck from '../src/Duck'
+import Duck from '../lib/Duck'
 
 function spawnDuck(duckContext) {
   const duck = Duck('Donald', 'Lake', duckContext)
@@ -141,10 +141,12 @@ describe('@duckness/duck', () => {
       duck.action('swim', 'SWIM')
       duck.action('fly', 'FLY')
       let state = {}
-      expect((state = duck(state, duck.action.swim()))).toEqual({
+      state = duck(state, duck.action.swim())
+      expect(state).toEqual({
         actedTimes: 1
       })
-      expect((state = duck(state, duck.action.fly()))).toEqual({
+      state = duck(state, duck.action.fly())
+      expect(state).toEqual({
         actedTimes: 2
       })
     })
@@ -171,19 +173,23 @@ describe('@duckness/duck', () => {
         swimTimes: 0,
         flyTimes: 0
       }
-      expect((state = duck(state, duck.action.slowSwim()))).toEqual({
+      state = duck(state, duck.action.slowSwim())
+      expect(state).toEqual({
         swimTimes: 1,
         flyTimes: 0
       })
-      expect((state = duck(state, duck.action.slowFly()))).toEqual({
+      state = duck(state, duck.action.slowFly())
+      expect(state).toEqual({
         swimTimes: 1,
         flyTimes: 1
       })
-      expect((state = duck(state, duck.action.fastSwim()))).toEqual({
+      state = duck(state, duck.action.fastSwim())
+      expect(state).toEqual({
         swimTimes: 2,
         flyTimes: 1
       })
-      expect((state = duck(state, duck.action.fastFly()))).toEqual({
+      state = duck(state, duck.action.fastFly())
+      expect(state).toEqual({
         swimTimes: 2,
         flyTimes: 2
       })
@@ -285,19 +291,23 @@ describe('@duckness/duck', () => {
       expect(duck.duckContext).toEqual({ mealSize: 1 })
       expect(duck.duckFace.duckContext).toEqual({ mealSize: 1 })
       let state = { fishEaten: 0 }
-      expect((state = duck(state, duck.action.eatFish()))).toEqual({
+      state = duck(state, duck.action.eatFish())
+      expect(state).toEqual({
         fishEaten: 1
       })
-      expect((state = duck(state, duck.action.eatFish()))).toEqual({
+      state = duck(state, duck.action.eatFish())
+      expect(state).toEqual({
         fishEaten: 2
       })
       duck.updateContext({ mealSize: 3 })
       expect(duck.duckContext).toEqual({ mealSize: 3 })
       expect(duck.duckFace.duckContext).toEqual({ mealSize: 3 })
-      expect((state = duck(state, duck.action.eatFish()))).toEqual({
+      state = duck(state, duck.action.eatFish())
+      expect(state).toEqual({
         fishEaten: 5
       })
-      expect((state = duck(state, duck.action.eatFish()))).toEqual({
+      state = duck(state, duck.action.eatFish())
+      expect(state).toEqual({
         fishEaten: 8
       })
     })

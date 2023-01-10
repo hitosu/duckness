@@ -13,6 +13,7 @@
     "test:watch": "yarn lint && jest --watch",
     "build": "yarn lerna run build",
     "rebuild": "yarn lerna run rebuild",
+    "clean": "yarn lerna run clean",
     "publish": "yarn lerna publish --no-private",
     "lint": "yarn lerna run lint && eslint 'stories/**/*.{js,jsx}'",
     "storybook": "start-storybook -p 6006",

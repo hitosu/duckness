@@ -1,30 +1,125 @@
-export default function Duck(duckName, poolName, duckContext) {
+export type TState = any
+
+export type TActionType = string
+export type TFullActionType = string
+export type TActionPayload = any
+export interface IAction {
+  type: TActionType
+  payload: TActionPayload
+  error: boolean
+}
+
+// optional builder for action payload
+export interface IPayloadBuilder {
+  (payload: TActionPayload, duckFace: IDuckFace): TActionPayload
+}
+// optional transform every built action
+export interface IActionTransformer {
+  (action: IAction, duckFace: IDuckFace): IAction
+}
+// map short duck action types to full action types
+type TActionTypesMap = { [actionType: TActionType]: TFullActionType }
+
+// select some value from sources (usually one source - state)
+export interface ISelector {
+  (...sources: any[]): any
+}
+// selector with added duckFace
+export interface IDuckedSelector {
+  (...args: [...any[], IDuckFace]): any
+  readonly originalSelector: ISelector
+  readonly selectorName: string
+}
+// build duck selector and register it under some name
+interface IBuildSelector {
+  (selectorName: string | null, selector: ISelector): IDuckedSelector
+}
+// map selector names to selector
+interface ISelectors {
+  [selectorName: string]: IDuckedSelector
+}
+
+// action constructor build action from payload
+export interface IActionConstructor {
+  (payload: TActionPayload): IAction
+  readonly actionType: TFullActionType
+  readonly duckActionType: TActionType
+  readonly payloadBuilder: IPayloadBuilder
+  readonly actionTransformer: IActionTransformer
+  readonly actionName?: string
+}
+// build and register action constructor
+interface IBuildActionConstructor {
+  (
+    actionNameOrType: string | TActionType | null,
+    forActionType?: TActionType | null,
+    payloadBuilder?: IPayloadBuilder,
+    actionTransformer?: IActionTransformer
+  ): IActionConstructor
+  [actionName: string]: IActionConstructor
+}
+
+type TTypedReducers = { [actionType: TActionType]: { actionType: TActionType; reducers: IReducer[] } }
+type TMatchActionType = TActionType | ((action: IAction, duckFace: IDuckFace) => boolean) | null
+type TCustomReducers = [TMatchActionType, IReducer][]
+interface IAddReducer {
+  (actionType: TMatchActionType, reducer: IReducer): void
+}
+
+interface ICloneDuck {
+  (duckName: string, poolName: string, duckContext: TDuckContext): IDuck
+}
+
+export type TDuckContext = any
+
+export interface IReducer {
+  (state: TState, action: IAction, duckFace?: IDuckFace): TState
+}
+
+export interface IDuck extends IReducer {
+  readonly duckFace: IDuckFace
+  readonly duckName: string
+  readonly poolName: string
+  readonly duckContext: any
+  readonly actionTypes: TActionTypesMap
+  readonly mapActionType: (actionType: TActionType) => TFullActionType
+  readonly listActionTypes: () => TActionType[]
+  readonly action: IBuildActionConstructor
+  readonly selector: IBuildSelector
+  readonly select: ISelectors
+  readonly reducer: IAddReducer
+  readonly clone: ICloneDuck
+  readonly updateContext: (newDuckContext: TDuckContext) => void
+}
+
+// duck interface added to all reducer, selector and some other calls
+export interface IDuckFace {
+  readonly reduce: IDuck
+  readonly duckName: string
+  readonly poolName: string
+  readonly duckContext: TDuckContext
+  readonly actionTypes: TActionTypesMap
+  readonly mapActionType: (actionType: TActionType) => TFullActionType
+  readonly listActionTypes: () => TActionType[]
+  readonly action: IBuildActionConstructor
+  readonly select: ISelectors
+}
+
+export default function Duck(duckName: string, poolName: string, duckContext: TDuckContext) {
   // updatable duck context
   const refDuckContext = {
     current: duckContext
   }
 
   // DUCK FACE is interface to duck received by selectors and reducers
-  const duckFace = {
-    /*
-    actionTypes
-    mapActionType
-    listActionTypes
-    select
-    action
-    reduce
-    duckName
-    poolName
-    duckContext
-    */
-  }
+  const duckFace: IDuckFace = {} as IDuckFace
 
   // Duck is root reducer
-  const typedReducers = {}
-  const customReducers = []
-  const duck = function duckRootReducer(state, action) {
-    var actionReducers = typedReducers[action.type]
-    var reducedState =
+  const typedReducers: TTypedReducers = {}
+  const customReducers: TCustomReducers = []
+  const duck: IDuck = function duckRootReducer(state, action) {
+    const actionReducers = typedReducers[action.type]
+    const reducedState =
       null == actionReducers || 0 === actionReducers.reducers.length
         ? state
         : 1 === actionReducers.reducers.length
@@ -47,7 +142,7 @@ export default function Duck(duckName, poolName, duckContext) {
           }
         }, reducedState)
       : reducedState
-  }
+  } as IDuck
 
   // Duck attributes
   Object.defineProperty(duck, 'duckFace', { value: duckFace, writable: false, enumerable: true })
@@ -84,11 +179,11 @@ export default function Duck(duckName, poolName, duckContext) {
 
 // ---- ACTION TYPES -------------------------------------------------------------------------
 
-function addActionTypes(duck, duckFace, duckName, poolName) {
-  const actionTypes = {}
-  function mapActionType(actionType) {
-    const fullActionType = `${poolName || ''}/${duckName || ''}/${actionType}`
-    return '@@' === actionType.substring(0, 2)
+function addActionTypes(duck: IDuck, duckFace: IDuckFace, duckName: string, poolName: string) {
+  const actionTypes: TActionTypesMap = {}
+  function mapActionType(actionType: TActionType): TFullActionType {
+    const fullActionType: TFullActionType = `${poolName || ''}/${duckName || ''}/${actionType}`
+    return '@@' === actionType.substring(0, 2) // do not store hidden types in dictionary
       ? fullActionType
       : actionTypes[actionType] ||
           Object.defineProperty(actionTypes, actionType, {
@@ -112,13 +207,19 @@ function addActionTypes(duck, duckFace, duckName, poolName) {
 
 // ---- ACTION CONSTRUCTORS -------------------------------------------------------------------------
 
-function addActionConstructors(duck, duckFace) {
-  function actionConstructor(actionName, actionType = actionName, payloadBuilder, actionTransformer) {
+function addActionConstructors(duck: IDuck, duckFace: IDuckFace) {
+  const buildActionConstructor: IBuildActionConstructor = function (
+    actionNameOrType,
+    forActionType,
+    payloadBuilder,
+    actionTransformer
+  ) {
+    const actionType = forActionType || actionNameOrType
     if ('string' !== typeof actionType || !actionType) {
       throw new Error('@duckness/duck.action: - actionType must be a non empty String')
     }
     const fullActionType = duck.mapActionType(actionType)
-    function constructAction(payload) {
+    const actionConstructor: IActionConstructor = function (payload: TActionPayload) {
       const isError = payload instanceof Error
       const action = {
         type: fullActionType,
@@ -126,68 +227,72 @@ function addActionConstructors(duck, duckFace) {
         error: isError
       }
       return actionTransformer ? actionTransformer(action, duckFace) : action
-    }
-    Object.defineProperty(constructAction, 'actionType', { value: fullActionType, writable: false, enumerable: true })
-    Object.defineProperty(constructAction, 'duckActionType', { value: actionType, writable: false, enumerable: true })
-    Object.defineProperty(constructAction, 'payloadBuilder', {
+    } as IActionConstructor
+    Object.defineProperty(actionConstructor, 'actionType', { value: fullActionType, writable: false, enumerable: true })
+    Object.defineProperty(actionConstructor, 'duckActionType', { value: actionType, writable: false, enumerable: true })
+    Object.defineProperty(actionConstructor, 'payloadBuilder', {
       value: payloadBuilder,
       writable: false,
       enumerable: true
     })
-    Object.defineProperty(constructAction, 'actionTransformer', {
+    Object.defineProperty(actionConstructor, 'actionTransformer', {
       value: actionTransformer,
       writable: false,
       enumerable: true
     })
 
-    if (actionName && 'string' === typeof actionName) {
-      Object.defineProperty(constructAction, 'actionName', { value: actionName, writable: false, enumerable: true })
-      Object.defineProperty(actionConstructor, actionName, {
-        value: constructAction,
+    if (actionNameOrType && 'string' === typeof actionNameOrType) {
+      Object.defineProperty(actionConstructor, 'actionName', {
+        value: actionNameOrType,
+        writable: false,
+        enumerable: true
+      })
+      Object.defineProperty(buildActionConstructor, actionNameOrType, {
+        value: actionConstructor,
         writable: false,
         enumerable: true
       })
     }
-    return constructAction
-  }
+    return actionConstructor
+  } as IBuildActionConstructor
 
-  Object.defineProperty(duck, 'action', { value: actionConstructor, writable: false, enumerable: true })
+  Object.defineProperty(duck, 'action', { value: buildActionConstructor, writable: false, enumerable: true })
 
-  Object.defineProperty(duckFace, 'action', { value: actionConstructor, writable: false, enumerable: true })
+  Object.defineProperty(duckFace, 'action', { value: buildActionConstructor, writable: false, enumerable: true })
 }
 
 // ---- SELECTORS -------------------------------------------------------------------------
 
-function addSelectors(duck, duckFace) {
-  const selectors = {}
-  function addSelector(selectorName, selector) {
+function addSelectors(duck: IDuck, duckFace: IDuckFace) {
+  const selectors: ISelectors = {}
+  const buildSelector: IBuildSelector = function (selectorName, selector) {
     if ('function' === typeof selector) {
-      const selectorWithContext = function (...args) {
+      const duckedSelector: IDuckedSelector = function (...args) {
         return selector.apply(this, [...args, duckFace])
-      }
-      Object.defineProperty(selectorWithContext, 'originalSelector', {
+      } as IDuckedSelector
+      Object.defineProperty(duckedSelector, 'originalSelector', {
         value: selector,
         writable: false,
         enumerable: true
       })
       if (selectorName) {
-        Object.defineProperty(selectorWithContext, 'selectorName', {
+        Object.defineProperty(duckedSelector, 'selectorName', {
           value: selectorName,
           writable: false,
           enumerable: true
         })
         Object.defineProperty(selectors, selectorName, {
-          value: selectorWithContext,
+          value: duckedSelector,
           writable: false,
           enumerable: true
         })
       }
-      return selectorWithContext
+      return duckedSelector
     } else {
       throw new Error('@duckness/duck.selector: - selector must be a Function')
     }
   }
-  Object.defineProperty(duck, 'selector', { value: addSelector, writable: false, enumerable: true })
+  Object.defineProperty(duck, 'selector', { value: buildSelector, writable: false, enumerable: true })
   Object.defineProperty(duck, 'select', { value: selectors, writable: false, enumerable: true })
 
   Object.defineProperty(duckFace, 'select', { value: selectors, writable: false, enumerable: true })
@@ -195,8 +300,8 @@ function addSelectors(duck, duckFace) {
 
 // ---- REDUCERS -------------------------------------------------------------------------
 
-function addReducers(duck, typedReducers, customReducers) {
-  function addReducer(actionType, reducer) {
+function addReducers(duck: IDuck, typedReducers: TTypedReducers, customReducers: TCustomReducers) {
+  const addReducer: IAddReducer = function (actionType, reducer) {
     if ('function' === typeof reducer) {
       if ('string' === typeof actionType) {
         const fullActionType = duck.mapActionType(actionType)
@@ -224,9 +329,9 @@ function addReducers(duck, typedReducers, customReducers) {
 
 // ---- CLONING --------------------------------------------------------------------------
 
-function addCloning(duck, typedReducers, customReducers) {
-  function cloneDuck(duckName, poolName, duckContext) {
-    const clonedDuck = Duck(duckName, poolName, duckContext)
+function addCloning(duck: IDuck, typedReducers: TTypedReducers, customReducers: TCustomReducers) {
+  const cloneDuck: ICloneDuck = function (duckName, poolName, duckContext) {
+    const clonedDuck: IDuck = Duck(duckName, poolName, duckContext)
     // clone action types
     duck.listActionTypes().forEach(function (actionType) {
       clonedDuck.mapActionType(actionType)
@@ -268,8 +373,8 @@ function addCloning(duck, typedReducers, customReducers) {
 
 // ---- CONTEXT UPDATE -------------------------------------------------------------------
 
-function addContextUpdate(duck, duckFace, refDuckContext) {
-  function updateContext(newDuckContext) {
+function addContextUpdate(duck: IDuck, duckFace: IDuckFace, refDuckContext: { current: TDuckContext }) {
+  function updateContext(newDuckContext: TDuckContext) {
     refDuckContext.current = newDuckContext
     Object.defineProperty(duck, 'duckContext', {
       value: refDuckContext.current,

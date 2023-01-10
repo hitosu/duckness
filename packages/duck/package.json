@@ -21,10 +21,11 @@
     "url": "git+https://github.com/hitosu/duckness.git"
   },
   "scripts": {
-    "build": "babel src --out-dir lib --source-maps",
-    "rebuild": "rimraf lib && babel src --out-dir lib --source-maps",
-    "build:watch": "babel src --out-dir lib --source-maps --watch",
-    "lint": "eslint '{src,__tests__}/**/*.{js,jsx}'"
+    "build": "tsc",
+    "rebuild": "rimraf lib && tsc",
+    "clean": "rimraf lib",
+    "build:watch": "tsc --watch --preserveWatchOutput",
+    "lint": "eslint '{src,__tests__}/**/*.{ts,tsx,js,jsx}'"
   },
   "bugs": {
     "url": "https://github.com/hitosu/duckness/issues"

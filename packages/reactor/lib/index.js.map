@@ -1,1 +1,1 @@
-{"version":3,"file":"index.js","sourceRoot":"","sources":["../src/index.ts"],"names":[],"mappings":";;;AAAA,qCAA8C;AAArC,kGAAA,OAAO,OAAW;AAE3B,qCAAmC;AAA1B,kGAAA,OAAO,OAAA"}
+{"version":3,"file":"index.js","sourceRoot":"","sources":["../src/index.ts"],"names":[],"mappings":";;;AAAA,qCAA8C;AAArC,kGAAA,OAAO,OAAW;AAE3B,qCAAmC;AAA1B,kGAAA,OAAO,OAAA","sourcesContent":["export { default as Reagent } from './Reagent'\n\nexport { default } from './Reactor'\n"]}
