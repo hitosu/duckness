@@ -22,8 +22,8 @@
   },
   "scripts": {
     "build": "tsc",
-    "rebuild": "rimraf lib && tsc",
-    "clean": "rimraf lib",
+    "rebuild": "yarn clean && tsc",
+    "clean": "rimraf lib && rm ./.tsbuildinfo",
     "build:watch": "tsc --watch --preserveWatchOutput",
     "lint": "eslint '{src,__tests__}/**/*.{ts,tsx,js,jsx}'"
   },
