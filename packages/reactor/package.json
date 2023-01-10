@@ -22,7 +22,7 @@
   "scripts": {
     "build": "tsc",
     "rebuild": "yarn clean && tsc",
-    "clean": "rimraf lib && rm ./.tsbuildinfo",
+    "clean": "rimraf lib && rm -f ./.tsbuildinfo",
     "build:watch": "tsc --watch --preserveWatchOutput",
     "lint": "eslint '{src,__tests__}/**/*.{ts,tsx,js,jsx}'"
   },

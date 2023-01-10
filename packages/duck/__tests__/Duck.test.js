@@ -92,6 +92,8 @@ describe('@duckness/duck', () => {
   describe('should handle selectors', () => {
     const duck = spawnDuck()
     duck.selector('fish', state => state.fish)
+    duck.selector('fishLength', (state, duckFace) => duckFace.select.fish(state).length)
+    const state = { fish: '{=={=<' }
 
     it('register selectors', function () {
       expect(duck.select.fish).toBeInstanceOf(Function)
@@ -99,8 +101,11 @@ describe('@duckness/duck', () => {
     })
 
     it('run selectors', function () {
-      const state = { fish: ['(==<', '{=={=<'] }
       expect(duck.select.fish(state)).toBe(state.fish)
+    })
+
+    it('selectors duckFace', function () {
+      expect(duck.select.fishLength(state)).toBe(6)
     })
   })
 

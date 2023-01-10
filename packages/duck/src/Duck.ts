@@ -267,8 +267,11 @@ function addSelectors(duck: IDuck, duckFace: IDuckFace) {
   const selectors: ISelectors = {}
   const buildSelector: IBuildSelector = function (selectorName, selector) {
     if ('function' === typeof selector) {
-      const duckedSelector: IDuckedSelector = function (...args) {
-        return selector.apply(this, [...args, duckFace])
+      const duckedSelector: IDuckedSelector = function () {
+        // eslint-disable-next-line prefer-rest-params
+        const args = Array.prototype.slice.call(arguments)
+        args.push(duckFace)
+        return selector.apply(this, args)
       } as IDuckedSelector
       Object.defineProperty(duckedSelector, 'originalSelector', {
         value: selector,

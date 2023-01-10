@@ -1,13 +1,4 @@
 "use strict";
-var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
-    if (pack || arguments.length === 2) for (var i = 0, l = from.length, ar; i < l; i++) {
-        if (ar || !(i in from)) {
-            if (!ar) ar = Array.prototype.slice.call(from, 0, i);
-            ar[i] = from[i];
-        }
-    }
-    return to.concat(ar || Array.prototype.slice.call(from));
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 function Duck(duckName, poolName, duckContext) {
     var refDuckContext = {
@@ -139,11 +130,9 @@ function addSelectors(duck, duckFace) {
     var buildSelector = function (selectorName, selector) {
         if ('function' === typeof selector) {
             var duckedSelector = function () {
-                var args = [];
-                for (var _i = 0; _i < arguments.length; _i++) {
-                    args[_i] = arguments[_i];
-                }
-                return selector.apply(this, __spreadArray(__spreadArray([], args, true), [duckFace], false));
+                var args = Array.prototype.slice.call(arguments);
+                args.push(duckFace);
+                return selector.apply(this, args);
             };
             Object.defineProperty(duckedSelector, 'originalSelector', {
                 value: selector,
