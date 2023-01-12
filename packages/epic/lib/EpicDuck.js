@@ -1,2 +1,48 @@
-"use strict";Object.defineProperty(exports,"__esModule",{value:!0}),exports.default=EpicDuck;var _duck=_interopRequireDefault(require("@duckness/duck")),_reduxObservable=require("redux-observable"),_operators=require("rxjs/operators");function _interopRequireDefault(a){return a&&a.__esModule?a:{default:a}}function EpicDuck(a,b,c){function d(){"function"==typeof f.current&&f.current.apply(f,arguments)}var e=(0,_duck.default)(a,b,c),f={current:"undefined"!=typeof console&&console.error||function(){}},g=[];return Object.defineProperty(e,"epic",{value:function(a){g.push(function(){for(var b=arguments.length,c=Array(b),f=0;f<b;f++)c[f]=arguments[f];return a.apply(void 0,c.concat([e.duckFace])).pipe((0,_operators.catchError)(function(a,b){try{a.poolName=e.poolName,a.duckName=e.duckName}catch(a){}return d(a,"@duckness/epic",e.poolName,e.duckName),b}))})},writable:!1,enumerable:!0}),Object.defineProperty(e,"rootEpic",{value:function(){return _reduxObservable.combineEpics.apply(void 0,g)},writable:!1,enumerable:!0}),Object.defineProperty(e,"setErrorReporter",{value:function(a){f.current=a},writable:!1,enumerable:!0}),Object.defineProperty(e,"reportError",{value:d,writable:!1,enumerable:!0}),e}
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+var duck_1 = require("@duckness/duck");
+var redux_observable_1 = require("redux-observable");
+var operators_1 = require("rxjs/operators");
+function EpicDuck(duckName, poolName, duckContext) {
+    var duck = (0, duck_1.default)(duckName, poolName, duckContext);
+    var refErrorReporter = {
+        current: ('undefined' !== typeof console && console.error) || (function () { return void 0; })
+    };
+    function setErrorReporter(reporter) {
+        refErrorReporter.current = reporter;
+    }
+    function reportError() {
+        var args = [];
+        for (var _i = 0; _i < arguments.length; _i++) {
+            args[_i] = arguments[_i];
+        }
+        if ('function' === typeof refErrorReporter.current) {
+            refErrorReporter.current.apply(refErrorReporter, args);
+        }
+    }
+    var epics = [];
+    function addEpic(epic) {
+        epics.push(function (action$, state$, dependencies) {
+            return (dependencies ? epic(action$, state$, dependencies, duck.duckFace) : epic(action$, state$, duck.duckFace)).pipe((0, operators_1.catchError)(function (error, source) {
+                try {
+                    error.poolName = duck.poolName;
+                    error.duckName = duck.duckName;
+                }
+                catch (_a) {
+                }
+                reportError(error, '@duckness/epic', duck.poolName, duck.duckName);
+                return source;
+            }));
+        });
+    }
+    function rootEpic() {
+        return redux_observable_1.combineEpics.apply(void 0, epics);
+    }
+    Object.defineProperty(duck, 'epic', { value: addEpic, writable: false, enumerable: true });
+    Object.defineProperty(duck, 'rootEpic', { value: rootEpic, writable: false, enumerable: true });
+    Object.defineProperty(duck, 'setErrorReporter', { value: setErrorReporter, writable: false, enumerable: true });
+    Object.defineProperty(duck, 'reportError', { value: reportError, writable: false, enumerable: true });
+    return duck;
+}
+exports.default = EpicDuck;
 //# sourceMappingURL=EpicDuck.js.map
