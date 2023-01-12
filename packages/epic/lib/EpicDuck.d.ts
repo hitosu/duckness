@@ -3,10 +3,10 @@ import { Action } from 'redux';
 import { Observable } from 'rxjs';
 import { Epic, ActionsObservable, StateObservable } from 'redux-observable';
 export interface IEpicDuck extends IDuck {
-    epic: (epic: IDuckedEpic) => void;
-    rootEpic: Epic;
-    setErrorReporter: (reporter: IErrorReporter) => void;
-    reportError: (...args: any[]) => void;
+    readonly epic: (epic: IDuckedEpic) => void;
+    readonly rootEpic: Epic;
+    readonly setErrorReporter: (reporter: IErrorReporter) => void;
+    readonly reportError: (...args: any[]) => void;
 }
 export interface IDuckedEpic<Input extends Action = any, Output extends Input = Input, State = any, Dependencies = any> extends Epic {
     (action$: ActionsObservable<Input>, state$: StateObservable<State>, dependencies: Dependencies, duckFace?: IDuckFace): Observable<Output>;

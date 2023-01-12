@@ -1,15 +1,141 @@
-import { createStore, applyMiddleware } from 'redux'
+import { createStore, applyMiddleware, Store, Middleware, Unsubscribe } from 'redux'
+import { IDuck, IReducer, IAction, ISelector, TState } from '@duckness/duck'
+
+export interface IPool {
+  readonly addDuck: (duck: IDuck) => void
+  readonly addMiddleware: (middleware: Middleware) => void
+  readonly addStream: (stream: IPoolStream) => void
+  readonly preReducer: (reducer: IReducer) => void
+  readonly postReducer: (reducer: IReducer) => void
+  readonly build: (props: TPoolProps) => Store
+  readonly reportError: IErrorReporter
+  readonly setErrorReporter: (reporter: IErrorReporter) => void
+  readonly store: Store
+  readonly dispatch: IPoolDispatch
+  readonly select: ISelector
+  readonly fetch: (
+    selector?: ISelector,
+    resolver?: (selectedValue: any, resolveValue: (value: any) => void, prevSelectedValue: any) => void
+  ) => Promise<any>
+  readonly trigger: (
+    selector?: ISelector,
+    callback?: (selectedValue: any) => void,
+    resolver?: (selectedValue: any, callback: (selectedValue: any) => void, prevSelectedValue: any) => void
+  ) => Unsubscribe
+  readonly reduce: IPoolReduce
+  readonly ducks: IDuck[]
+  readonly getDuckByName: (duckPath: TDuckPath) => IDuck
+  readonly middlewares: Middleware[]
+  readonly streams: IPoolStream[]
+  readonly props: TPoolProps
+}
+export interface IPoolArgs {
+  poolName?: string
+  props?: TPoolProps
+  ducks?: IDuck[]
+  middlewares?: Middleware[]
+  streams?: IPoolStream[]
+  buildStore?: (
+    props: TPoolProps,
+    {
+      refProps,
+      refDucks,
+      refReducers,
+      refErrorReporter
+    }: { refProps: TRefProps; refDucks: TRefDucks; refReducers: TRefReducers; refErrorReporter: TRefErrorReporter }
+  ) => any
+  buildRootReducer?: (
+    ducks: IDuck[],
+    {
+      refProps,
+      refReducers,
+      refDucks,
+      refErrorReporter
+    }: { refProps: TRefProps; refReducers: TRefReducers; refDucks: TRefDucks; refErrorReporter: TRefErrorReporter }
+  ) => IReducer
+  connectReduxDevtoolsExtension?: boolean
+}
+export type TPoolProps = { [key: string]: any }
+
+export { TState }
+export type TDuckPath = string | [duckPoolName: string, duckName: string]
+
+export interface IPoolDispatch {
+  (action: IAction): ReturnType<Store['dispatch']>
+  (duckPath: TDuckPath, actionName: string, payload: any): ReturnType<Store['dispatch']>
+}
+export interface IPoolError extends Error {
+  poolName?: string
+  actionName?: string
+  duckPath?: TDuckPath
+  dispatchedAction?: IAction
+}
+
+export interface IPoolReduce {
+  (action: IAction): TState
+  (state: TState, action: IAction): TState
+}
+
+export interface IPoolStream {
+  beforeBuild?: ({
+    refDucks,
+    refProps,
+    refReducers,
+    refErrorReporter
+  }: {
+    refDucks: TRefDucks
+    refProps: TRefProps
+    refReducers: TRefReducers
+    refErrorReporter: TRefErrorReporter
+  }) => void
+  middlewares?: ({
+    refDucks,
+    refProps,
+    refReducers,
+    refErrorReporter
+  }: {
+    refDucks: TRefDucks
+    refProps: TRefProps
+    refReducers: TRefReducers
+    refErrorReporter: TRefErrorReporter
+  }) => Middleware[]
+  afterBuild?: ({
+    refStore,
+    refDucks,
+    refProps,
+    refReducers,
+    refErrorReporter
+  }: {
+    refStore: TRefStore
+    refDucks: TRefDucks
+    refProps: TRefProps
+    refReducers: TRefReducers
+    refErrorReporter: TRefErrorReporter
+  }) => void
+}
+
+export interface IErrorReporter {
+  (...args: any[]): void
+}
+
+export type TRefProps = { current: TPoolProps }
+export type TRefDucks = { current: IDuck[]; map: { [poolName: string]: { [duckName: string]: IDuck } } }
+export type TRefStore = { current: Store }
+export type TRefReducers = { root: IReducer; pre: IReducer; post: IReducer }
+export type TRefStreams = { current: IPoolStream[] }
+export type TRefMiddlewares = { current: Middleware[] }
+export type TRefErrorReporter = { current: IErrorReporter }
 
 // this pool stream will send @@INIT action to every registered duck after build
-const initDucksStream = Object.freeze({
-  afterBuild({ refStore, refDucks, refProps } = {}) {
+const initDucksStream: IPoolStream = Object.freeze({
+  afterBuild({ refStore, refDucks, refProps }) {
     refDucks.current.forEach(duck => {
       refStore.current.dispatch({ type: duck.mapActionType('@@INIT'), payload: refProps.current })
     })
   }
-})
+} as IPoolStream)
 
-function mapDuck(map = {}, duck) {
+function mapDuck(map: { [poolName: string]: { [duckName: string]: IDuck } } = {}, duck: IDuck) {
   const { poolName, duckName } = duck
   if (null != poolName && null != duckName) {
     if (null == map[poolName]) {
@@ -30,40 +156,47 @@ export default function Pool({
   buildStore = () => {
     return {}
   },
-  buildRootReducer
-} = {}) {
-  const refProps = { current: initProps || {} }
-  const refDucks = { current: initDucks || [], map: (initDucks || []).reduce((map, duck) => mapDuck(map, duck), {}) }
-  const refStreams = { current: [...(initStreams || []), initDucksStream] }
-  const refMiddlewares = { current: initMiddlewares || [] }
-  const refErrorReporter = { current: ('undefined' !== typeof console && console.error) || (() => {}) } // eslint-disable-line no-console
+  buildRootReducer,
+  connectReduxDevtoolsExtension = true
+}: IPoolArgs = {}) {
+  const refProps: TRefProps = { current: initProps || {} }
+  const refDucks: TRefDucks = {
+    current: initDucks || [],
+    map: (initDucks || []).reduce((map, duck) => mapDuck(map, duck), {})
+  }
+  const refStreams: TRefStreams = { current: (initStreams || []).concat([initDucksStream]) }
+  const refMiddlewares: TRefMiddlewares = { current: initMiddlewares || [] }
+  const refErrorReporter: TRefErrorReporter = {
+    // eslint-disable-next-line no-console
+    current: ('undefined' !== typeof console && console.error) || (() => void 0)
+  }
 
-  function addDuck(duck) {
+  const addDuck: IPool['addDuck'] = function (duck) {
     refDucks.current.push(duck)
     refDucks.map = mapDuck(refDucks.map, duck)
   }
 
-  function addMiddleware(middleware) {
+  const addMiddleware: IPool['addMiddleware'] = function (middleware) {
     refMiddlewares.current.push(middleware)
   }
 
-  function addStream(stream) {
+  const addStream: IPool['addStream'] = function (stream) {
     refStreams.current.unshift(stream)
   }
 
-  function setErrorReporter(reporter) {
+  const setErrorReporter: IPool['setErrorReporter'] = function (reporter) {
     refErrorReporter.current = reporter
   }
 
-  function reportError(...args) {
+  const reportError: IErrorReporter = function (...args) {
     if ('function' === typeof refErrorReporter.current) {
       refErrorReporter.current(...args)
     }
   }
 
-  const refStore = { current: null }
+  const refStore: TRefStore = { current: null }
 
-  function getDuckByName(duckPath) {
+  const getDuckByName: IPool['getDuckByName'] = function (duckPath) {
     if ('string' === typeof duckPath || Array.isArray(duckPath)) {
       const [duckPoolName, duckName] = 'string' === typeof duckPath ? [poolName, duckPath] : [duckPath[0], duckPath[1]]
       return refDucks.map[duckPoolName] ? refDucks.map[duckPoolName][duckName] : null
@@ -71,17 +204,19 @@ export default function Pool({
       return null
     }
   }
-  function getDispatchActionFromDispatchArgs(args) {
+  const getDispatchActionFromDispatchArgs: (args: IArguments) => IAction = function (args) {
     // dispatch(action)
-    // dispatch(duckName, actionName, ...actionArgs)
-    // dispatch([poolName, duckName], actionName, ...actionArgs)
+    // dispatch(duckName, actionName, payload)
+    // dispatch([poolName, duckName], actionName, payload)
     if (1 === args.length) {
       return args[0]
     } else if (args.length > 1) {
-      const [duckPath, actionName, ...actionArgs] = args
+      const [duckPath, actionName, payload] = [args[0], args[1], args[2]]
       const duck = getDuckByName(duckPath)
       if (null == duck) {
-        const error = new Error(`Received action '${actionName}' dispatch but duck '${duckPath}' is not found`)
+        const error: IPoolError = new Error(
+          `Received action '${actionName}' dispatch but duck '${duckPath}' is not found`
+        )
         error.actionName = actionName
         error.duckPath = duckPath
         reportError(error, '@duckness/pool', 'dispatch')
@@ -89,7 +224,7 @@ export default function Pool({
       } else {
         const actionCreator = duck.action[actionName]
         if (null == actionCreator) {
-          const error = new Error(
+          const error: IPoolError = new Error(
             `Received action dispatch but action '${actionName}' for duck '${duckPath}' is not found`
           )
           error.actionName = actionName
@@ -97,47 +232,48 @@ export default function Pool({
           reportError(error, '@duckness/pool', 'dispatch')
           return null
         } else {
-          return actionCreator(...actionArgs)
+          return actionCreator(payload)
         }
       }
     } else {
       return null
     }
   }
-  function dispatch(...args) {
-    const action = getDispatchActionFromDispatchArgs(args)
+  const dispatch: IPool['dispatch'] = function () {
+    // eslint-disable-next-line prefer-rest-params
+    const action = getDispatchActionFromDispatchArgs(arguments)
     if (null == action) {
-      const error = new Error('Received action dispatch without action')
+      const error: IPoolError = new Error('Received action dispatch without action')
       error.poolName = poolName
       reportError(error, '@duckness/pool', 'dispatch')
     } else {
       if (refStore.current) {
         return refStore.current.dispatch(action)
       } else {
-        const error = new Error('Received action dispatch but pool is not built yet')
+        const error: IPoolError = new Error('Received action dispatch but pool is not built yet')
         error.dispatchedAction = action
         error.poolName = poolName
         reportError(error, '@duckness/pool', 'dispatch', action)
       }
     }
     return void 0
-  }
+  } as IPool['dispatch']
 
-  const refReducers = { root: null, pre: null, post: null }
-  function reduce(stateOrAction, andAction) {
+  const refReducers: TRefReducers = { root: null, pre: null, post: null }
+  const reduce: IPool['reduce'] = function (stateOrAction: TState | IAction, andAction?: IAction) {
     if (void 0 === andAction && !refStore.current) {
-      const error = new Error('Reducing state but pool is not built yet')
-      error.dispatchedAction = stateOrAction
+      const error: IPoolError = new Error('Reducing state but pool is not built yet')
+      error.dispatchedAction = stateOrAction as IAction
       error.poolName = poolName
       reportError(error, '@duckness/pool', 'reduce', stateOrAction)
       return stateOrAction
     }
     const state = void 0 === andAction ? refStore.current.getState() : stateOrAction
-    const action = void 0 === andAction ? stateOrAction : andAction
+    const action: IAction = void 0 === andAction ? (stateOrAction as IAction) : andAction
     if (refReducers.root) {
       return refReducers.root(state, action)
     } else {
-      const error = new Error('Reducing state but pool is not built yet')
+      const error: IPoolError = new Error('Reducing state but pool is not built yet')
       error.dispatchedAction = action
       error.poolName = poolName
       reportError(error, '@duckness/pool', 'reduce', action)
@@ -145,7 +281,7 @@ export default function Pool({
     }
   }
 
-  function select(selector) {
+  const select: IPool['select'] = function (selector) {
     if (refStore.current) {
       return 'function' === typeof selector ? selector(refStore.current.getState()) : refStore.current.getState()
     } else {
@@ -153,20 +289,20 @@ export default function Pool({
     }
   }
 
-  function fetch(selector, resolver) {
+  const fetch: IPool['fetch'] = function (selector, resolver) {
     return new Promise((resolve, reject) => {
       if (refStore.current) {
-        let prevSelectedValue = void 0
+        let prevSelectedValue: any = void 0
         let resolved = false
-        let unsubscribe = void 0
-        const resolveValue = value => {
+        let unsubscribe: Unsubscribe = void 0
+        const resolveValue = (value: unknown) => {
           if (unsubscribe) {
             unsubscribe()
           }
           resolved = true
           resolve(value)
         }
-        const tryResolve = currentState => {
+        const tryResolve = (currentState: TState) => {
           const selectedValue = 'function' === typeof selector ? selector(currentState) : currentState
           if ('function' === typeof resolver) {
             resolver(selectedValue, resolveValue, prevSelectedValue)
@@ -182,7 +318,7 @@ export default function Pool({
           })
         }
       } else {
-        const error = new Error('Fetching state but pool is not built yet')
+        const error: IPoolError = new Error('Fetching state but pool is not built yet')
         error.poolName = poolName
         reportError(error, '@duckness/pool', 'fetch')
         reject(error)
@@ -190,10 +326,10 @@ export default function Pool({
     })
   }
 
-  function trigger(selector, callback, resolver) {
+  const trigger: IPool['trigger'] = function (selector, callback, resolver) {
     if (refStore.current) {
-      let prevSelectedValue = void 0
-      const tryResolve = currentState => {
+      let prevSelectedValue: any = void 0
+      const tryResolve = (currentState: TState) => {
         const selectedValue = 'function' === typeof selector ? selector(currentState) : currentState
         if ('function' === typeof resolver) {
           resolver(selectedValue, callback, prevSelectedValue)
@@ -207,14 +343,14 @@ export default function Pool({
         tryResolve(refStore.current.getState())
       })
     } else {
-      const error = new Error('Fetching state but pool is not built yet')
+      const error: IPoolError = new Error('Fetching state but pool is not built yet')
       error.poolName = poolName
       reportError(error, '@duckness/pool', 'trigger')
       return void 0
     }
   }
 
-  function setPreReducer(reducer) {
+  const setPreReducer: IPool['preReducer'] = function (reducer) {
     refReducers.pre = (state, action) => {
       try {
         return reducer(state, action)
@@ -230,7 +366,7 @@ export default function Pool({
       }
     }
   }
-  function setPostReducer(reducer) {
+  const setPostReducer: IPool['postReducer'] = function (reducer) {
     refReducers.post = (state, action) => {
       try {
         return reducer(state, action)
@@ -247,7 +383,7 @@ export default function Pool({
     }
   }
 
-  function build(props = refProps.current) {
+  const build: IPool['build'] = function (props = refProps.current) {
     // save props
     refProps.current = props || {}
 
@@ -285,19 +421,21 @@ export default function Pool({
 
     // compose redux middlewares
     const composeEnhancers =
-      typeof window === 'object' && window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__
-        ? window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__({})
-        : x => x
-    const middlewares = [
-      ...refStreams.current.reduce(
+      connectReduxDevtoolsExtension &&
+      typeof window === 'object' &&
+      (window as any).__REDUX_DEVTOOLS_EXTENSION_COMPOSE__
+        ? (window as any).__REDUX_DEVTOOLS_EXTENSION_COMPOSE__({})
+        : (x: any) => x
+    const middlewares = refStreams.current
+      .reduce(
         (streamMiddlewares, stream) =>
           stream.middlewares
             ? streamMiddlewares.concat(stream.middlewares({ refDucks, refProps, refReducers, refErrorReporter }) || [])
             : streamMiddlewares,
         []
-      ),
-      ...refMiddlewares.current
-    ]
+      )
+      .concat(refMiddlewares.current || [])
+
     const enhancer = composeEnhancers(applyMiddleware(...middlewares))
 
     // create store
@@ -316,7 +454,7 @@ export default function Pool({
     return refStore.current
   }
 
-  const pool = {}
+  const pool: IPool = {} as IPool
 
   Object.defineProperty(pool, 'addDuck', { value: addDuck, writable: false, enumerable: true })
   Object.defineProperty(pool, 'addMiddleware', { value: addMiddleware, writable: false, enumerable: true })
@@ -339,26 +477,26 @@ export default function Pool({
   Object.defineProperty(pool, 'reduce', { value: reduce, writable: false, enumerable: true })
   Object.defineProperty(pool, 'ducks', {
     get() {
-      return [...(refDucks.current || [])]
+      return (refDucks.current || []).slice()
     },
     enumerable: true
   })
   Object.defineProperty(pool, 'getDuckByName', { value: getDuckByName, writable: false, enumerable: true })
   Object.defineProperty(pool, 'middlewares', {
     get() {
-      return [...(refMiddlewares.current || [])]
+      return (refMiddlewares.current || []).slice()
     },
     enumerable: true
   })
   Object.defineProperty(pool, 'streams', {
     get() {
-      return [...(refStreams.current || [])]
+      return (refStreams.current || []).slice()
     },
     enumerable: true
   })
   Object.defineProperty(pool, 'props', {
     get() {
-      return { ...(refProps.current || {}) }
+      return Object.assign({}, refProps.current || {})
     },
     enumerable: true
   })

@@ -16,7 +16,7 @@
     "clean": "yarn lerna run clean",
     "publish": "yarn lerna publish --no-private",
     "lint": "yarn lerna run lint && eslint 'stories/**/*.{js,jsx}'",
-    "storybook": "start-storybook -p 6006",
+    "storybook": "yarn build && start-storybook -p 6006",
     "build-storybook": "build-storybook",
     "prepare": "husky install"
   },

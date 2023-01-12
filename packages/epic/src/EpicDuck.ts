@@ -6,13 +6,13 @@ import { catchError as rxCatchError } from 'rxjs/operators'
 
 export interface IEpicDuck extends IDuck {
   // add epic
-  epic: (epic: IDuckedEpic) => void
+  readonly epic: (epic: IDuckedEpic) => void
   // root epic for this duck
-  rootEpic: Epic
+  readonly rootEpic: Epic
   // set error reporter for isolated epics
-  setErrorReporter: (reporter: IErrorReporter) => void
+  readonly setErrorReporter: (reporter: IErrorReporter) => void
   // report error to configured error reporter
-  reportError: (...args: any[]) => void
+  readonly reportError: (...args: any[]) => void
 }
 
 export interface IDuckedEpic<Input extends Action = any, Output extends Input = Input, State = any, Dependencies = any>
