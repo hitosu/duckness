@@ -31,6 +31,7 @@
     "@storybook/addons": "^6.5.15",
     "@storybook/cli": "^6.5.15",
     "@storybook/react": "^6.5.15",
+    "@types/react-dom": "^17.0.18",
     "@typescript-eslint/eslint-plugin": "^5.48.1",
     "@typescript-eslint/parser": "^5.48.1",
     "babel-jest": "^29.3.1",
@@ -54,13 +55,14 @@
     "react-redux": "^8.0.5",
     "redux": "^4.2.0",
     "redux-observable": "^1.2.0",
-    "rxjs": "^6.6.7",
-    "redux-saga": "^1.2.2"
+    "redux-saga": "^1.2.2",
+    "rxjs": "^6.6.7"
   },
   "resolutions": {
     "trim": ">= 1",
     "trim-newlines": ">= 4.0.1",
     "glob-parent": ">= 5.1.2",
-    "got": ">=11.8.5"
+    "got": ">=11.8.5",
+    "**/@types/react": "^17.0.2"
   }
 }

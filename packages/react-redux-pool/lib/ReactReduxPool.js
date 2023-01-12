@@ -1,2 +1,25 @@
-"use strict";Object.defineProperty(exports,"__esModule",{value:!0}),exports.default=ReactReduxPool;var _react=_interopRequireDefault(require("react")),_reactRedux=require("react-redux");function _interopRequireDefault(a){return a&&a.__esModule?a:{default:a}}function ReactReduxPool(a){var b=1<arguments.length&&void 0!==arguments[1]?arguments[1]:function(){return null},c={};return Object.defineProperty(c,"render",{value:function(){return null==a.store&&a.build(a.props),_react.default.createElement(_reactRedux.Provider,{store:a.store},b(a.props))},writable:!1,enumerable:!0}),Object.keys(a).forEach(function(b){Object.defineProperty(c,b,{get:function get(){return a[b]},enumerable:!0})}),c}
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+var React = require("react");
+var react_redux_1 = require("react-redux");
+function ReactReduxPool(pool, renderRoot) {
+    if (renderRoot === void 0) { renderRoot = function (_props) { return null; }; }
+    var render = function () {
+        if (null == pool.store)
+            pool.build(pool.props);
+        return React.createElement(react_redux_1.Provider, { store: pool.store }, renderRoot(pool.props));
+    };
+    var reactReduxPool = {};
+    Object.defineProperty(reactReduxPool, 'render', { value: render, writable: false, enumerable: true });
+    Object.keys(pool).forEach(function (poolKey) {
+        Object.defineProperty(reactReduxPool, poolKey, {
+            get: function () {
+                return pool[poolKey];
+            },
+            enumerable: true
+        });
+    });
+    return reactReduxPool;
+}
+exports.default = ReactReduxPool;
 //# sourceMappingURL=ReactReduxPool.js.map
