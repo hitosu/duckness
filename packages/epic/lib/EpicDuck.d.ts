@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 import { Epic, ActionsObservable, StateObservable } from 'redux-observable';
 export interface IEpicDuck extends IDuck {
     readonly epic: (epic: IDuckedEpic) => void;
-    readonly rootEpic: Epic;
+    readonly rootEpic: () => Epic;
     readonly setErrorReporter: (reporter: IErrorReporter) => void;
     readonly reportError: (...args: any[]) => void;
 }

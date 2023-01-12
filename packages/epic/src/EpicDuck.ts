@@ -8,7 +8,7 @@ export interface IEpicDuck extends IDuck {
   // add epic
   readonly epic: (epic: IDuckedEpic) => void
   // root epic for this duck
-  readonly rootEpic: Epic
+  readonly rootEpic: () => Epic
   // set error reporter for isolated epics
   readonly setErrorReporter: (reporter: IErrorReporter) => void
   // report error to configured error reporter
@@ -37,18 +37,18 @@ export default function EpicDuck(duckName: string, poolName: string, duckContext
     current: ('undefined' !== typeof console && console.error) || (() => void 0) // eslint-disable-line no-console
   }
 
-  function setErrorReporter(reporter: IErrorReporter) {
+  const setErrorReporter: IEpicDuck['setErrorReporter'] = function (reporter: IErrorReporter) {
     refErrorReporter.current = reporter
   }
 
-  function reportError(...args: any[]) {
+  const reportError: IEpicDuck['reportError'] = function (...args: any[]) {
     if ('function' === typeof refErrorReporter.current) {
       refErrorReporter.current(...args)
     }
   }
 
   const epics: Epic[] = []
-  function addEpic(epic: IDuckedEpic) {
+  const addEpic: IEpicDuck['epic'] = function (epic) {
     // add isolated epic
     epics.push((action$, state$, dependencies) =>
       (dependencies ? epic(action$, state$, dependencies, duck.duckFace) : epic(action$, state$, duck.duckFace)).pipe(
@@ -66,7 +66,7 @@ export default function EpicDuck(duckName: string, poolName: string, duckContext
     )
   }
 
-  function rootEpic() {
+  const rootEpic: IEpicDuck['rootEpic'] = function () {
     return combineEpics(...epics)
   }
 

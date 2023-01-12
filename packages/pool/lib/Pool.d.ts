@@ -1,5 +1,6 @@
 import { Store, Middleware, Unsubscribe } from 'redux';
 import { IDuck, IReducer, IAction, ISelector, TState } from '@duckness/duck';
+export { IDuck, IReducer, IAction, ISelector, TState };
 export interface IPool {
     readonly addDuck: (duck: IDuck) => void;
     readonly addMiddleware: (middleware: Middleware) => void;
@@ -44,7 +45,6 @@ export interface IPoolArgs {
 export type TPoolProps = {
     [key: string]: any;
 };
-export { TState };
 export type TDuckPath = string | [duckPoolName: string, duckName: string];
 export interface IPoolDispatch {
     (action: IAction): ReturnType<Store['dispatch']>;
@@ -61,19 +61,19 @@ export interface IPoolReduce {
     (state: TState, action: IAction): TState;
 }
 export interface IPoolStream {
-    beforeBuild?: ({ refDucks, refProps, refReducers, refErrorReporter }: {
+    readonly beforeBuild?: ({ refDucks, refProps, refReducers, refErrorReporter }: {
         refDucks: TRefDucks;
         refProps: TRefProps;
         refReducers: TRefReducers;
         refErrorReporter: TRefErrorReporter;
     }) => void;
-    middlewares?: ({ refDucks, refProps, refReducers, refErrorReporter }: {
+    readonly middlewares?: ({ refDucks, refProps, refReducers, refErrorReporter }: {
         refDucks: TRefDucks;
         refProps: TRefProps;
         refReducers: TRefReducers;
         refErrorReporter: TRefErrorReporter;
     }) => Middleware[];
-    afterBuild?: ({ refStore, refDucks, refProps, refReducers, refErrorReporter }: {
+    readonly afterBuild?: ({ refStore, refDucks, refProps, refReducers, refErrorReporter }: {
         refStore: TRefStore;
         refDucks: TRefDucks;
         refProps: TRefProps;

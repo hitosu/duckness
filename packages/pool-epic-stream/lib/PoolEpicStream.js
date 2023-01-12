@@ -1,2 +1,32 @@
-"use strict";var _reduxObservable=require("redux-observable");Object.defineProperty(exports,"__esModule",{value:!0}),exports.default=PoolEpicStream;function _toConsumableArray(a){return _arrayWithoutHoles(a)||_iterableToArray(a)||_unsupportedIterableToArray(a)||_nonIterableSpread()}function _nonIterableSpread(){throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.")}function _unsupportedIterableToArray(a,b){if(a){if("string"==typeof a)return _arrayLikeToArray(a,b);var c=Object.prototype.toString.call(a).slice(8,-1);return"Object"===c&&a.constructor&&(c=a.constructor.name),"Map"===c||"Set"===c?Array.from(a):"Arguments"===c||/^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(c)?_arrayLikeToArray(a,b):void 0}}function _iterableToArray(a){if("undefined"!=typeof Symbol&&null!=a[Symbol.iterator]||null!=a["@@iterator"])return Array.from(a)}function _arrayWithoutHoles(a){if(Array.isArray(a))return _arrayLikeToArray(a)}function _arrayLikeToArray(a,b){(null==b||b>a.length)&&(b=a.length);for(var c=0,d=Array(b);c<b;c++)d[c]=a[c];return d}function PoolEpicStream(){var a=0<arguments.length&&void 0!==arguments[0]?arguments[0]:{},b=a.buildRootEpic,c=(0,_reduxObservable.createEpicMiddleware)(),d={};return Object.defineProperty(d,"middlewares",{value:function(){return[c]},writable:!1,enumerable:!0}),Object.defineProperty(d,"beforeBuild",{value:function(){},writable:!1,enumerable:!0}),Object.defineProperty(d,"afterBuild",{value:function(){var a=0<arguments.length&&void 0!==arguments[0]?arguments[0]:{},d=a.refDucks,e=a.refErrorReporter,f=b?b(d.current,{refDucks:d,refErrorReporter:e}):_reduxObservable.combineEpics.apply(void 0,_toConsumableArray(d.current.reduce(function(a,b){return b.rootEpic&&(b.setErrorReporter(e.current),a.push(b.rootEpic())),a},[])));c.run(f)},writable:!1,enumerable:!0}),d}
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+var redux_observable_1 = require("redux-observable");
+function PoolEpicStream(_a) {
+    var _b = _a === void 0 ? {} : _a, buildRootEpic = _b.buildRootEpic;
+    var epicMiddleware = (0, redux_observable_1.createEpicMiddleware)();
+    var beforeBuild = function () {
+    };
+    var middlewares = function () {
+        return [epicMiddleware];
+    };
+    var afterBuild = function (_a) {
+        var refDucks = _a.refDucks, refErrorReporter = _a.refErrorReporter;
+        var rootEpic = buildRootEpic
+            ? buildRootEpic(refDucks.current, { refDucks: refDucks, refErrorReporter: refErrorReporter })
+            : redux_observable_1.combineEpics.apply(void 0, refDucks.current.reduce(function (epics, duck) {
+                if (duck.rootEpic) {
+                    duck.setErrorReporter(refErrorReporter.current);
+                    epics.push(duck.rootEpic());
+                }
+                return epics;
+            }, []));
+        epicMiddleware.run(rootEpic);
+    };
+    var PoolEpicStream = {};
+    Object.defineProperty(PoolEpicStream, 'middlewares', { value: middlewares, writable: false, enumerable: true });
+    Object.defineProperty(PoolEpicStream, 'beforeBuild', { value: beforeBuild, writable: false, enumerable: true });
+    Object.defineProperty(PoolEpicStream, 'afterBuild', { value: afterBuild, writable: false, enumerable: true });
+    return PoolEpicStream;
+}
+exports.default = PoolEpicStream;
 //# sourceMappingURL=PoolEpicStream.js.map

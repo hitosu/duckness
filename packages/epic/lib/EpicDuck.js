@@ -8,10 +8,10 @@ function EpicDuck(duckName, poolName, duckContext) {
     var refErrorReporter = {
         current: ('undefined' !== typeof console && console.error) || (function () { return void 0; })
     };
-    function setErrorReporter(reporter) {
+    var setErrorReporter = function (reporter) {
         refErrorReporter.current = reporter;
-    }
-    function reportError() {
+    };
+    var reportError = function () {
         var args = [];
         for (var _i = 0; _i < arguments.length; _i++) {
             args[_i] = arguments[_i];
@@ -19,9 +19,9 @@ function EpicDuck(duckName, poolName, duckContext) {
         if ('function' === typeof refErrorReporter.current) {
             refErrorReporter.current.apply(refErrorReporter, args);
         }
-    }
+    };
     var epics = [];
-    function addEpic(epic) {
+    var addEpic = function (epic) {
         epics.push(function (action$, state$, dependencies) {
             return (dependencies ? epic(action$, state$, dependencies, duck.duckFace) : epic(action$, state$, duck.duckFace)).pipe((0, operators_1.catchError)(function (error, source) {
                 try {
@@ -34,10 +34,10 @@ function EpicDuck(duckName, poolName, duckContext) {
                 return source;
             }));
         });
-    }
-    function rootEpic() {
+    };
+    var rootEpic = function () {
         return redux_observable_1.combineEpics.apply(void 0, epics);
-    }
+    };
     Object.defineProperty(duck, 'epic', { value: addEpic, writable: false, enumerable: true });
     Object.defineProperty(duck, 'rootEpic', { value: rootEpic, writable: false, enumerable: true });
     Object.defineProperty(duck, 'setErrorReporter', { value: setErrorReporter, writable: false, enumerable: true });

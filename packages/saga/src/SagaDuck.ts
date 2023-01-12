@@ -1,25 +1,40 @@
-import Duck from '@duckness/duck'
+import Duck, { IDuck, TDuckContext } from '@duckness/duck'
 import { spawn, call, all } from 'redux-saga/effects'
+import { Saga } from 'redux-saga'
 
-export default function SagaDuck(duckName, appName, duckContext) {
-  const duck = Duck(duckName, appName, duckContext)
+export interface ISagaDuck extends IDuck {
+  readonly saga: (saga: TSaga) => void
+  readonly rootSaga: () => Generator<ReturnType<typeof all>>
+  readonly setErrorReporter: (reporter: IErrorReporter) => void
+  readonly reportError: (...args: any[]) => void
+}
+
+export type TSaga = Saga
+
+export interface IErrorReporter {
+  (...args: any[]): void
+}
+
+export default function SagaDuck(duckName: string, appName: string, duckContext: TDuckContext) {
+  const duck: ISagaDuck = Duck(duckName, appName, duckContext) as ISagaDuck
 
   const refErrorReporter = {
-    current: ('undefined' !== typeof console && console.error) || (() => {}) // eslint-disable-line no-console
+    // eslint-disable-next-line no-console
+    current: ('undefined' !== typeof console && console.error) || (() => void 0)
   }
 
-  function setErrorReporter(reporter) {
+  const setErrorReporter: ISagaDuck['setErrorReporter'] = function (reporter) {
     refErrorReporter.current = reporter
   }
 
-  function reportError(...args) {
+  const reportError: ISagaDuck['reportError'] = function (...args) {
     if ('function' === typeof refErrorReporter.current) {
       refErrorReporter.current(...args)
     }
   }
 
-  const sagas = []
-  function addSaga(saga) {
+  const sagas: ReturnType<typeof spawn>[] = []
+  const addSaga: ISagaDuck['saga'] = function (saga) {
     sagas.push(
       spawn(function* () {
         while (true) {
@@ -40,7 +55,7 @@ export default function SagaDuck(duckName, appName, duckContext) {
     )
   }
 
-  function* rootSaga() {
+  const rootSaga: ISagaDuck['rootSaga'] = function* () {
     yield all(sagas)
   }
 

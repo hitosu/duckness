@@ -1,5 +1,6 @@
 import { createStore, applyMiddleware, Store, Middleware, Unsubscribe } from 'redux'
 import { IDuck, IReducer, IAction, ISelector, TState } from '@duckness/duck'
+export { IDuck, IReducer, IAction, ISelector, TState }
 
 export interface IPool {
   readonly addDuck: (duck: IDuck) => void
@@ -57,7 +58,6 @@ export interface IPoolArgs {
 }
 export type TPoolProps = { [key: string]: any }
 
-export { TState }
 export type TDuckPath = string | [duckPoolName: string, duckName: string]
 
 export interface IPoolDispatch {
@@ -77,7 +77,7 @@ export interface IPoolReduce {
 }
 
 export interface IPoolStream {
-  beforeBuild?: ({
+  readonly beforeBuild?: ({
     refDucks,
     refProps,
     refReducers,
@@ -88,7 +88,7 @@ export interface IPoolStream {
     refReducers: TRefReducers
     refErrorReporter: TRefErrorReporter
   }) => void
-  middlewares?: ({
+  readonly middlewares?: ({
     refDucks,
     refProps,
     refReducers,
@@ -99,7 +99,7 @@ export interface IPoolStream {
     refReducers: TRefReducers
     refErrorReporter: TRefErrorReporter
   }) => Middleware[]
-  afterBuild?: ({
+  readonly afterBuild?: ({
     refStore,
     refDucks,
     refProps,
