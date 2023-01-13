@@ -1,6 +1,14 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react'
+import * as React from 'react'
+import { Store, Action } from 'redux'
 
-const UNSET_MARKER = {}
+export type TSelectedState = any
+export type TStoreState = any
+export interface ISelector {
+  (...sources: any[]): any
+}
+export type TActionCreator = (payload: any) => Action
+export type TPayloadTransformer = ((Action: any) => Action) | any
+export type TDispatcher = (dispatch: Store['dispatch'], ...args: any[]) => void
 
 /*
  * shouldUpdate:
@@ -8,22 +16,40 @@ const UNSET_MARKER = {}
  *   function - update if true == shouldUpdate(nextSelectedState, prevSelectedState, ?storePrevSelectedState(prevSelectedState))
  *   (default) - update if nextSelectedState !== prevSelectedState
  *
+ */
+export type TShouldUpdate =
+  | boolean
+  | ((
+      nextSelectedState: TSelectedState,
+      prevSelectedState: TSelectedState,
+      storePrevSelectedState?: (prevSelectedState: TSelectedState) => void
+    ) => boolean)
+
+/*
  * shouldSelect:
  *   function - select if true == shouldSelect(nextStoreState, prevStoreState)
  *   (default) - always select
  */
+export type TShouldSelect = (nextStoreState: TStoreState, prevStoreState: TStoreState) => boolean
 
-export default function useRedux(store, selector, shouldUpdate, shouldSelect) {
-  const [{ selectedState }, setSelectedState] = useState(() => {
+const UNSET_MARKER = {}
+
+export default function useRedux(
+  store: Store,
+  selector: ISelector,
+  shouldUpdate: TShouldUpdate,
+  shouldSelect: TShouldSelect
+) {
+  const [{ selectedState }, setSelectedState] = React.useState(() => {
     return { selectedState: selector(store.getState()) }
   })
 
   const customShouldSelect = 'function' === typeof shouldSelect
   const customShouldUpdate = 'function' === typeof shouldUpdate
 
-  const refPrevStoreState = useRef(void 0)
-  const refPrevSelectedState = useRef(UNSET_MARKER)
-  useEffect(() => {
+  const refPrevStoreState = React.useRef<TStoreState>(void 0)
+  const refPrevSelectedState = React.useRef<TSelectedState>(UNSET_MARKER)
+  React.useEffect(() => {
     refPrevStoreState.current = customShouldSelect ? store.getState() : null
     if (customShouldUpdate) {
       let prevSelectedStateUpdated = false
@@ -43,9 +69,9 @@ export default function useRedux(store, selector, shouldUpdate, shouldSelect) {
     }
   }, [store, selector, shouldUpdate, shouldSelect])
 
-  const refSubscription = useRef(null)
-  refSubscription.current = useCallback(
-    nextStoreState => {
+  const refSubscription = React.useRef<(nextStoreState: TStoreState) => void>(null)
+  refSubscription.current = React.useCallback(
+    (nextStoreState: TStoreState) => {
       if (!customShouldSelect || shouldSelect(nextStoreState, refPrevStoreState.current)) {
         const nextSelectedState = selector(nextStoreState)
         let prevSelectedStateUpdated = false
@@ -71,7 +97,7 @@ export default function useRedux(store, selector, shouldUpdate, shouldSelect) {
     [selector, shouldUpdate, shouldSelect]
   )
 
-  useEffect(() => {
+  React.useEffect(() => {
     const unsubscribe = store.subscribe(() => {
       refSubscription.current(store.getState())
     })
@@ -83,8 +109,12 @@ export default function useRedux(store, selector, shouldUpdate, shouldSelect) {
   return selectedState
 }
 
-export function useDispatchAction(store, actionCreator, payloadTransformer) {
-  return useCallback(
+export function useDispatchAction(
+  store: Store,
+  actionCreator: TActionCreator,
+  payloadTransformer?: TPayloadTransformer
+) {
+  return React.useCallback(
     payload =>
       void 0 === payloadTransformer
         ? store.dispatch(actionCreator(payload))
@@ -95,18 +125,33 @@ export function useDispatchAction(store, actionCreator, payloadTransformer) {
   )
 }
 
-export function useDispatch(store, dispatcher, deps = []) {
-  return useCallback((...args) => dispatcher(store.dispatch, ...args), [store, ...deps])
+export function useDispatch(store: Store, dispatcher: TDispatcher, deps: any[] = []) {
+  return React.useCallback((...args) => dispatcher(store.dispatch, ...args), [store, ...deps])
 }
 
-export function combineSelectors(selectorsMap, { selectedStatesEqual } = {}) {
+export function combineSelectors(
+  selectorsMap: { [key: string]: ISelector },
+  {
+    selectedStatesEqual
+  }: {
+    selectedStatesEqual?: (
+      selectorKey: string,
+      nextSelectedState: TSelectedState,
+      prevSelectedState: TSelectedState
+    ) => boolean
+  } = {}
+) {
   const selectorKeys = Object.keys(selectorsMap)
-  const combinedSelectors = {
-    selector: (...state) => {
-      const selectedState = {}
+  const combinedSelectors: {
+    selector: ISelector
+    shouldUpdate: Exclude<TShouldUpdate, boolean>
+    areEqual: (nextSelectedState: TSelectedState, prevSelectedState: TSelectedState) => boolean
+  } = {
+    selector: (...sources) => {
+      const selectedState: { [key: string]: TSelectedState } = {}
       for (let i = 0; i < selectorKeys.length; i++) {
         const selectorKey = selectorKeys[i]
-        selectedState[selectorKey] = selectorsMap[selectorKey](...state)
+        selectedState[selectorKey] = selectorsMap[selectorKey](...sources)
       }
       return selectedState
     },
@@ -141,15 +186,24 @@ export function combineSelectors(selectorsMap, { selectedStatesEqual } = {}) {
   return combinedSelectors
 }
 
-export function connect(store, selector, shouldUpdate, shouldSelect, dispatch = store.dispatch) {
+export function connect(
+  store: Store,
+  selector: ISelector,
+  shouldUpdate: TShouldUpdate,
+  shouldSelect: TShouldSelect,
+  dispatch = store.dispatch
+) {
   const emptyObject = {}
   const emptySelector = () => emptyObject
 
-  return function (Component, mapToProps) {
-    function ConnectedComponent(props) {
-      const refProps = useRef(props)
+  return function (
+    Component: React.ComponentType,
+    mapToProps?: (selected: TSelectedState, props: any, dispatch: typeof store.dispatch) => any
+  ) {
+    function ConnectedComponent(props: any) {
+      const refProps = React.useRef<any>(props)
       refProps.current = props
-      const safeSelector = useCallback(
+      const safeSelector = React.useCallback(
         selector ? state => selector(state, refProps.current) || emptyObject : emptySelector,
         []
       )

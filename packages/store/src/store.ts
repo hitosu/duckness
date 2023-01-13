@@ -1,6 +1,31 @@
 import { useEffect, useState, useRef } from 'react'
 
-export function selectAll(value) {
+export type TState = any
+export type TValue = any
+export interface ISelector {
+  (...sources: any[]): any
+}
+export interface IUpdater {
+  (currentState: TState): TState
+}
+export interface IListener {
+  (value: TValue): void
+  selector?: (storeState: TState) => TValue
+  shouldUpdate?: (nextValue: TValue, prevValue: TValue) => boolean
+  shouldSelect?: (nextStoreState: TState, prevStoreState: TState) => boolean
+  prevValue?: TValue
+}
+export type TUseStoreArgs = {
+  updateOnMount?: IUpdater
+  updateOnUnmount?: IUpdater
+  selector?: IListener['selector']
+  shouldSelect?: IListener['shouldSelect']
+  shouldUpdate?: IListener['shouldUpdate']
+  debounce?: number
+}
+export type TAction = (...args: any[]) => TState
+
+export function selectAll(value: TValue) {
   return value
 }
 
@@ -8,24 +33,27 @@ export function always() {
   return true
 }
 
-export function whenChanged(a, b) {
+export function whenChanged(a: TValue, b: TValue) {
   return a !== b
 }
 
-export default function createStore({ initState = {}, actions = {} } = {}) {
+export default function createStore({
+  initState = {},
+  actions = {}
+}: { initState?: TState; actions?: { [actionName: string]: TAction } } = {}) {
   const refStore = {
     current: initState
   }
 
-  const listeners = new Set()
+  const listeners: Set<IListener> = new Set()
 
-  function updateStore(updater) {
-    const nextStore = updater(refStore.current)
+  function updateStore(updater: IUpdater) {
+    const nextStoreState = updater(refStore.current)
     listeners.forEach(function (listener) {
-      if (listener.shouldSelect && !listener.shouldSelect(nextStore, refStore.current)) {
+      if (listener.shouldSelect && !listener.shouldSelect(nextStoreState, refStore.current)) {
         return
       }
-      const nextValue = listener.selector ? listener.selector(nextStore) : nextStore
+      const nextValue = listener.selector ? listener.selector(nextStoreState) : nextStoreState
       if (null == listener.shouldUpdate || listener.shouldUpdate(nextValue, listener.prevValue)) {
         listener(nextValue)
         if (null != listener.shouldUpdate) {
@@ -33,7 +61,7 @@ export default function createStore({ initState = {}, actions = {} } = {}) {
         }
       }
     })
-    refStore.current = nextStore
+    refStore.current = nextStoreState
     return refStore.current
   }
 
@@ -44,17 +72,17 @@ export default function createStore({ initState = {}, actions = {} } = {}) {
     shouldSelect,
     shouldUpdate = whenChanged,
     debounce
-  } = {}) {
+  }: TUseStoreArgs = {}) {
     const [value, setValue] = useState(function () {
       return selector(updateOnMount ? updateStore(updateOnMount) : refStore.current)
     })
 
-    const debounceDuration = useRef()
+    const debounceDuration = useRef<number>()
     debounceDuration.current = debounce
-    const debounceTimer = useRef()
+    const debounceTimer = useRef<ReturnType<typeof setTimeout>>()
 
     useEffect(function () {
-      const listener = function (nextValue) {
+      const listener = function (nextValue: TValue) {
         if (debounceTimer.current) {
           clearTimeout(debounceTimer.current)
         }
@@ -80,7 +108,7 @@ export default function createStore({ initState = {}, actions = {} } = {}) {
     return value
   }
 
-  function Consumer(props) {
+  function Consumer(props: TUseStoreArgs & { children: (value: TValue) => React.ReactNode }) {
     const value = useStore({
       updateOnMount: props.updateOnMount,
       updateOnUnmount: props.updateOnUnmount,
@@ -93,10 +121,10 @@ export default function createStore({ initState = {}, actions = {} } = {}) {
     return props.children(value)
   }
 
-  const boundActions = {}
+  const boundActions: { [actionName: string]: TAction } = {}
   Object.keys(actions).forEach(function (actionName) {
     boundActions[actionName] = function (...args) {
-      updateStore(function (store) {
+      updateStore(function (store: TState) {
         return actions[actionName].apply(store, args) || store
       })
     }
@@ -106,14 +134,14 @@ export default function createStore({ initState = {}, actions = {} } = {}) {
     listeners.clear()
   }
 
-  function subscribe(listener) {
+  function subscribe(listener: IListener) {
     listeners.add(listener)
     return function () {
       listeners.delete(listener)
     }
   }
 
-  function getState(selector) {
+  function getState(selector: ISelector) {
     return selector ? selector(refStore.current) : refStore.current
   }
 

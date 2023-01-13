@@ -1,2 +1,24 @@
-"use strict";var _useRedux=_interopRequireWildcard(require("@duckness/use-redux"));function _typeof(a){"@babel/helpers - typeof";return _typeof="function"==typeof Symbol&&"symbol"==typeof Symbol.iterator?function(a){return typeof a}:function(a){return a&&"function"==typeof Symbol&&a.constructor===Symbol&&a!==Symbol.prototype?"symbol":typeof a},_typeof(a)}Object.defineProperty(exports,"__esModule",{value:!0}),Object.defineProperty(exports,"combineSelectors",{enumerable:!0,get:function get(){return _useRedux.combineSelectors}}),exports.connect=connect,exports.default=usePool,exports.useDispatch=useDispatch,exports.useDispatchAction=useDispatchAction;function _getRequireWildcardCache(a){if("function"!=typeof WeakMap)return null;var b=new WeakMap,c=new WeakMap;return(_getRequireWildcardCache=function(a){return a?c:b})(a)}function _interopRequireWildcard(a,b){if(!b&&a&&a.__esModule)return a;if(null===a||"object"!==_typeof(a)&&"function"!=typeof a)return{default:a};var c=_getRequireWildcardCache(b);if(c&&c.has(a))return c.get(a);var d={},e=Object.defineProperty&&Object.getOwnPropertyDescriptor;for(var f in a)if("default"!=f&&Object.prototype.hasOwnProperty.call(a,f)){var g=e?Object.getOwnPropertyDescriptor(a,f):null;g&&(g.get||g.set)?Object.defineProperty(d,f,g):d[f]=a[f]}return d.default=a,c&&c.set(a,d),d}function usePool(a,b,c,d){return(0,_useRedux.default)(a.store,b,c,d)}function useDispatchAction(a,b,c){return(0,_useRedux.useDispatchAction)(a.store,b,c)}function useDispatch(a,b,c){return(0,_useRedux.useDispatch)(a.store,b,c)}function connect(a,b,c,d){var e=4<arguments.length&&arguments[4]!==void 0?arguments[4]:a.dispatch;return(0,_useRedux.connect)(a.store,b,c,d,e)}
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.combineSelectors = exports.connect = exports.useDispatch = exports.useDispatchAction = void 0;
+var use_redux_1 = require("@duckness/use-redux");
+Object.defineProperty(exports, "combineSelectors", { enumerable: true, get: function () { return use_redux_1.combineSelectors; } });
+function usePool(pool, selector, shouldUpdate, shouldSelect) {
+    return (0, use_redux_1.default)(pool.store, selector, shouldUpdate, shouldSelect);
+}
+exports.default = usePool;
+function useDispatchAction(pool, actionCreator, payloadTransformer) {
+    return (0, use_redux_1.useDispatchAction)(pool.store, actionCreator, payloadTransformer);
+}
+exports.useDispatchAction = useDispatchAction;
+function useDispatch(pool, dispatcher, deps) {
+    if (deps === void 0) { deps = []; }
+    return (0, use_redux_1.useDispatch)(pool.store, dispatcher, deps);
+}
+exports.useDispatch = useDispatch;
+function connect(pool, selector, shouldUpdate, shouldSelect, dispatch) {
+    if (dispatch === void 0) { dispatch = pool.dispatch; }
+    return (0, use_redux_1.connect)(pool.store, selector, shouldUpdate, shouldSelect, dispatch);
+}
+exports.connect = connect;
 //# sourceMappingURL=usePool.js.map

@@ -1,2 +1,170 @@
-"use strict";var _react=_interopRequireWildcard(require("react"));function _typeof(a){"@babel/helpers - typeof";return _typeof="function"==typeof Symbol&&"symbol"==typeof Symbol.iterator?function(a){return typeof a}:function(a){return a&&"function"==typeof Symbol&&a.constructor===Symbol&&a!==Symbol.prototype?"symbol":typeof a},_typeof(a)}Object.defineProperty(exports,"__esModule",{value:!0}),exports.combineSelectors=combineSelectors,exports.connect=connect,exports.default=useRedux,exports.useDispatch=useDispatch,exports.useDispatchAction=useDispatchAction;function _getRequireWildcardCache(a){if("function"!=typeof WeakMap)return null;var b=new WeakMap,c=new WeakMap;return(_getRequireWildcardCache=function(a){return a?c:b})(a)}function _interopRequireWildcard(a,b){if(!b&&a&&a.__esModule)return a;if(null===a||"object"!==_typeof(a)&&"function"!=typeof a)return{default:a};var c=_getRequireWildcardCache(b);if(c&&c.has(a))return c.get(a);var d={},e=Object.defineProperty&&Object.getOwnPropertyDescriptor;for(var f in a)if("default"!=f&&Object.prototype.hasOwnProperty.call(a,f)){var g=e?Object.getOwnPropertyDescriptor(a,f):null;g&&(g.get||g.set)?Object.defineProperty(d,f,g):d[f]=a[f]}return d.default=a,c&&c.set(a,d),d}function _extends(){return _extends=Object.assign?Object.assign.bind():function(a){for(var b,c=1;c<arguments.length;c++)for(var d in b=arguments[c],b)Object.prototype.hasOwnProperty.call(b,d)&&(a[d]=b[d]);return a},_extends.apply(this,arguments)}function _toConsumableArray(a){return _arrayWithoutHoles(a)||_iterableToArray(a)||_unsupportedIterableToArray(a)||_nonIterableSpread()}function _nonIterableSpread(){throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.")}function _iterableToArray(a){if("undefined"!=typeof Symbol&&null!=a[Symbol.iterator]||null!=a["@@iterator"])return Array.from(a)}function _arrayWithoutHoles(a){if(Array.isArray(a))return _arrayLikeToArray(a)}function _slicedToArray(a,b){return _arrayWithHoles(a)||_iterableToArrayLimit(a,b)||_unsupportedIterableToArray(a,b)||_nonIterableRest()}function _nonIterableRest(){throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.")}function _unsupportedIterableToArray(a,b){if(a){if("string"==typeof a)return _arrayLikeToArray(a,b);var c=Object.prototype.toString.call(a).slice(8,-1);return"Object"===c&&a.constructor&&(c=a.constructor.name),"Map"===c||"Set"===c?Array.from(a):"Arguments"===c||/^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(c)?_arrayLikeToArray(a,b):void 0}}function _arrayLikeToArray(a,b){(null==b||b>a.length)&&(b=a.length);for(var c=0,d=Array(b);c<b;c++)d[c]=a[c];return d}function _iterableToArrayLimit(a,b){var c=null==a?null:"undefined"!=typeof Symbol&&a[Symbol.iterator]||a["@@iterator"];if(null!=c){var d,e,f,g,h=[],i=!0,j=!1;try{if(f=(c=c.call(a)).next,0===b){if(Object(c)!==c)return;i=!1}else for(;!(i=(d=f.call(c)).done)&&(h.push(d.value),h.length!==b);i=!0);}catch(a){j=!0,e=a}finally{try{if(!i&&null!=c.return&&(g=c.return(),Object(g)!==g))return}finally{if(j)throw e}}return h}}function _arrayWithHoles(a){if(Array.isArray(a))return a}var UNSET_MARKER={};function useRedux(a,b,c,d){var e=(0,_react.useState)(function(){return{selectedState:b(a.getState())}}),f=_slicedToArray(e,2),g=f[0].selectedState,h=f[1],i="function"==typeof d,j="function"==typeof c,k=(0,_react.useRef)(void 0),l=(0,_react.useRef)(UNSET_MARKER);(0,_react.useEffect)(function(){if(k.current=i?a.getState():null,j){var b=!1;c(g,UNSET_MARKER===l.current?g:l.current,function(a){l.current=a,b=!0}),b||(l.current=g)}else!0!==c&&(l.current=g)},[a,b,c,d]);var m=(0,_react.useRef)(null);return m.current=(0,_react.useCallback)(function(a){if(!i||d(a,k.current)){var e=b(a),f=!1;(!0===c||j&&c(e,l.current,function(a){l.current=a,f=!0})||!j&&e!==l.current)&&(h({selectedState:e}),!f&&!0!==c&&(l.current=e))}i&&(k.current=a)},[b,c,d]),(0,_react.useEffect)(function(){var b=a.subscribe(function(){m.current(a.getState())});return function(){b()}},[a]),g}function useDispatchAction(a,b,c){return(0,_react.useCallback)(function(d){return void 0===c?a.dispatch(b(d)):"function"==typeof c?a.dispatch(b(c(d))):a.dispatch(b(c))},[a,b,c])}function useDispatch(a,b){var c=2<arguments.length&&arguments[2]!==void 0?arguments[2]:[];return(0,_react.useCallback)(function(){for(var c=arguments.length,d=Array(c),e=0;e<c;e++)d[e]=arguments[e];return b.apply(void 0,[a.dispatch].concat(d))},[a].concat(_toConsumableArray(c)))}function combineSelectors(a){var b=1<arguments.length&&arguments[1]!==void 0?arguments[1]:{},c=b.selectedStatesEqual,d=Object.keys(a),e={selector:function selector(){for(var b,c={},e=0;e<d.length;e++)b=d[e],c[b]=a[b].apply(a,arguments);return c},shouldUpdate:c?function(a,b,e){for(var f,g=0;g<d.length;g++)if(f=d[g],!c(f,a[f],b[f]))return!0;return e&&e(b),!1}:function(a,b,c){for(var e,f=0;f<d.length;f++)if(e=d[f],a[e]!==b[e])return!0;return c&&c(b),!1},areEqual:function areEqual(a,b){return!e.shouldUpdate(a,b)}};return e}function connect(a,b,c,d){var e=4<arguments.length&&arguments[4]!==void 0?arguments[4]:a.dispatch,f={},g=function(){return f};return function(h,i){function j(j){var k=(0,_react.useRef)(j);k.current=j;var l=(0,_react.useCallback)(b?function(a){return b(a,k.current)||f}:g,[]),m=useRedux(a,l,c,d),n=(i?i(m,j,e):m)||f;return _react.default.createElement(h,_extends({},j,n))}return j.displayName="connect(".concat(h.displayName||h.name||"Component",")"),j}}
+"use strict";
+var __assign = (this && this.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
+var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
+    if (pack || arguments.length === 2) for (var i = 0, l = from.length, ar; i < l; i++) {
+        if (ar || !(i in from)) {
+            if (!ar) ar = Array.prototype.slice.call(from, 0, i);
+            ar[i] = from[i];
+        }
+    }
+    return to.concat(ar || Array.prototype.slice.call(from));
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.connect = exports.combineSelectors = exports.useDispatch = exports.useDispatchAction = void 0;
+var React = require("react");
+var UNSET_MARKER = {};
+function useRedux(store, selector, shouldUpdate, shouldSelect) {
+    var _a = React.useState(function () {
+        return { selectedState: selector(store.getState()) };
+    }), selectedState = _a[0].selectedState, setSelectedState = _a[1];
+    var customShouldSelect = 'function' === typeof shouldSelect;
+    var customShouldUpdate = 'function' === typeof shouldUpdate;
+    var refPrevStoreState = React.useRef(void 0);
+    var refPrevSelectedState = React.useRef(UNSET_MARKER);
+    React.useEffect(function () {
+        refPrevStoreState.current = customShouldSelect ? store.getState() : null;
+        if (customShouldUpdate) {
+            var prevSelectedStateUpdated_1 = false;
+            shouldUpdate(selectedState, UNSET_MARKER === refPrevSelectedState.current ? selectedState : refPrevSelectedState.current, function (prevSelectedState) {
+                refPrevSelectedState.current = prevSelectedState;
+                prevSelectedStateUpdated_1 = true;
+            });
+            if (!prevSelectedStateUpdated_1) {
+                refPrevSelectedState.current = selectedState;
+            }
+        }
+        else if (true !== shouldUpdate) {
+            refPrevSelectedState.current = selectedState;
+        }
+    }, [store, selector, shouldUpdate, shouldSelect]);
+    var refSubscription = React.useRef(null);
+    refSubscription.current = React.useCallback(function (nextStoreState) {
+        if (!customShouldSelect || shouldSelect(nextStoreState, refPrevStoreState.current)) {
+            var nextSelectedState = selector(nextStoreState);
+            var prevSelectedStateUpdated_2 = false;
+            if (true === shouldUpdate ||
+                (customShouldUpdate &&
+                    shouldUpdate(nextSelectedState, refPrevSelectedState.current, function (prevSelectedState) {
+                        refPrevSelectedState.current = prevSelectedState;
+                        prevSelectedStateUpdated_2 = true;
+                    })) ||
+                (!customShouldUpdate && nextSelectedState !== refPrevSelectedState.current)) {
+                setSelectedState({ selectedState: nextSelectedState });
+                if (!prevSelectedStateUpdated_2 && true !== shouldUpdate) {
+                    refPrevSelectedState.current = nextSelectedState;
+                }
+            }
+        }
+        if (customShouldSelect) {
+            refPrevStoreState.current = nextStoreState;
+        }
+    }, [selector, shouldUpdate, shouldSelect]);
+    React.useEffect(function () {
+        var unsubscribe = store.subscribe(function () {
+            refSubscription.current(store.getState());
+        });
+        return function () {
+            unsubscribe();
+        };
+    }, [store]);
+    return selectedState;
+}
+exports.default = useRedux;
+function useDispatchAction(store, actionCreator, payloadTransformer) {
+    return React.useCallback(function (payload) {
+        return void 0 === payloadTransformer
+            ? store.dispatch(actionCreator(payload))
+            : 'function' === typeof payloadTransformer
+                ? store.dispatch(actionCreator(payloadTransformer(payload)))
+                : store.dispatch(actionCreator(payloadTransformer));
+    }, [store, actionCreator, payloadTransformer]);
+}
+exports.useDispatchAction = useDispatchAction;
+function useDispatch(store, dispatcher, deps) {
+    if (deps === void 0) { deps = []; }
+    return React.useCallback(function () {
+        var args = [];
+        for (var _i = 0; _i < arguments.length; _i++) {
+            args[_i] = arguments[_i];
+        }
+        return dispatcher.apply(void 0, __spreadArray([store.dispatch], args, false));
+    }, __spreadArray([store], deps, true));
+}
+exports.useDispatch = useDispatch;
+function combineSelectors(selectorsMap, _a) {
+    var _b = _a === void 0 ? {} : _a, selectedStatesEqual = _b.selectedStatesEqual;
+    var selectorKeys = Object.keys(selectorsMap);
+    var combinedSelectors = {
+        selector: function () {
+            var sources = [];
+            for (var _i = 0; _i < arguments.length; _i++) {
+                sources[_i] = arguments[_i];
+            }
+            var selectedState = {};
+            for (var i = 0; i < selectorKeys.length; i++) {
+                var selectorKey = selectorKeys[i];
+                selectedState[selectorKey] = selectorsMap[selectorKey].apply(selectorsMap, sources);
+            }
+            return selectedState;
+        },
+        shouldUpdate: selectedStatesEqual
+            ? function (nextSelectedState, prevSelectedState, storePrevSelectedState) {
+                for (var i = 0; i < selectorKeys.length; i++) {
+                    var selectorKey = selectorKeys[i];
+                    if (!selectedStatesEqual(selectorKey, nextSelectedState[selectorKey], prevSelectedState[selectorKey])) {
+                        return true;
+                    }
+                }
+                if (storePrevSelectedState) {
+                    storePrevSelectedState(prevSelectedState);
+                }
+                return false;
+            }
+            : function (nextSelectedState, prevSelectedState, storePrevSelectedState) {
+                for (var i = 0; i < selectorKeys.length; i++) {
+                    var selectorKey = selectorKeys[i];
+                    if (nextSelectedState[selectorKey] !== prevSelectedState[selectorKey]) {
+                        return true;
+                    }
+                }
+                if (storePrevSelectedState) {
+                    storePrevSelectedState(prevSelectedState);
+                }
+                return false;
+            },
+        areEqual: function (nextSelectedState, prevSelectedState) {
+            return !combinedSelectors.shouldUpdate(nextSelectedState, prevSelectedState);
+        }
+    };
+    return combinedSelectors;
+}
+exports.combineSelectors = combineSelectors;
+function connect(store, selector, shouldUpdate, shouldSelect, dispatch) {
+    if (dispatch === void 0) { dispatch = store.dispatch; }
+    var emptyObject = {};
+    var emptySelector = function () { return emptyObject; };
+    return function (Component, mapToProps) {
+        function ConnectedComponent(props) {
+            var refProps = React.useRef(props);
+            refProps.current = props;
+            var safeSelector = React.useCallback(selector ? function (state) { return selector(state, refProps.current) || emptyObject; } : emptySelector, []);
+            var selected = useRedux(store, safeSelector, shouldUpdate, shouldSelect);
+            var connectedProps = (mapToProps ? mapToProps(selected, props, dispatch) : selected) || emptyObject;
+            return React.createElement(Component, __assign({}, props, connectedProps));
+        }
+        ConnectedComponent.displayName = "connect(".concat(Component.displayName || Component.name || 'Component', ")");
+        return ConnectedComponent;
+    };
+}
+exports.connect = connect;
 //# sourceMappingURL=useRedux.js.map
