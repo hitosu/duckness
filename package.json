@@ -1,6 +1,6 @@
 {
   "name": "duckness",
-  "version": "0.3.4",
+  "version": "1.0.0",
   "description": "Duckness - Modular Redux Ducks monorepo",
   "main": "index.js",
   "repository": "git@github.com:hitosu/duckness.git",
