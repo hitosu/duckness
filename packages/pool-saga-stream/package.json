@@ -1,6 +1,6 @@
 {
   "name": "@duckness/pool-saga-stream",
-  "version": "0.10.0",
+  "version": "1.0.0",
   "description": "Duckness Pool Saga Stream - @duckness/saga plugin for @duckness/pool",
   "keywords": ["redux", "ducks", "modular", "duckness", "redux-saga"],
   "author": "Vasily Kazantsev <vasily@kazantsev.xyz>",
@@ -31,8 +31,8 @@
     "url": "https://github.com/hitosu/duckness/issues"
   },
   "dependencies": {
-    "@duckness/pool": "^0.10.0",
-    "@duckness/saga": "^0.10.0"
+    "@duckness/pool": "^1.0.0",
+    "@duckness/saga": "^1.0.0"
   },
   "peerDependencies": {
     "redux-saga": "^1.2.2"

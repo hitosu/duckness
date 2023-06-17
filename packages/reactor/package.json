@@ -1,6 +1,6 @@
 {
   "name": "@duckness/reactor",
-  "version": "0.10.0",
+  "version": "1.0.0",
   "description": "Duckness Reactor -  reactive data flow builder",
   "author": "Vasily Kazantsev <vasily@kazantsev.xyz>",
   "homepage": "https://github.com/hitosu/duckness/tree/master/packages/reactor",
