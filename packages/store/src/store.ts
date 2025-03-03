@@ -37,6 +37,8 @@ export function whenChanged(a: TValue, b: TValue) {
   return a !== b
 }
 
+const MAX_EXECUTION_TIME = 1000 / 12
+
 export default function createStore({
   initState = {},
   actions = {}
@@ -47,24 +49,50 @@ export default function createStore({
 
   const listeners: Set<IListener> = new Set()
 
-  function updateStore(updater: IUpdater) {
+  function updateStore(updater: IUpdater, isAsync: boolean = false) {
     const nextStoreState = updater(refStore.current)
+    const queue = [];
     listeners.forEach(function (listener) {
       if (listener.shouldSelect && !listener.shouldSelect(nextStoreState, refStore.current)) {
         return
       }
       const nextValue = listener.selector ? listener.selector(nextStoreState) : nextStoreState
       if (null == listener.shouldUpdate || listener.shouldUpdate(nextValue, listener.prevValue)) {
-        listener(nextValue)
+        if (isAsync) {
+          queue.push([ listener, nextValue ])
+        } else { 
+          listener(nextValue)
+        }
         if (null != listener.shouldUpdate) {
           listener.prevValue = nextValue
         }
       }
     })
+    if (isAsync && queue.length) {
+      setTimeout(() => {
+         executeQueue(queue)
+      }, 0)
+    }
     refStore.current = nextStoreState
     return refStore.current
   }
 
+  function executeQueue(queue) {
+        const start = performance.now();
+        let next = queue.shift();
+        while (next && performance.now() - start < MAX_EXECUTION_TIME) {
+            const listener = next[0];
+            const nextValue = next[1];
+            listener(nextValue);
+            next = queue.shift();
+        }
+        if (queue.length) {
+            setTimeout(function () {
+                executeQueue(queue);
+            }, 0);
+        }
+    }
+  
   function useStore({
     updateOnMount,
     updateOnUnmount,
