@@ -41,8 +41,9 @@ const MAX_EXECUTION_TIME = 1000 / 12
 
 export default function createStore({
   initState = {},
-  actions = {}
-}: { initState?: TState; actions?: { [actionName: string]: TAction } } = {}) {
+  actions = {},
+  isAsync = false
+}: { initState?: TState; actions?: { [actionName: string]: TAction }; isAsync: boolean } = {}) {
   const refStore = {
     current: initState
   }
@@ -69,9 +70,9 @@ export default function createStore({
       }
     })
     if (isAsync && queue.length) {
-      setTimeout(() => {
+      requestAnimationFrame(() => {
          executeQueue(queue)
-      }, 0)
+      })
     }
     refStore.current = nextStoreState
     return refStore.current
@@ -87,9 +88,9 @@ export default function createStore({
             next = queue.shift();
         }
         if (queue.length) {
-            setTimeout(function () {
+            requestAnimationFrame(function () {
                 executeQueue(queue);
-            }, 0);
+            });
         }
     }
   
@@ -102,7 +103,7 @@ export default function createStore({
     debounce
   }: TUseStoreArgs = {}) {
     const [value, setValue] = useState(function () {
-      return selector(updateOnMount ? updateStore(updateOnMount) : refStore.current)
+      return selector(updateOnMount ? updateStore(updateOnMount, isAsync) : refStore.current)
     })
 
     const debounceDuration = useRef<number>()
@@ -128,7 +129,7 @@ export default function createStore({
       listener.shouldUpdate = shouldUpdate
       listeners.add(listener)
       return function () {
-        if (updateOnUnmount) updateStore(updateOnUnmount)
+        if (updateOnUnmount) updateStore(updateOnUnmount, isAsync)
         listeners.delete(listener)
       }
     }, [])
@@ -154,7 +155,7 @@ export default function createStore({
     boundActions[actionName] = function (...args) {
       updateStore(function (store: TState) {
         return actions[actionName].apply(store, args) || store
-      })
+      }, isAsync)
     }
   })
 
