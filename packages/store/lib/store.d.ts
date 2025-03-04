@@ -1,46 +1,54 @@
 /// <reference types="react" />
-export type TState = any;
-export type TValue = any;
-export interface ISelector {
-    (...sources: any[]): any;
+export type TState<S = {}> = S;
+export type TSelectedValue<R = unknown> = R | null | undefined;
+export interface ISelector<S, R> {
+    (source: TState<S>): TSelectedValue<R>;
+    (...sources: unknown[]): TSelectedValue<R>;
 }
-export interface IUpdater {
-    (currentState: TState): TState;
+export interface IUpdater<S> {
+    (currentState: TState<S>): TState<S>;
 }
-export interface IListener {
-    (value: TValue): void;
-    selector?: (storeState: TState) => TValue;
-    shouldUpdate?: (nextValue: TValue, prevValue: TValue) => boolean;
-    shouldSelect?: (nextStoreState: TState, prevStoreState: TState) => boolean;
-    prevValue?: TValue;
+export interface IListener<S = unknown, R = unknown> {
+    (value: TSelectedValue<R>): void;
+    selector?: (storeState: TState<S>) => TSelectedValue<R>;
+    shouldUpdate?: (nextValue: TSelectedValue<R>, prevValue: TSelectedValue<R>) => boolean;
+    shouldSelect?: (nextStoreState: TState<S>, prevStoreState: TState<S>) => boolean;
+    prevValue?: TSelectedValue<R>;
 }
-export type TUseStoreArgs = {
-    updateOnMount?: IUpdater;
-    updateOnUnmount?: IUpdater;
-    selector?: IListener['selector'];
-    shouldSelect?: IListener['shouldSelect'];
-    shouldUpdate?: IListener['shouldUpdate'];
+export interface TUseStoreArgs<S = unknown, R = unknown> {
+    updateOnMount?: IUpdater<S>;
+    updateOnUnmount?: IUpdater<S>;
+    selector?: IListener<S, R>['selector'];
+    shouldSelect?: IListener<S>['shouldSelect'];
+    shouldUpdate?: IListener<S, R>['shouldUpdate'];
     debounce?: number;
+}
+export interface TAction<S = unknown> {
+    (state: TState<S>): TState<S>;
+    (...args: unknown[]): TState<S>;
+}
+export type CreateStoreArguments<S = unknown> = {
+    initState?: TState<S>;
+    actions?: Record<string, TAction<S>>;
+    isAsync?: boolean;
 };
-export type TAction = (...args: any[]) => TState;
-export declare function selectAll(value: TValue): any;
-export declare function always(): boolean;
-export declare function whenChanged(a: TValue, b: TValue): boolean;
-export default function createStore({ initState, actions }?: {
-    initState?: TState;
-    actions?: {
-        [actionName: string]: TAction;
-    };
-}): Readonly<{
-    useStore: ({ updateOnMount, updateOnUnmount, selector, shouldSelect, shouldUpdate, debounce }?: TUseStoreArgs) => any;
+export type CreateStoreReturnType<S = unknown> = Readonly<{
+    useStore: <R>({ updateOnMount, updateOnUnmount, selector, shouldSelect, shouldUpdate, debounce }?: TUseStoreArgs<S, R>) => R;
     Consumer: (props: TUseStoreArgs & {
-        children: (value: TValue) => React.ReactNode;
-    }) => import("react").ReactNode;
+        children: (value: TSelectedValue) => React.ReactNode;
+    }) => React.ReactNode;
     actions: {
         [actionName: string]: TAction;
     };
-    updateStore: (updater: IUpdater) => any;
-    getState: (selector: ISelector) => any;
+    updateStore: (updater: IUpdater<S>) => TState<S>;
+    getState: {
+        (): TState<S>;
+        <R = unknown>(selector: ISelector<S, R>): TSelectedValue<R>;
+    };
     subscribe: (listener: IListener) => () => void;
     destroy: () => void;
 }>;
+export declare function selectAll(value: TSelectedValue): unknown;
+export declare function always(): boolean;
+export declare function whenChanged(a: TSelectedValue, b: TSelectedValue): boolean;
+export default function createStore<S>({ initState, actions, isAsync }?: CreateStoreArguments<S>): CreateStoreReturnType<S>;

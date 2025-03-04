@@ -14,33 +14,60 @@ function whenChanged(a, b) {
     return a !== b;
 }
 exports.whenChanged = whenChanged;
+var MAX_EXECUTION_TIME = 1000 / 12;
 function createStore(_a) {
-    var _b = _a === void 0 ? {} : _a, _c = _b.initState, initState = _c === void 0 ? {} : _c, _d = _b.actions, actions = _d === void 0 ? {} : _d;
+    var _b = _a === void 0 ? {} : _a, _c = _b.initState, initState = _c === void 0 ? {} : _c, _d = _b.actions, actions = _d === void 0 ? {} : _d, _e = _b.isAsync, isAsync = _e === void 0 ? false : _e;
     var refStore = {
         current: initState
     };
     var listeners = new Set();
     function updateStore(updater) {
         var nextStoreState = updater(refStore.current);
+        var queue = [];
         listeners.forEach(function (listener) {
             if (listener.shouldSelect && !listener.shouldSelect(nextStoreState, refStore.current)) {
                 return;
             }
             var nextValue = listener.selector ? listener.selector(nextStoreState) : nextStoreState;
             if (null == listener.shouldUpdate || listener.shouldUpdate(nextValue, listener.prevValue)) {
-                listener(nextValue);
+                if (isAsync) {
+                    queue.push([listener, nextValue]);
+                }
+                else {
+                    listener(nextValue);
+                }
                 if (null != listener.shouldUpdate) {
                     listener.prevValue = nextValue;
                 }
             }
         });
+        if (isAsync && queue.length) {
+            requestAnimationFrame(function () {
+                executeQueue(queue);
+            });
+        }
         refStore.current = nextStoreState;
         return refStore.current;
+    }
+    function executeQueue(queue) {
+        var start = performance.now();
+        var next = queue.shift();
+        while (next && performance.now() - start < MAX_EXECUTION_TIME) {
+            var listener = next[0];
+            var nextValue = next[1];
+            listener(nextValue);
+            next = queue.shift();
+        }
+        if (queue.length) {
+            requestAnimationFrame(function () {
+                executeQueue(queue);
+            });
+        }
     }
     function useStore(_a) {
         var _b = _a === void 0 ? {} : _a, updateOnMount = _b.updateOnMount, updateOnUnmount = _b.updateOnUnmount, selector = _b.selector, shouldSelect = _b.shouldSelect, _c = _b.shouldUpdate, shouldUpdate = _c === void 0 ? whenChanged : _c, debounce = _b.debounce;
         var _d = (0, react_1.useState)(function () {
-            return selector(updateOnMount ? updateStore(updateOnMount) : refStore.current);
+            return updateOnMount ? selector(updateStore(updateOnMount)) : selector(refStore.current);
         }), value = _d[0], setValue = _d[1];
         var debounceDuration = (0, react_1.useRef)();
         debounceDuration.current = debounce;
@@ -65,8 +92,9 @@ function createStore(_a) {
             listener.shouldUpdate = shouldUpdate;
             listeners.add(listener);
             return function () {
-                if (updateOnUnmount)
+                if (updateOnUnmount) {
                     updateStore(updateOnUnmount);
+                }
                 listeners.delete(listener);
             };
         }, []);
