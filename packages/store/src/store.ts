@@ -1,31 +1,73 @@
 import { useEffect, useState, useRef } from 'react'
 
-export type TState = any
-export type TValue = any
-export interface ISelector {
-  (...sources: any[]): any
+// eslint-disable-next-line @typescript-eslint/ban-types
+export type TState<S = {}> = S
+export type TSelectedValue<R = unknown> = R | null | undefined
+
+export interface ISelector<S, R> {
+  (source: TState<S>): TSelectedValue<R>
+  (...sources: unknown[]): TSelectedValue<R>
 }
-export interface IUpdater {
-  (currentState: TState): TState
+
+export interface IUpdater<S> {
+  (currentState: TState<S>): TState<S>
 }
-export interface IListener {
-  (value: TValue): void
-  selector?: (storeState: TState) => TValue
-  shouldUpdate?: (nextValue: TValue, prevValue: TValue) => boolean
-  shouldSelect?: (nextStoreState: TState, prevStoreState: TState) => boolean
-  prevValue?: TValue
+
+export interface IListener<S = unknown, R = unknown> {
+  (value: TSelectedValue<R>): void
+  selector?: (storeState: TState<S>) => TSelectedValue<R>
+  shouldUpdate?: (nextValue: TSelectedValue<R>, prevValue: TSelectedValue<R>) => boolean
+  shouldSelect?: (nextStoreState: TState<S>, prevStoreState: TState<S>) => boolean
+  prevValue?: TSelectedValue<R>
 }
-export type TUseStoreArgs = {
-  updateOnMount?: IUpdater
-  updateOnUnmount?: IUpdater
-  selector?: IListener['selector']
-  shouldSelect?: IListener['shouldSelect']
-  shouldUpdate?: IListener['shouldUpdate']
+
+export interface TUseStoreArgs<S = unknown, R = unknown> {
+  updateOnMount?: IUpdater<S>
+  updateOnUnmount?: IUpdater<S>
+  selector?: IListener<S, R>['selector']
+  shouldSelect?: IListener<S>['shouldSelect']
+  shouldUpdate?: IListener<S, R>['shouldUpdate']
   debounce?: number
 }
-export type TAction = (...args: any[]) => TState
 
-export function selectAll(value: TValue) {
+export interface TAction<S = unknown> {
+  (state: TState<S>): TState<S>
+  (...args: unknown[]): TState<S>
+}
+
+export type CreateStoreArguments<S = unknown> = {
+  initState?: TState<S>
+  actions?: Record<string, TAction<S>>
+  isAsync?: boolean
+}
+
+export type CreateStoreReturnType<S = unknown> = Readonly<{
+  useStore: <R>({
+    updateOnMount,
+    updateOnUnmount,
+    selector,
+    shouldSelect,
+    shouldUpdate,
+    debounce
+  }?: TUseStoreArgs<S, R>) => R
+  Consumer: (
+    props: TUseStoreArgs & {
+      children: (value: TSelectedValue) => React.ReactNode
+    }
+  ) => React.ReactNode
+  actions: {
+    [actionName: string]: TAction
+  }
+  updateStore: (updater: IUpdater<S>) => TState<S>
+  getState: {
+    (): TState<S>
+    <R = unknown>(selector: ISelector<S, R>): TSelectedValue<R>
+  }
+  subscribe: (listener: IListener) => () => void
+  destroy: () => void
+}>
+
+export function selectAll(value: TSelectedValue) {
   return value
 }
 
@@ -33,26 +75,26 @@ export function always() {
   return true
 }
 
-export function whenChanged(a: TValue, b: TValue) {
+export function whenChanged(a: TSelectedValue, b: TSelectedValue) {
   return a !== b
 }
 
 const MAX_EXECUTION_TIME = 1000 / 12
 
-export default function createStore({
-  initState = {},
+export default function createStore<S>({
+  initState = {} as TState<S>,
   actions = {},
   isAsync = false
-}: { initState?: TState; actions?: { [actionName: string]: TAction }; isAsync: boolean } = {}) {
-  const refStore = {
+}: CreateStoreArguments<S> = {}): CreateStoreReturnType<S> {
+  const refStore: { current: TState<S> } = {
     current: initState
   }
 
   const listeners: Set<IListener> = new Set()
 
-  function updateStore(updater: IUpdater, isAsync: boolean = false) {
+  function updateStore(updater: IUpdater<S>) {
     const nextStoreState = updater(refStore.current)
-    const queue = [];
+    const queue = [] as [IListener, TSelectedValue][]
     listeners.forEach(function (listener) {
       if (listener.shouldSelect && !listener.shouldSelect(nextStoreState, refStore.current)) {
         return
@@ -60,8 +102,8 @@ export default function createStore({
       const nextValue = listener.selector ? listener.selector(nextStoreState) : nextStoreState
       if (null == listener.shouldUpdate || listener.shouldUpdate(nextValue, listener.prevValue)) {
         if (isAsync) {
-          queue.push([ listener, nextValue ])
-        } else { 
+          queue.push([listener, nextValue])
+        } else {
           listener(nextValue)
         }
         if (null != listener.shouldUpdate) {
@@ -71,39 +113,39 @@ export default function createStore({
     })
     if (isAsync && queue.length) {
       requestAnimationFrame(() => {
-         executeQueue(queue)
+        executeQueue(queue)
       })
     }
     refStore.current = nextStoreState
     return refStore.current
   }
 
-  function executeQueue(queue) {
-        const start = performance.now();
-        let next = queue.shift();
-        while (next && performance.now() - start < MAX_EXECUTION_TIME) {
-            const listener = next[0];
-            const nextValue = next[1];
-            listener(nextValue);
-            next = queue.shift();
-        }
-        if (queue.length) {
-            requestAnimationFrame(function () {
-                executeQueue(queue);
-            });
-        }
+  function executeQueue(queue: [IListener, TSelectedValue][]) {
+    const start = performance.now()
+    let next = queue.shift()
+    while (next && performance.now() - start < MAX_EXECUTION_TIME) {
+      const listener = next[0]
+      const nextValue = next[1]
+      listener(nextValue)
+      next = queue.shift()
     }
-  
-  function useStore({
+    if (queue.length) {
+      requestAnimationFrame(function () {
+        executeQueue(queue)
+      })
+    }
+  }
+
+  function useStore<R>({
     updateOnMount,
     updateOnUnmount,
     selector,
     shouldSelect,
     shouldUpdate = whenChanged,
     debounce
-  }: TUseStoreArgs = {}) {
+  }: TUseStoreArgs<S, R> = {}) {
     const [value, setValue] = useState(function () {
-      return selector(updateOnMount ? updateStore(updateOnMount, isAsync) : refStore.current)
+      return updateOnMount ? selector(updateStore(updateOnMount)) : selector(refStore.current)
     })
 
     const debounceDuration = useRef<number>()
@@ -111,7 +153,7 @@ export default function createStore({
     const debounceTimer = useRef<ReturnType<typeof setTimeout>>()
 
     useEffect(function () {
-      const listener = function (nextValue: TValue) {
+      const listener = function (nextValue: TSelectedValue<R>) {
         if (debounceTimer.current) {
           clearTimeout(debounceTimer.current)
         }
@@ -129,7 +171,9 @@ export default function createStore({
       listener.shouldUpdate = shouldUpdate
       listeners.add(listener)
       return function () {
-        if (updateOnUnmount) updateStore(updateOnUnmount, isAsync)
+        if (updateOnUnmount) {
+          updateStore(updateOnUnmount)
+        }
         listeners.delete(listener)
       }
     }, [])
@@ -137,7 +181,7 @@ export default function createStore({
     return value
   }
 
-  function Consumer(props: TUseStoreArgs & { children: (value: TValue) => React.ReactNode }) {
+  function Consumer<R>(props: TUseStoreArgs<S, R> & { children: (value: TSelectedValue<R>) => React.ReactNode }) {
     const value = useStore({
       updateOnMount: props.updateOnMount,
       updateOnUnmount: props.updateOnUnmount,
@@ -155,7 +199,7 @@ export default function createStore({
     boundActions[actionName] = function (...args) {
       updateStore(function (store: TState) {
         return actions[actionName].apply(store, args) || store
-      }, isAsync)
+      })
     }
   })
 
@@ -170,7 +214,7 @@ export default function createStore({
     }
   }
 
-  function getState(selector: ISelector) {
+  function getState<R>(selector: ISelector<S, R>) {
     return selector ? selector(refStore.current) : refStore.current
   }
 
@@ -182,5 +226,5 @@ export default function createStore({
     getState,
     subscribe,
     destroy
-  })
+  } as CreateStoreReturnType<S>)
 }
