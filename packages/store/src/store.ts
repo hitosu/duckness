@@ -1,9 +1,9 @@
 import { useEffect, useState, useRef } from 'react'
 
-export type TState = any
-export type TValue = any
+export type TState = unknown
+export type TValue = unknown
 export interface ISelector {
-  (...sources: any[]): any
+  (...sources: unknown[]): unknown
 }
 export interface IUpdater {
   (currentState: TState): TState
@@ -13,6 +13,7 @@ export interface IListener {
   selector?: (storeState: TState) => TValue
   shouldUpdate?: (nextValue: TValue, prevValue: TValue) => boolean
   shouldSelect?: (nextStoreState: TState, prevStoreState: TState) => boolean
+  async?: boolean
   prevValue?: TValue
 }
 export type TUseStoreArgs = {
@@ -22,8 +23,9 @@ export type TUseStoreArgs = {
   shouldSelect?: IListener['shouldSelect']
   shouldUpdate?: IListener['shouldUpdate']
   debounce?: number
+  async?: boolean
 }
-export type TAction = (...args: any[]) => TState
+export type TAction = (...args: unknown[]) => TState
 
 export function selectAll(value: TValue) {
   return value
@@ -45,20 +47,67 @@ export default function createStore({
     current: initState
   }
 
-  const listeners: Set<IListener> = new Set()
+  const listeners = new Set<IListener>()
+  const asyncListeners = new Set<IListener>()
+  let isRunningAsyncListeners = false
+  let asyncListenersProcessingTime = 0
+  function runAsyncListeners() {
+    if (!isRunningAsyncListeners) {
+      isRunningAsyncListeners = true
+      requestAnimationFrame(function () {
+        let listener: IListener = null
+        while ((listener = asyncListeners.values().next().value)) {
+          const start = performance.now()
+          try {
+            const nextValue = listener.selector ? listener.selector(refStore.current) : refStore.current
+            if (null == listener.shouldUpdate || listener.shouldUpdate(nextValue, listener.prevValue)) {
+              listener(nextValue)
+            }
+            if (null != listener.shouldUpdate) {
+              listener.prevValue = nextValue
+            }
+          } catch (error) {
+            // eslint-disable-next-line no-console
+            console.error(error)
+          }
+          asyncListeners.delete(listener)
+          const end = performance.now()
+          asyncListenersProcessingTime += end - start
+          if (asyncListenersProcessingTime > 14) {
+            asyncListenersProcessingTime = 0
+            isRunningAsyncListeners = false
+            runAsyncListeners()
+            break
+          }
+        }
+        asyncListenersProcessingTime = 0
+        isRunningAsyncListeners = false
+      })
+    }
+  }
 
   function updateStore(updater: IUpdater) {
     const nextStoreState = updater(refStore.current)
     listeners.forEach(function (listener) {
-      if (listener.shouldSelect && !listener.shouldSelect(nextStoreState, refStore.current)) {
-        return
-      }
-      const nextValue = listener.selector ? listener.selector(nextStoreState) : nextStoreState
-      if (null == listener.shouldUpdate || listener.shouldUpdate(nextValue, listener.prevValue)) {
-        listener(nextValue)
-        if (null != listener.shouldUpdate) {
-          listener.prevValue = nextValue
+      try {
+        if (listener.shouldSelect && !listener.shouldSelect(nextStoreState, refStore.current)) {
+          return
         }
+        if (listener.async) {
+          asyncListeners.add(listener)
+          runAsyncListeners()
+        } else {
+          const nextValue = listener.selector ? listener.selector(nextStoreState) : nextStoreState
+          if (null == listener.shouldUpdate || listener.shouldUpdate(nextValue, listener.prevValue)) {
+            listener(nextValue)
+          }
+          if (null != listener.shouldUpdate) {
+            listener.prevValue = nextValue
+          }
+        }
+      } catch (error) {
+        // eslint-disable-next-line no-console
+        console.error(error)
       }
     })
     refStore.current = nextStoreState
@@ -71,6 +120,7 @@ export default function createStore({
     selector,
     shouldSelect,
     shouldUpdate = whenChanged,
+    async = false,
     debounce
   }: TUseStoreArgs = {}) {
     const [value, setValue] = useState(function () {
@@ -98,10 +148,16 @@ export default function createStore({
       listener.selector = selector
       listener.shouldSelect = shouldSelect
       listener.shouldUpdate = shouldUpdate
+      listener.async = async
       listeners.add(listener)
       return function () {
+        if (debounceTimer.current) {
+          clearTimeout(debounceTimer.current)
+          debounceTimer.current = null
+        }
         if (updateOnUnmount) updateStore(updateOnUnmount)
         listeners.delete(listener)
+        asyncListeners.delete(listener)
       }
     }, [])
 
@@ -115,7 +171,8 @@ export default function createStore({
       selector: props.selector,
       shouldSelect: props.shouldSelect,
       shouldUpdate: props.shouldUpdate,
-      debounce: props.debounce
+      debounce: props.debounce,
+      async: props.async
     })
 
     return props.children(value)

@@ -7,7 +7,9 @@
   "author": "Vasily Kazantsev <vasily@kazantsev.xyz>",
   "license": "MIT",
   "private": true,
-  "workspaces": ["packages/*"],
+  "workspaces": [
+    "packages/*"
+  ],
   "scripts": {
     "test": "yarn lint && jest",
     "test:watch": "yarn lint && jest --watch",
@@ -43,6 +45,7 @@
     "eslint-plugin-react": "^7.31.11",
     "husky": "^8.0.3",
     "jest": "^29.3.1",
+    "jest-environment-jsdom": "^29.7.0",
     "lerna": "^6.4.0",
     "prettier": "^2.8.2",
     "prop-types": "^15.8.1",

@@ -20,28 +20,76 @@ function createStore(_a) {
         current: initState
     };
     var listeners = new Set();
+    var asyncListeners = new Set();
+    var isRunningAsyncListeners = false;
+    var asyncListenersProcessingTime = 0;
+    function runAsyncListeners() {
+        if (!isRunningAsyncListeners) {
+            isRunningAsyncListeners = true;
+            requestAnimationFrame(function () {
+                var listener = null;
+                while ((listener = asyncListeners.values().next().value)) {
+                    var start = performance.now();
+                    try {
+                        var nextValue = listener.selector ? listener.selector(refStore.current) : refStore.current;
+                        if (null == listener.shouldUpdate || listener.shouldUpdate(nextValue, listener.prevValue)) {
+                            listener(nextValue);
+                        }
+                        if (null != listener.shouldUpdate) {
+                            listener.prevValue = nextValue;
+                        }
+                    }
+                    catch (error) {
+                        console.error(error);
+                    }
+                    asyncListeners.delete(listener);
+                    var end = performance.now();
+                    asyncListenersProcessingTime += end - start;
+                    if (asyncListenersProcessingTime > 14) {
+                        asyncListenersProcessingTime = 0;
+                        isRunningAsyncListeners = false;
+                        runAsyncListeners();
+                        break;
+                    }
+                }
+                asyncListenersProcessingTime = 0;
+                isRunningAsyncListeners = false;
+            });
+        }
+    }
     function updateStore(updater) {
         var nextStoreState = updater(refStore.current);
         listeners.forEach(function (listener) {
-            if (listener.shouldSelect && !listener.shouldSelect(nextStoreState, refStore.current)) {
-                return;
-            }
-            var nextValue = listener.selector ? listener.selector(nextStoreState) : nextStoreState;
-            if (null == listener.shouldUpdate || listener.shouldUpdate(nextValue, listener.prevValue)) {
-                listener(nextValue);
-                if (null != listener.shouldUpdate) {
-                    listener.prevValue = nextValue;
+            try {
+                if (listener.shouldSelect && !listener.shouldSelect(nextStoreState, refStore.current)) {
+                    return;
                 }
+                if (listener.async) {
+                    asyncListeners.add(listener);
+                    runAsyncListeners();
+                }
+                else {
+                    var nextValue = listener.selector ? listener.selector(nextStoreState) : nextStoreState;
+                    if (null == listener.shouldUpdate || listener.shouldUpdate(nextValue, listener.prevValue)) {
+                        listener(nextValue);
+                    }
+                    if (null != listener.shouldUpdate) {
+                        listener.prevValue = nextValue;
+                    }
+                }
+            }
+            catch (error) {
+                console.error(error);
             }
         });
         refStore.current = nextStoreState;
         return refStore.current;
     }
     function useStore(_a) {
-        var _b = _a === void 0 ? {} : _a, updateOnMount = _b.updateOnMount, updateOnUnmount = _b.updateOnUnmount, selector = _b.selector, shouldSelect = _b.shouldSelect, _c = _b.shouldUpdate, shouldUpdate = _c === void 0 ? whenChanged : _c, debounce = _b.debounce;
-        var _d = (0, react_1.useState)(function () {
+        var _b = _a === void 0 ? {} : _a, updateOnMount = _b.updateOnMount, updateOnUnmount = _b.updateOnUnmount, selector = _b.selector, shouldSelect = _b.shouldSelect, _c = _b.shouldUpdate, shouldUpdate = _c === void 0 ? whenChanged : _c, _d = _b.async, async = _d === void 0 ? false : _d, debounce = _b.debounce;
+        var _e = (0, react_1.useState)(function () {
             return selector(updateOnMount ? updateStore(updateOnMount) : refStore.current);
-        }), value = _d[0], setValue = _d[1];
+        }), value = _e[0], setValue = _e[1];
         var debounceDuration = (0, react_1.useRef)();
         debounceDuration.current = debounce;
         var debounceTimer = (0, react_1.useRef)();
@@ -63,11 +111,17 @@ function createStore(_a) {
             listener.selector = selector;
             listener.shouldSelect = shouldSelect;
             listener.shouldUpdate = shouldUpdate;
+            listener.async = async;
             listeners.add(listener);
             return function () {
+                if (debounceTimer.current) {
+                    clearTimeout(debounceTimer.current);
+                    debounceTimer.current = null;
+                }
                 if (updateOnUnmount)
                     updateStore(updateOnUnmount);
                 listeners.delete(listener);
+                asyncListeners.delete(listener);
             };
         }, []);
         return value;
@@ -79,7 +133,8 @@ function createStore(_a) {
             selector: props.selector,
             shouldSelect: props.shouldSelect,
             shouldUpdate: props.shouldUpdate,
-            debounce: props.debounce
+            debounce: props.debounce,
+            async: props.async
         });
         return props.children(value);
     }
