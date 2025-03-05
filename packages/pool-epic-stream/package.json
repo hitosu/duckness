@@ -1,6 +1,6 @@
 {
   "name": "@duckness/pool-epic-stream",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "Duckness Pool Epic Stream - @duckness/epic plugin for @duckness/pool",
   "keywords": ["redux", "ducks", "modular", "duckness", "redux-observable"],
   "author": "Vasily Kazantsev <vasily@kazantsev.xyz>",
@@ -31,8 +31,8 @@
     "url": "https://github.com/hitosu/duckness/issues"
   },
   "dependencies": {
-    "@duckness/epic": "^1.0.0",
-    "@duckness/pool": "^1.0.0"
+    "@duckness/epic": "^1.0.2",
+    "@duckness/pool": "^1.0.2"
   },
   "peerDependencies": {
     "redux-observable": "^1.2.0"

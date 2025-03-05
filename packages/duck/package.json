@@ -1,6 +1,6 @@
 {
   "name": "@duckness/duck",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "@duckness/duck - Modular Redux Ducks hatchery",
   "keywords": ["redux", "ducks", "modular"],
   "author": "Vasily Kazantsev <vasily@kazantsev.xyz>",

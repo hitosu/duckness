@@ -1,6 +1,6 @@
 {
   "name": "@duckness/use-redux",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "React hook for Redux store",
   "keywords": ["react", "react-hooks", "redux"],
   "author": "Vasily Kazantsev <vasily@kazantsev.xyz>",

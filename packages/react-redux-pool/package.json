@@ -1,6 +1,6 @@
 {
   "name": "@duckness/react-redux-pool",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "@duckness/pool + React-Redux",
   "keywords": ["duckness", "react", "redux", "react-redux", "redux-saga"],
   "author": "Vasily Kazantsev <vasily@kazantsev.xyz>",
@@ -31,7 +31,7 @@
     "url": "https://github.com/hitosu/duckness/issues"
   },
   "dependencies": {
-    "@duckness/pool": "^1.0.0"
+    "@duckness/pool": "^1.0.2"
   },
   "peerDependencies": {
     "react": ">= 16",
